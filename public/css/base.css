@@ -1,0 +1,167 @@
+/* Réinitialisation des marges et padding du navigateur */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+body {
+    font-family: 'Comfortaa', sans-serif;
+    background-color: #FAF3E0;
+}
+
+/* Header */
+.navbar-custom {
+    background-color: #5F7F5F;
+    width: 100%;
+    position: relative;
+    z-index: 1000;
+}
+
+.container-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 10px;
+}
+
+.logo-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo {
+    height: 100px;
+    margin-right: 2px;
+}
+
+.menu-nav {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.menu-nav a {
+    color: white;
+    text-decoration: none;
+    font-family: 'Comfortaa', sans-serif;
+    font-size: 32px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    transition: color 0.3s;
+}
+
+.menu-nav a:hover {
+    color: #E8CBAE;
+}
+
+.separator {
+    color: white; /* couleur de base */
+    font-family: 'Courier New', monospace; /* effet type écriture */
+    font-size: 40px; 
+    font-weight: 100;
+    display: inline-block;
+    transform: scaleX(0.5);
+    text-shadow:
+        0 0 1px #fff,
+        0 0 2px #fff,
+        0 0 3px #fff,
+        0 0 1px #aaa; /* léger effet flou pour simuler la craie */
+    filter: blur(0.3px); /* léger flou pour effet craie */
+    opacity: 0.8;     
+}
+
+/* Body */
+.content {
+  flex: 1;
+  font-family: 'Comfortaa', sans-serif;
+background-color: #FAF3E0;
+}
+
+/* Footer */
+.nav-footer {
+    background-color: #5F7F5F;
+    font-family: 'Comfortaa', sans-serif;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+}
+
+/* Container principal */
+.container-footer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+/* Liens footer */
+.navbar-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-left: 0px;
+}
+
+.navbar-footer a {
+    color: white;
+    text-decoration: none;
+    font-size: 30px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    transition: color 0.3s;
+}
+
+.navbar-footer a:hover {
+    color: #E8CBAE;
+}
+
+/* Copyright */
+.copyrigth {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Réseaux sociaux */
+.reseaux-sociaux {
+    text-align: center;
+    margin-right: 10px;
+}
+
+.reseaux-sociaux .retrouvez-nous {
+    margin: 0 0 8px 0;
+    font-size: 30px;
+    font-weight: bold;
+    color: white;
+}
+
+.reseaux-sociaux i {
+    font-size: 35px;
+    color: white;
+    margin: 0 10px;
+    transition: transform 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+}
+
+.reseaux-sociaux i:hover {
+    transform: scale(1.2);
+    color: #E8CBAE;
+}
