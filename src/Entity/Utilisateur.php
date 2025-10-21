@@ -8,9 +8,14 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
-class Utilisateur
+#[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé.')]
+#[UniqueEntity(fields: ['pseudo'], message: 'Ce pseudo est déjà pris.')]
+class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
     public const STATUS_ACTIF = 'actif';
     public const STATUS_SUSPENDU = 'suspendu';
@@ -21,12 +26,15 @@ class Utilisateur
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: 'Le nom est obligatoire.')]
     private ?string $familyName = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: 'Le prénom est obligatoire.')]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: 'Le pseudo est obligatoire.')]
     private ?string $pseudo = null;
 
     #[ORM\Column(length: 180)]
@@ -36,12 +44,20 @@ class Utilisateur
 
     /**
      * @var string The hashed password
-     */
+    */
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank(message: 'La date de naissance est obligatoire.')]
+    #[Assert\LessThanOrEqual(
+        value: '-16 years',
+        message: 'Vous devez avoir au moins 16 ans pour vous inscrire.'
+    )]
     private ?\DateTime $birthDate = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $profilePicture = null;
 
     #[ORM\Column(length: 20)]
     private ?string $status = self::STATUS_ACTIF;
@@ -49,6 +65,9 @@ class Utilisateur
     #[ORM\ManyToOne(targetEntity: Role::class, inversedBy: 'utilisateurs')]
     private ?Role $role = null;
 
+    /** 
+     * @var Collection<int, Club> 
+    */
     #[ORM\OneToMany(mappedBy: 'createur', targetEntity: Club::class)]
     private Collection $clubsCrees;
 
@@ -143,15 +162,26 @@ class Utilisateur
         return $this;
     }
 
-    public function getBirthDate(): ?\DateTime
+    public function getBirthDate(): ?\DateTimeInterface
     {
         return $this->birthDate;
     }
 
-    public function setBirthDate(\DateTime $birthDate): static
+    public function setBirthDate(\DateTimeInterface $birthDate): static
     {
         $this->birthDate = $birthDate;
 
+        return $this;
+    }
+
+    public function getProfilePicture(): ?string
+    {
+        return $this->profilePicture;
+    }
+
+    public function setProfilePicture(?string $profilePicture): self
+    {
+        $this->profilePicture = $profilePicture;
         return $this;
     }
 
@@ -189,6 +219,16 @@ class Utilisateur
     {
         $this->role = $role;
         return $this;
+    }
+
+    public function getRoles(): array
+    {
+        $roles = [];
+        if ($this->role) {
+            $roles[] = $this->role->getLabel();
+        }
+        $roles[] = 'ROLE_USER';
+        return array_unique($roles);
     }
 
     public function getClubsCrees(): Collection
@@ -328,5 +368,19 @@ class Utilisateur
             }
         }
         return $this;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    public function eraseCredentials(): void
+    {
+    }
+
+    public function getSalt(): ?string
+    {
+        return null;
     }
 }
