@@ -18,6 +18,9 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Validator\Constraints\IsTrue;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class RegistrationFormType extends AbstractType
 {
@@ -47,8 +50,12 @@ class RegistrationFormType extends AbstractType
 
             ->add('email', EmailType::class, [
                 'label' => 'Email',
+                'attr' => [
+                    'class' => 'form-control',
+                ],
                 'constraints' => [
-                    new NotBlank(['message' => 'L’email est obligatoire.'])
+                    new NotBlank(['message' => 'L’email est obligatoire.']),
+                    new Assert\Email(['message' => 'l\'adresse email "{{ value }}" n\'est pas valide.']),
                 ],
             ])
 
@@ -56,7 +63,7 @@ class RegistrationFormType extends AbstractType
                 'type' => PasswordType::class,
                 'mapped' => false, // plainPassword n'existe pas en BDD, on va devoir le hashé manuellement
                 'first_options' => ['label' => 'Mot de passe'],
-                'second_options' => ['label' => 'Confimez le mot de passe.'], 
+                'second_options' => ['label' => 'Confimez le mot de passe'], 
                 'invalid_message' => 'Les mots de passe ne correspondent pas.',
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez rentrer un mot de passe.']),
@@ -75,6 +82,18 @@ class RegistrationFormType extends AbstractType
             ->add('birthDate', DateType::class, [
                 'label' => 'Date de naissance',
                 'widget' => 'single_text',
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez renseigner votre date de naissance',
+                    ]),
+                    new Assert\LessThanOrEqual([
+                        'value' => (new \DateTime())->modify('-16 years'),
+                        'message' => 'Vous devez avoir au moins 16 ans pour vous inscrire.',
+                    ]),
+                ],
+                'attr' => [
+                    'max' => (new \DateTime())->modify('-16 years')->format('Y-m-d'),
+                ],
             ])
 
             ->add('profilePicture', FileType::class, [
@@ -93,7 +112,17 @@ class RegistrationFormType extends AbstractType
                 ],
             ])
 
-            -> add('submit', SubmitType::class, [
+            ->add('agreeTerms', CheckBoxType::class, [
+                'mapped' => false,
+                'label_html' => true,
+                'label' => 'J’accepte les <a href="'. $options['mentions_url'] .'">mentions légales</a> et la <a href="'. $options['confidentialite_url'] .'">politique de confidentialité</a>.',                'constraints' => [
+                    new IsTrue([
+                        'message' => 'Vous devez accepter les conditions pour continuer.'
+                    ]),
+                ],
+            ])
+
+            ->add('submit', SubmitType::class, [
                 'label' => 'Créer un compte',
                 'attr' => ['class' => 'btn-create-account'],
             ])
@@ -104,6 +133,8 @@ class RegistrationFormType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Utilisateur::class,
+            'mentions_url' => null,
+            'confidentialite_url' => null,
         ]);
     }
 }

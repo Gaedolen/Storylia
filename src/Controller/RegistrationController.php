@@ -28,7 +28,13 @@ class RegistrationController extends AbstractController
     public function register(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $em): Response
     {
         $utilisateur = new Utilisateur();
-        $form = $this->createForm(RegistrationFormType::class, $utilisateur);
+
+        // Création du formulaire avec les URL
+        $form = $this->createForm(RegistrationFormType::class, $utilisateur, [
+            'mentions_url' => $this->generateUrl('mentions_legales'),
+            'confidentialite_url' => $this->generateUrl('politique_confidentialite'),
+        ]);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

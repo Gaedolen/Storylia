@@ -1,0 +1,292 @@
+/* -- Global -- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Comfortaa', sans-serif;
+    background-color: #FAF3E0;
+}
+
+/* -- Conteneur principal -- */
+.conteneur-principal {
+    background-color: #E8CBAE;
+    border-radius: 25px;
+    padding: 30px 20px;
+    max-width: 800px;
+    margin: 40px auto;
+    box-shadow:
+        0 6px 10px rgba(0, 0, 0, 0.3),
+        inset 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+    color: #714B2F;
+    font-size: 38px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 25px;
+    text-decoration: underline;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+}
+
+.form-container {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+/* Colonnes gauche et droite */
+.left-container,
+.right-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Séparateur entre les colonnes */
+.line-separator {
+    width: 2px;
+    background: linear-gradient(
+        to bottom, 
+        rgba(113, 75, 47, 0), 
+        rgba(113, 75, 47, 1) 40%,
+        rgba(113, 75, 47, 1) 60%, 
+        rgba(113, 75, 47, 0)
+    );
+    align-self: stretch;
+}
+
+/* Labels */
+.form-container label {
+    font-weight: bold;
+    color: #714B2F;
+    font-size: 18px;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+}
+
+/* Champs de formulaire */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-control {
+    width: 100%;
+    flex: 1;
+    padding: 10px;
+    border-radius: 25px;
+    border: none;
+    font-size: 16px;
+    margin-top: 5px;
+    box-shadow:
+        0 6px 10px rgba(51, 51, 51, 0.2),
+        inset 0 4px 6px rgba(51, 51, 51, 0.2);
+}
+
+/* Assure que les inputs restent larges */
+.form-group {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Bouton */
+.btn-create-account {
+    background-color: #C97C5D;
+    color: white;
+    padding: 12px 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 25px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow:
+        0 6px 10px rgba(0, 0, 0, 0.3),
+        inset 0 4px 6px rgba(0, 0, 0, 0.2);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+    white-space: nowrap;
+    width: auto;
+    max-width: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+
+.btn-create-account:hover {
+    background-color: #B46749;
+    transform: translateY(-2px);
+}
+
+/* Bouton téléchargement photo de profil */
+.file-input-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.file-input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.custom-file-label {
+    display: inline-block;
+    padding: 8px 15px;
+    border-radius: 25px;
+    background-color: #C97C5D;
+    color: white !important;
+    font-size: 15px !important;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow:
+        0 6px 10px rgba(0, 0, 0, 0.3),
+        inset 0 4px 6px rgba(0, 0, 0, 0.2);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+    z-index: 1;
+    max-width: fit-content;
+}
+
+.file-input:hover + .custom-file-label,
+.file-input:focus + .custom-file-label {
+    background-color: #B46749;
+    transform: translateY(-2px);
+}
+
+.custom-file-label:hover {
+    background-color: #B46749 !important;
+    transform: translateY(-2px) !important;
+}
+
+.file-name {
+    margin-top: 5px;
+    font-style: italic;
+    color: #714B2F;
+}
+
+/* Placement bouton de création de compte et du p */
+.right-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.right-bottom .form-group {
+    width: auto;
+}
+
+/* Checkbox mentions légales */
+.agree-terms__label {
+    display: flex;
+    align-items: center;      /* texte aligné avec la checkbox */
+    gap: 10px;                /* espace entre checkbox et texte */
+    cursor: pointer;
+}
+
+.agree-terms__checkbox {
+    position: absolute;
+    opacity: 0;        /* invisible mais toujours cliquable */
+    width: 20px;       /* même taille que le carré */
+    height: 20px;
+    cursor: pointer;   /* indique qu’on peut cliquer */
+    z-index: 2;        /* au-dessus du span */
+    margin: 0;         /* supprime marges par défaut */
+}
+
+.custom-checkbox {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;           /* carré avec coins arrondis */
+    border: 2px solid rgba(113,75,47,0.25);
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    position: relative;
+}
+
+/* coche */
+.agree-terms__checkbox:checked + .custom-checkbox::after {
+    content: "✓";
+    position: absolute;
+    top: 0;
+    left: 2px;
+    font-size: 16px;
+    color: #714B2F;
+    line-height: 20px;
+    text-align: center;
+}
+
+/* focus */
+.agree-terms__checkbox:focus + .custom-checkbox {
+    outline: 3px solid rgba(201,124,93,0.25);
+    outline-offset: 2px;
+}
+
+/* texte */
+.agree-terms__text {
+    font-size: 13px;       /* petite taille */
+    font-weight: normal;   /* non gras */
+    line-height: 1.2;
+    color: #714B2F;
+    white-space: nowrap;   /* texte sur une seule ligne */
+}
+
+.agree-terms__text a {
+    color: #C97C5D;        /* couleur différente pour les liens */
+    text-decoration: none;
+}
+
+.agree-terms__text a:hover {
+    color: #B46749;
+    text-decoration: underline;
+}
+
+
+/* Lien d'inscription */
+p a {
+    color: #C97C5D;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.3s ease;
+}
+
+p a:hover {
+    color: #B46749;
+    text-decoration: underline;
+}
+
+p a svg {
+    stroke: currentColor;
+    transition: transform 0.2s ease;
+}
+
+p a:hover svg {
+    transform: translateX(3px);
+}
+
+
+/* Message flash succès */
+.alert-success {
+    background-color: #D4EDDA;
+    color: #155724;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+

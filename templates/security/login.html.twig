@@ -2,20 +2,35 @@
 
 {% block title %}Connexion{% endblock %}
 
-{% block body %}
-<h1>Se connecter</h1>
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/security/login.css') }}">
+{% endblock %}
 
-<form method="post">
+{% block body %}
+<div class="conteneur-login">
+    <h1>Connexion</h1>
+
     {% if error %}
-        <div style="color:red;">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
     {% endif %}
 
-    <label>Email</label>
-    <input type="email" name="_username" value="{{ last_username }}" required autofocus>
+    <form action="{{ path('login') }}" method="post">
+        <label for="username">Email :</label>
+        <input type="text" id="username" name="_username" value="{{ last_username }}" required autofocus>
 
-    <label>Mot de passe</label>
-    <input type="password" name="_password" required>
+        <label for="password">Mot de passe :</label>
+        <input type="password" id="password" name="_password" required>
 
-    <button type="submit">Connexion</button>
-</form>
+        <button type="submit">Se connecter</button>
+    </form>
+
+    <p>
+        Pas encore de compte ? <a href="{{ path('register') }}">Inscrivez-vous ici 
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon-arrow" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <line x1="17" y1="7" x2="7" y2="17" />
+            <polyline points="8 7 17 7 17 16" />
+        </svg></a>
+    </p>
+</div>
 {% endblock %}

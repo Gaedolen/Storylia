@@ -78,8 +78,7 @@ body {
         0 0 1px #fff,
         0 0 2px #fff,
         0 0 3px #fff,
-        0 0 1px #aaa; /* léger effet flou pour simuler la craie */
-    filter: blur(0.3px); /* léger flou pour effet craie */
+        0 0 1px #aaa;
     opacity: 0.8;     
 }
 

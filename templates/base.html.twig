@@ -46,7 +46,7 @@
 
                                 <a href="#">Gérer les utilisateurs</a>
                             {% elseif is_granted('ROLE_EMPLOYE') %}
-                                <a href="{{ path('employe_dashboard') }}">Accueil</a>
+                                <a href="#">Accueil</a>
                                 <span class="separator">|</span>
 
                                 <a href="#">Vérifier les livres</a>
@@ -71,7 +71,7 @@
                             <a href="#">Mon Compte</a>
 
                             <span class="separator">|</span>
-                            <a href="#">Déconnexion</a>
+                            <a href="{{ path('logout') }}">Déconnexion</a>
 
                             {% else %}
                             <!-- Utilisateur non connecté -->
@@ -87,7 +87,7 @@
                             <a href="#">Contact</a>
                             <span class="separator">|</span>
                             
-                            <a href="#">Se connecter</a>
+                            <a href="{{ path('login') }}">Se connecter</a>
                         {% endif %}
                     </nav>
                 </div>
