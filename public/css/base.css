@@ -16,6 +16,10 @@ html, body {
     min-height: 100vh;
 }
 
+.content {
+    flex: 1 0 auto;
+}
+
 body {
     font-family: 'Comfortaa', sans-serif;
     background-color: #FAF3E0;
@@ -92,11 +96,10 @@ background-color: #FAF3E0;
 /* Footer */
 .nav-footer {
     background-color: #5F7F5F;
-    font-family: 'Comfortaa', sans-serif;
     padding: 20px 40px;
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    flex-direction: column;
+    justify-content: flex-start;
     position: relative;
 }
 

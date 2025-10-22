@@ -191,32 +191,31 @@ h1 {
 /* Checkbox mentions légales */
 .agree-terms__label {
     display: flex;
-    align-items: center;      /* texte aligné avec la checkbox */
-    gap: 10px;                /* espace entre checkbox et texte */
+    align-items: center;
+    gap: 10px;
     cursor: pointer;
 }
 
 .agree-terms__checkbox {
     position: absolute;
-    opacity: 0;        /* invisible mais toujours cliquable */
-    width: 20px;       /* même taille que le carré */
+    opacity: 0;
+    width: 20px;
     height: 20px;
-    cursor: pointer;   /* indique qu’on peut cliquer */
-    z-index: 2;        /* au-dessus du span */
-    margin: 0;         /* supprime marges par défaut */
+    cursor: pointer;
+    z-index: 2;
+    margin: 0;
 }
 
 .custom-checkbox {
     width: 20px;
     height: 20px;
-    border-radius: 5px;           /* carré avec coins arrondis */
+    border-radius: 5px;
     border: 2px solid rgba(113,75,47,0.25);
     background: white;
     box-shadow: 0 2px 4px rgba(0,0,0,0.08);
     position: relative;
 }
 
-/* coche */
 .agree-terms__checkbox:checked + .custom-checkbox::after {
     content: "✓";
     position: absolute;
@@ -228,23 +227,21 @@ h1 {
     text-align: center;
 }
 
-/* focus */
 .agree-terms__checkbox:focus + .custom-checkbox {
     outline: 3px solid rgba(201,124,93,0.25);
     outline-offset: 2px;
 }
 
-/* texte */
 .agree-terms__text {
-    font-size: 13px;       /* petite taille */
-    font-weight: normal;   /* non gras */
+    font-size: 13px;
+    font-weight: normal;
     line-height: 1.2;
     color: #714B2F;
-    white-space: nowrap;   /* texte sur une seule ligne */
+    white-space: nowrap;
 }
 
 .agree-terms__text a {
-    color: #C97C5D;        /* couleur différente pour les liens */
+    color: #C97C5D;
     text-decoration: none;
 }
 
