@@ -19,17 +19,16 @@ security:
             form_login:
                 login_path: login
                 check_path: login
-                csrf_token_generator: security.csrf.token_manager
                 default_target_path: homepage
                 remember_me: true
             remember_me:
                 secret:   '%kernel.secret%'
                 lifetime: 604800
                 path:     /
-                cookie_secure: auto
+                secure: auto
             logout:
                 path: logout
-                csrf_token_generator: security.csrf.token_manager
+                csrf_token_id: logout
                 target: homepage
 
             # activate different ways to authenticate

@@ -49,4 +49,53 @@
 
     </section>
 
+    <section class="container my-5">
+        <h2 class="mb-4 text-center">Les coups de cœurs de la communauté</h2>
+        <div class="text-center mt-4">
+            <a href="#" {#"{{ path('books_favorites') }}"#} class="btn btn-outline-primary">Voir plus de coups de cœur</a>
+        </div>
+
+        {# Carrousel Bootstrap #}
+        <div id="carouselFavorites" class="carousel slide" data-bs-ride="carousel">
+            <div clas="carousel-inner">
+
+                {% for book in favorites %}
+                    <div class="carousel-item {% if loop.first %}active{% endif %}">
+                        <div class="d-flex justify-content-center">
+                            <a href="#" {#"{{ path('book_show', {'id': book.id}) }}"#} class="text-decoration-none text-dark">
+                                <div class="card text-center shadow-sm" style="width: 18rem;">
+
+                                    {# Image de couverture #}
+                                    {% if book.cover %}
+                                        <img src="{{ asset('uploads/covers/' ~ book.cover ) }}" class="card-img-top" alt="{{ book.title }}">
+                                    {% else %}
+                                        <img src="{{ asset('images/default_cover.jpg') }}" class="card-img-top" alt="{{ book.title }}">
+                                    {% endif %}
+
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ book.title }}</h5>
+                                        <p class="card-text">
+                                            {{ book.author.name }}
+                                        </p>
+                                    </div>
+
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+
+            </div>
+
+            {# Flèches de navigation #}
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselFavorites" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Précédent</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselFavorites" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Suivant</span>
+            </button>
+        </div>
+    </section>
 {% endblock %}

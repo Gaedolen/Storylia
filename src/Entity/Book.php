@@ -32,6 +32,9 @@ class Book
     #[ORM\Column(length: 50)]
     private ?string $edition = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $cover = null;
+
     #[ORM\ManyToOne(targetEntity: Author::class, inversedBy: 'books')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Author $author = null;
@@ -111,6 +114,18 @@ class Book
     public function setEdition(string $edition): static
     {
         $this->edition = $edition;
+
+        return $this;
+    }
+
+    public function getCover(): ?string
+    {
+        return $this->cover;
+    }
+
+    public function setCover(?string $cover): static
+    {
+        $this->cover = $cover;
 
         return $this;
     }
