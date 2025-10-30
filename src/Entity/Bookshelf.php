@@ -13,7 +13,7 @@ class Bookshelf
     #[ORM\Column]
     private ?int $id = null;
     
-    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'bookshelfs')]
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'bookshelves')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Utilisateur $utilisateur = null;
 
@@ -21,8 +21,9 @@ class Bookshelf
     #[ORM\JoinColumn(nullable: false)]
     private ?Book $book = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $readingStatus = null;
+    #[ORM\ManyToOne(targetEntity: ReadingStatus::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?ReadingStatus $readingStatus = null;
 
     // Getters et setters
 
@@ -53,12 +54,12 @@ class Bookshelf
         return $this;
     }
 
-    public function getReadingStatus(): ?string
+    public function getReadingStatus(): ?ReadingStatus
     {
         return $this->readingStatus;
     }
 
-    public function setReadingStatus(string $readingStatus): static
+    public function setReadingStatus(?ReadingStatus $readingStatus): static
     {
         $this->readingStatus = $readingStatus;
         return $this;

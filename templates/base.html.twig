@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="">
         <meta name="keywords" content="livre, partage, club lecture, bibliothèque">
         <meta name="author" content="Storylia">
@@ -71,7 +72,7 @@
 
                             <!-- Liens communs à tous les utilisateurs connectés -->
                             <span class="separator">|</span>
-                            <a href="#">Mon Compte</a>
+                            <a href="{{ path('app_profil') }}">Mon profil</a>
 
                             <span class="separator">|</span>
                             <a href="{{ path('logout') }}">Déconnexion</a>
@@ -90,7 +91,7 @@
                             <a href="#">Contact</a>
                             <span class="separator">|</span>
                             
-                            <a href="{{ path('login') }}">Se connecter</a>
+                            <a href="{{ path('app_login') }}">Se connecter</a>
                         {% endif %}
                     </nav>
                 </div>

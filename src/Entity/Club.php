@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\ClubRepository;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ClubRepository::class)]
@@ -33,10 +35,14 @@ class Club
     #[ORM\JoinColumn(nullable: false)]
     private ?Utilisateur $creator = null;
 
+    #[ORM\ManyToMany(targetEntity: Utilisateur::class, mappedBy: 'clubsMembre')]
+    private Collection $membres;
+
     public function __construct()
     {
         $this->creationDate = new \DateTime();
         $this->status = self::STATUS_ACTIF;
+        $this->membres = new ArrayCollection();
     }
 
     // Getters et setters
@@ -114,6 +120,31 @@ class Club
     public function setCreator(?Utilisateur $creator): static
     {
         $this->creator = $creator;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Utilisateur>
+     */
+    public function getMembres(): Collection
+    {
+        return $this->membres;
+    }
+
+    public function addMembre(Utilisateur $utilisateur): self
+    {
+        if (!$this->membres->contains($utilisateur)) {
+            $this->membres[] = $utilisateur;
+            $utilisateur->addClubMembre($this);
+        }
+        return $this;
+    }
+
+    public function removeMembre(Utilisateur $utilisateur): self
+    {
+        if ($this->membres->removeElement($utilisateur)) {
+            $utilisateur->removeClubMembre($this);
+        }
         return $this;
     }
 }

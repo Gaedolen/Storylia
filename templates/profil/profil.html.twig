@@ -1,0 +1,113 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon profil{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/profil/profil.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="profil-container">
+
+    <!-- ASIDE: menu profil -->
+    <aside class="profil-aside">
+        <div class="profil-photo">
+            <img src="{{ asset('uploads/profiles/' ~ utilisateur.profilePicture) }}" alt="Photo de profil de {{ utilisateur.pseudo }}">
+        </div>
+        <h2 class="profil-pseudo">{{ utilisateur.pseudo }}</h2>
+        
+        <nav class="profil-menu">
+            <ul>
+                <li><a href="{{ path('app_profil') }}" class="active">Profil</a></li>
+                <li><a href="{{ path('app_profil_bibliotheque') }}">Bibliothèque</a></li>
+                <li><a href="{{ path('app_profil_clubs') }}">Clubs</a></li>
+                <li><a href="{{ path('app_profil_historique') }}">Historique</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- CONTENU PRINCIPAL -->
+    <main class="profil-main">
+        <div class="grid-profil">
+
+            <!-- Carte données personnelles -->
+            <div class="card personal-info">
+                <h3>Profil de {{ utilisateur.pseudo }}</h3>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <i class="fa-solid fa-user"></i>
+                        <span class="label">Pseudo</span>
+                        <span class="value">{{ utilisateur.pseudo }}</span>
+                    </div>
+
+                    <div class="info-item">
+                        <i class="fa-solid fa-calendar"></i>
+                        <span class="label">Année de naissance</span>
+                        <span class="value">{{ utilisateur.birthDate|date('Y') }}</span>
+                    </div>
+
+                        <a href="{{ path('app_profil_bibliotheque') }}" class="info-item link-card">
+                            <i class="fa-solid fa-book"></i>
+                            <span class="label">Livres dans la bibliothèque</span>
+                            <span class="value">
+                                {{ utilisateur.bookshelves|filter(b => b.readingStatus != 'envies')|length }}
+                            </span>
+                        </a>
+                </div>
+
+                {% if utilisateur.presentation %}
+                    <div class="presentation">
+                        <h4>À propos de moi</h4>
+                        <p>{{ utilisateur.presentation }}</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Carte préférences et coups de coeur -->
+            <div class="card preferences">
+                <h3>Préférences de lecture</h3>
+                <ul>
+                    {% for pref in utilisateur.preferences %}
+                        <li>{{ pref }}</li>
+                    {% endfor %}
+                </ul>
+
+                <h3>Mes coups de coeur</h3>
+                <ul>
+                    {% for book in utilisateur.bookshelves|filter(b => b.readingStatus == 'coup_de_coeur')|slice(0,3) %}
+                        <li>{{ book.book.title }} - {{ book.book.author }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Lecture du moment -->
+            <div class="card current-reading">
+                <h3>Lecture du moment</h3>
+                {% set en_cours = utilisateur.bookshelves|filter(b => b.readingStatus == 'en_train_de_lire')|first %}
+                {% if en_cours %}
+                    <div>{{ en_cours.book.title }} - {{ en_cours.book.author }}</div>
+                {% else %}
+                    <div>Aucune lecture en cours</div>
+                {% endif %}
+            </div>
+
+            <!-- Carrousel dernières lectures -->
+            <div class="card last-read">
+                <h3>Dernières lectures</h3>
+                <div class="carousel">
+                    {% for book in utilisateur.bookshelves|filter(b => b.readingStatus in ['adore','apprecie','mitige','pas_aime','lu_aussi'])|slice(0,20) %}
+                        <div class="carousel-item">
+                            <img src="{{ asset('uploads/books/' ~ book.book.cover) }}" alt="{{ book.book.title }}">
+                            <div>{{ book.book.title }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</div>
+
+{% endblock %}

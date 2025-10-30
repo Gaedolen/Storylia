@@ -81,15 +81,18 @@ h1 {
     align-items: center;
     gap: 10px;
     cursor: pointer;
+    position: relative;
 }
 
 .remember-me__checkbox {
     position: absolute;
     opacity: 0;
-    width: 100%;
+    width: 20px;
     height: 100%;
     margin: 0;
     cursor: pointer;
+    top: 0;
+    left: 0;
 }
 
 .remember-me .custom-checkbox {

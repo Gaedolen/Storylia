@@ -14,7 +14,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 #[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé.')]
-#[UniqueEntity(fields: ['pseudo'], message: 'Ce pseudo est déjà pris.')]
+#[UniqueEntity(fields: ['pseudo'], message: 'Ce pseudo est déjà utilisé. Veuillez en choisir un autre.')]
 class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
     public const STATUS_ACTIF = 'actif';
@@ -59,6 +59,12 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $profilePicture = null;
 
+    #[ORM\Column(type: "text", nullable: true)]
+    private ?string $presentation = null;
+
+    #[ORM\Column(type: "json", nullable: true)]
+    private array $preferences = [];
+
     #[ORM\Column(length: 20)]
     private ?string $status = self::STATUS_ACTIF;
 
@@ -71,8 +77,12 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'createur', targetEntity: Club::class)]
     private Collection $clubsCrees;
 
+    #[ORM\ManyToMany(targetEntity: Club::class, inversedBy: 'membres')]
+    #[ORM\JoinTable(name: 'utilisateur_club')]
+    private Collection $clubsMembre;
+
     #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Bookshelf::class)]
-    private Collection $bookshelfs;
+    private Collection $bookshelves;
 
     #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Review::class)]
     private Collection $review;
@@ -89,7 +99,8 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->clubsCrees = new ArrayCollection();
-        $this->bookshelfs = new ArrayCollection();
+        $this->clubsMembre = new ArrayCollection();
+        $this->bookshelves = new ArrayCollection();
         $this->review = new ArrayCollection();
         $this->signalementsFaits = new ArrayCollection();
         $this->signalementsRecus = new ArrayCollection();
@@ -185,6 +196,28 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getPresentation(): ?string
+    {
+        return $this->presentation;
+    }
+
+    public function setPresentation(?string $presentation): self
+    {
+        $this->presentation = $presentation;
+        return $this;
+    }
+
+    public function getPreferences(): array
+    {
+        return $this->preferences;
+    }
+
+    public function setPreferences(array $preferences): self
+    {
+        $this->preferences = $preferences;
+        return $this;
+    }
+
     public function getStatus(): ?string
     {
         return $this->status;
@@ -255,15 +288,40 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getBookshelfs(): Collection 
+    /**
+     * @return Collection<int, Club>
+     */
+    public function getClubsMembre(): Collection
+    {
+        return $this->clubsMembre;
+    }
+
+    public function addClubMembre(Club $club): self
+    {
+        if (!$this->clubsMembre->contains($club)) {
+            $this->clubsMembre[] = $club;
+            $club->addMembre($this);
+        }
+        return $this;
+    }
+
+    public function removeClubMembre(Club $club): self
+    {
+        if ($this->clubsMembre->removeElement($club)) {
+            $club->removeMembre($this);
+        }
+        return $this;
+    }
+
+    public function getBookshelves(): Collection 
     { 
-        return $this->bookshelfs; 
+        return $this->bookshelves; 
     }
 
     public function addBookshelf(Bookshelf $bookshelf): self
     {
-        if (!$this->bookshelfs->contains($bookshelf)) {
-            $this->bookshelfs[] = $bookshelf;
+        if (!$this->bookshelves->contains($bookshelf)) {
+            $this->bookshelves[] = $bookshelf;
             $bookshelf->setUtilisateur($this);
         }
         return $this;
@@ -271,7 +329,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeBookshelf(Bookshelf $bookshelf): self
     {
-        if ($this->bookshelfs->removeElement($bookshelf)) {
+        if ($this->bookshelves->removeElement($bookshelf)) {
             if ($bookshelf->getUtilisateur() === $this) {
                 $bookshelf->setUtilisateur(null);
             }
@@ -349,6 +407,14 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
             }
         }
         return $this;
+    }
+
+    /**
+     * @return Collection<int, ReadingHistory>
+     */
+    public function getReadingHistory(): Collection
+    {
+        return $this->readingHistory;
     }
 
     public function addReadingHistory(ReadingHistory $history): self
