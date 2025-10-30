@@ -1,0 +1,178 @@
+.bibliotheque-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Menu profil */
+.profil-menu-horizontal {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 30px;
+    padding: 10px 15px;
+    border-radius: 20px;
+    background-color: #E8CBAE;
+    box-shadow: 2px 2px 15px rgba(0,0,0,0.08);
+    width: fit-content;       /* largeur juste suffisante */
+    max-width: 100%;   /* pas dépasser l'écran */
+    margin-bottom: 10px;
+}
+
+/* Photo et pseudo */
+.profil-user {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.profil-user img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid #714B2F;
+}
+
+.profil-user .pseudo {
+    font-weight: 600;
+    color: #714B2F;
+}
+
+/* Liens de navigation */
+.profil-links {
+    display: flex;
+    gap: 10px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.profil-links li a {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background-color: #A67856;
+    color: #FAF3E0;
+    font-weight: 600;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.profil-links li a:hover,
+.profil-links li a.active {
+    background-color: #714B2F;
+    color: #fff8f0;
+    transform: translateY(-2px);
+}
+
+/* Supprimer le soulignement des liens du menu horizontal */
+nav.profil-menu-horizontal .profil-links li a,
+nav.profil-menu-horizontal .profil-links li a:hover,
+nav.profil-menu-horizontal .profil-links li a:focus,
+nav.profil-menu-horizontal .profil-links li a:active {
+    text-decoration: none !important;
+}
+
+/* Bloc catégorie */
+.bibliotheque-categories {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.category {
+    background-color: #A67856;
+    border-radius: 20px;
+    padding: 15px;
+}
+
+.category h2 {
+    color: #FAF3E0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+/* Bloc interne des livres */
+.category-books {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    background-color: #E8CBAE;
+    padding: 10px;
+    border-radius: 15px;
+}
+
+/* Carte livre */
+.book-card {
+    display: flex;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #fff8f0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.cover img {
+    width: 70px;
+    height: 100px;
+    object-fit: cover;
+}
+
+.info {
+    padding: 5px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.info h3 {
+    font-weight: 600;
+    color: #714B2F;
+    margin: 0 0 5px 0;
+}
+
+.info p {
+    font-size: 0.85rem;
+    color: #714B2F;
+    margin: 0 0 10px 0;
+}
+
+.buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.buttons button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #714B2F;
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+
+.buttons button:hover {
+    color: #A67856;
+}
+
+/* --- Responsive tablette et mobile --- */
+@media (max-width: 1024px) {
+    .profil-menu-horizontal {
+        flex-wrap: wrap; /* les liens passent sous la photo si pas assez de place */
+        justify-content: center;
+    }
+}
+
+@media (max-width: 600px) {
+    .profil-menu-horizontal {
+        flex-direction: column; /* photo au-dessus des liens */
+        align-items: center;
+        gap: 10px;
+    }
+    .profil-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
+}

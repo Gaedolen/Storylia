@@ -1,0 +1,207 @@
+.historique-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Menu profil */
+.profil-menu-horizontal {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 30px;
+    padding: 10px 15px;
+    border-radius: 20px;
+    background-color: #E8CBAE;
+    box-shadow: 2px 2px 15px rgba(0,0,0,0.08);
+    width: fit-content;       /* largeur juste suffisante */
+    max-width: 100%;   /* pas dépasser l'écran */
+    margin-bottom: 10px;
+}
+
+/* Photo et pseudo */
+.profil-user {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.profil-user img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid #714B2F;
+}
+
+.profil-user .pseudo {
+    font-weight: 600;
+    color: #714B2F;
+}
+
+/* Liens de navigation */
+.profil-links {
+    list-style: none;
+    display: flex;
+    gap: 10px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.profil-links li a {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background-color: #A67856;
+    color: #FAF3E0;
+    font-weight: 600;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.profil-links li a:hover,
+.profil-links li a.active {
+    background-color: #714B2F;
+    color: #fff8f0;
+    transform: translateY(-2px);
+}
+
+/* Supprimer le soulignement des liens du menu horizontal */
+nav.profil-menu-horizontal .profil-links li a,
+nav.profil-menu-horizontal .profil-links li a:hover,
+nav.profil-menu-horizontal .profil-links li a:focus,
+nav.profil-menu-horizontal .profil-links li a:active {
+    text-decoration: none !important;
+}
+
+/* Grille historique */
+.grid-historique {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* Carte année */
+.year-card {
+    background-color: #fff3eb;
+    border-radius: 30px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.year-card h3 {
+    margin-bottom: 15px;
+    color: #714B2F;
+    font-size: 1.5rem;
+    border-bottom: 3px solid #A67856;
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+/* Carte mois */
+.month-card {
+    background-color: #A67856;
+    padding: 15px;
+    border-radius: 20px;
+    margin-bottom: 15px;
+}
+
+.month-card h4 {
+    color: #FAF3E0;
+    margin-bottom: 10px;
+}
+
+/* Livres du mois */
+.month-books {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+}
+
+/* Livre individuel */
+.book-card {
+    display: flex;
+    background-color: #E8CBAE;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 3px 8px rgba(166, 120, 86, 0.2);
+}
+
+.book-card .cover img {
+    width: 80px;
+    height: 120px;
+    object-fit: cover;
+}
+
+.book-card .info {
+    flex: 1;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.book-card .info h5 {
+    margin: 0 0 5px 0;
+    color: #714B2F;
+}
+
+.book-card .info p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #714B2F;
+}
+
+.book-card .buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.book-card .buttons button {
+    border: none;
+    background-color: #A67856;
+    color: #FAF3E0;
+    border-radius: 8px;
+    padding: 4px 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.book-card .buttons button:hover {
+    background-color: #714B2F;
+}
+
+/* --- MEDIA QUERIES --- */
+@media (max-width: 1024px) {
+    .month-books {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .profil-menu-horizontal {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .profil-links {
+        flex-wrap: wrap;
+    }
+
+    .book-card {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .book-card .cover img {
+        width: 100px;
+        height: 150px;
+    }
+
+    .book-card .info {
+        padding: 8px;
+        text-align: center;
+    }
+}

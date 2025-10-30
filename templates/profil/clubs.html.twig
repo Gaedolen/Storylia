@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes clubs{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/profil/clubs.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="clubs-container">
+
+        {# Menu de navigation profil #}
+        <nav class="profil-menu-horizontal">
+            <div class="profil-user">
+                <img src="{{ asset('uploads/profiles/' ~ app.user.profilePicture) }}" alt="Photo de profil">
+                <span class="pseudo">{{ app.user.pseudo }}</span>
+            </div>
+
+            <ul class="profil-links">
+                <li><a href="{{ path('app_profil') }}" class="{{ app.request.get('_route') == 'app_profil' ? 'active' : '' }}">Profil</a></li>
+                <li><a href="{{ path('app_profil_bibliotheque') }}" class="{{ app.request.get('_route') == 'app_profil_bibliotheque' ? 'active' : '' }}">Bibliothèque</a></li>
+                <li><a href="{{ path('app_profil_clubs') }}" class="{{ app.request.get('_route') == 'app_profil_clubs' ? 'active' : '' }}">Club</a></li>
+                <li><a href="{{ path('app_profil_historique') }}" class="{{ app.request.get('_route') == 'app_profil_historique' ? 'active' : '' }}">Historique</a></li>
+            </ul>
+        </nav>
+    </div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ma bibliotheque{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/profil/bibliotheque.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="bibliotheque-container">
+
+        {# Menu de navigation profil #}
+        <nav class="profil-menu-horizontal">
+            <div class="profil-user">
+                <img src="{{ asset('uploads/profiles/' ~ app.user.profilePicture) }}" alt="Photo de profil">
+                <span class="pseudo">{{ app.user.pseudo }}</span>
+            </div>
+
+            <ul class="profil-links">
+                <li><a href="{{ path('app_profil') }}" class="{{ app.request.get('_route') == 'app_profil' ? 'active' : '' }}">Profil</a></li>
+                <li><a href="{{ path('app_profil_bibliotheque') }}" class="{{ app.request.get('_route') == 'app_profil_bibliotheque' ? 'active' : '' }}">Bibliothèque</a></li>
+                <li><a href="{{ path('app_profil_clubs') }}" class="{{ app.request.get('_route') == 'app_profil_clubs' ? 'active' : '' }}">Clubs</a></li>
+                <li><a href="{{ path('app_profil_historique') }}" class="{{ app.request.get('_route') == 'app_profil_historique' ? 'active' : '' }}">Historique</a></li>
+            </ul>
+        </nav>
+
+        <div class="bibliotheque-categories">
+            {% for status, books in categories %}
+                <div class="category">
+                    <h2>{{ status|replace({'_':' '})|capitalize }}</h2>
+                    <div class="category-books">
+                        {% for bookShelf in books %}
+                            <div class="book-card">
+                                {# Côté gauche : couverture #}
+                                <div class="cover">
+                                    <img src="{{ asset('uploads/books/' ~ bookShelf.book.cover) }}" alt="{{ bookShelf.book.title }}">
+                                </div>
+
+                                {# Côté droit : titre, auteur, boutons #}
+                                <div class="info">
+                                    <div>
+                                        <h3>{{ bookShelf.book.title }}</h3>
+                                        <p>{{ bookShelf.book.author }}</p>
+                                    </div>
+                                    <div class="buttons">
+                                        {# Bouton déplacer #}
+                                        <button title="Déplacer">
+                                            <i class="fa-solid fa-arrow-right"></i>
+                                        </button>
+                                        {# Bouton supprimer #}
+                                        <button title="Supprimer">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <p>Votre bibliothèque est vide pour l’instant.</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

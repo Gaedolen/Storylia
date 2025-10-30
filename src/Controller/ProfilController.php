@@ -77,8 +77,26 @@ class ProfilController extends AbstractController
         // Récupère tous les livres liés à cet utilisateur dans Bookshelf
         $bookshelves = $utilisateur->getBookshelves();
 
+        // Trie par catégorie
+        $categories = [
+            'en_train_de_lire' => [],
+            'coup_de_coeur' => [],
+            'adore' => [],
+            'apprecie' => [],
+            'mitige' => [],
+            'pas_aime' => [],
+            'lu_aussi' => [],
+            'pal' => [],
+            'envies' => [],
+        ];
+
+        foreach($bookshelves as $book) {
+            $categories[$book->getReadingStatus()][] = $book;
+        }
+
         return $this->render('profil/bibliotheque.html.twig', [
-            'bookshelves' => $bookshelves,
+            'categories' => $categories,
+            'utilisateur' => $utilisateur,
         ]);
     }
 
@@ -108,11 +126,31 @@ class ProfilController extends AbstractController
         /** @var Utilisateur $utilisateur */
         $utilisateur = $this->getUser();
 
-        // Récupère tous les livres lus avec la date dans ReadingHistory
-        $readingHistory = $utilisateur->getReadingHistory();
+        $historique = []; // regroupe les livres lus
+
+        $moisFrancais = [ // traduction des mois en français
+            'January'=>'Janvier','February'=>'Février','March'=>'Mars',
+            'April'=>'Avril','May'=>'Mai','June'=>'Juin',
+            'July'=>'Juillet','August'=>'Août','September'=>'Septembre',
+            'October'=>'Octobre','November'=>'Novembre','December'=>'Décembre'
+        ];
+
+        foreach($utilisateur->getReadingHistory() as $reading) { // renvoie tous les livres lus par l'utilisateur
+            $date = $reading->getReadingDate(); // On récupère la date de lecture
+            if(!$date)continue; // si la date est null, on ignore le livre en passant au suivant
+
+            $year = $date->format('Y'); // extrait l'année
+            $month = $moisFrancais[$date->format('F')]; // extrait le mois
+
+            $historique[$year][$month][] = $reading; // Range le tableau dans l'historique
+        }
+
+        // Trier par année décroissante
+        ksort($historique);
 
         return $this->render('profil/historique.html.twig', [
-            'readingHistory' => $readingHistory,
+            'utilsiateur' => $utilisateur,
+            'historique' => $historique,
         ]);
     }
 }

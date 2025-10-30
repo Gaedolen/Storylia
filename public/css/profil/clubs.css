@@ -1,0 +1,75 @@
+.clubs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Menu profil */
+.profil-menu-horizontal {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 30px;
+    padding: 10px 15px;
+    border-radius: 20px;
+    background-color: #E8CBAE;
+    box-shadow: 2px 2px 15px rgba(0,0,0,0.08);
+    width: fit-content;       /* largeur juste suffisante */
+    max-width: 100%;   /* pas dépasser l'écran */
+    margin-bottom: 10px;
+}
+
+/* Photo et pseudo */
+.profil-user {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.profil-user img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid #714B2F;
+}
+
+.profil-user .pseudo {
+    font-weight: 600;
+    color: #714B2F;
+}
+
+/* Liens de navigation */
+.profil-links {
+    display: flex;
+    gap: 10px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.profil-links li a {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background-color: #A67856;
+    color: #FAF3E0;
+    font-weight: 600;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.profil-links li a:hover,
+.profil-links li a.active {
+    background-color: #714B2F;
+    color: #fff8f0;
+    transform: translateY(-2px);
+}
+
+/* Supprimer le soulignement des liens du menu horizontal */
+nav.profil-menu-horizontal .profil-links li a,
+nav.profil-menu-horizontal .profil-links li a:hover,
+nav.profil-menu-horizontal .profil-links li a:focus,
+nav.profil-menu-horizontal .profil-links li a:active {
+    text-decoration: none !important;
+}
