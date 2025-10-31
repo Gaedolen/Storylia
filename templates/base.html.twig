@@ -39,61 +39,71 @@
                         <a href="{{ path('app_accueil') }}"><img src="{{ asset('images/logo.PNG') }}" alt="Storylia" class="logo"></a>
                     </div>
 
-                    <nav class="menu-nav">
-                        {% if app.user %}
-                            {% if is_granted('ROLE_ADMIN') %}
-                                <a href="#">Accueil</a>
-                                <span class="separator">|</span>
+                    <div class='menu-section'>
+                        <nav class="menu-nav">
+                            {% if app.user %}
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <a href="#">Accueil</a>
+                                    <span class="separator">|</span>
 
-                                <a href="#">Gérer les employés</a>
-                                <span class="separator">|</span>
+                                    <a href="#">Gérer les employés</a>
+                                    <span class="separator">|</span>
 
-                                <a href="#">Gérer les utilisateurs</a>
-                            {% elseif is_granted('ROLE_EMPLOYE') %}
-                                <a href="#">Accueil</a>
-                                <span class="separator">|</span>
+                                    <a href="#">Gérer les utilisateurs</a>
+                                {% elseif is_granted('ROLE_EMPLOYE') %}
+                                    <a href="#">Accueil</a>
+                                    <span class="separator">|</span>
 
-                                <a href="#">Vérifier les livres</a>
-                                <span class="separator">|</span>
+                                    <a href="#">Vérifier les livres</a>
+                                    <span class="separator">|</span>
 
-                                <a href="#">Signalements</a>
-                            {% else %}
+                                    <a href="#">Signalements</a>
+                                {% else %}
+                                    <a href="{{ path('app_accueil') }}">Accueil</a>
+                                    <span class="separator">|</span>
+
+                                    <a href="#">Club Lecture</a>
+                                    <span class="separator">|</span>
+
+                                    <a href="{{ path('app_recherche_livre') }}">Livres</a>
+                                    <span class="separator">|</span>
+
+                                    <a href="#">Contact</a>
+                                {% endif %}
+
+                                <!-- Liens communs à tous les utilisateurs connectés -->
+                                <span class="separator">|</span>
+                                <a href="{{ path('app_profil') }}">Mon profil</a>
+
+                                <span class="separator">|</span>
+                                <a href="{{ path('logout') }}">Déconnexion</a>
+
+                                {% else %}
+                                <!-- Utilisateur non connecté -->
                                 <a href="{{ path('app_accueil') }}">Accueil</a>
                                 <span class="separator">|</span>
 
                                 <a href="#">Club Lecture</a>
                                 <span class="separator">|</span>
 
-                                <a href="#">Livres</a>
+                                <a href="{{ path('app_recherche_livre') }}">Livres</a>
                                 <span class="separator">|</span>
 
                                 <a href="#">Contact</a>
+                                <span class="separator">|</span>
+                                
+                                <a href="{{ path('app_login') }}">Se connecter</a>
                             {% endif %}
+                        </nav>
 
-                            <!-- Liens communs à tous les utilisateurs connectés -->
-                            <span class="separator">|</span>
-                            <a href="{{ path('app_profil') }}">Mon profil</a>
-
-                            <span class="separator">|</span>
-                            <a href="{{ path('logout') }}">Déconnexion</a>
-
-                            {% else %}
-                            <!-- Utilisateur non connecté -->
-                            <a href="{{ path('app_accueil') }}">Accueil</a>
-                            <span class="separator">|</span>
-
-                            <a href="#">Club Lecture</a>
-                            <span class="separator">|</span>
-
-                            <a href="#">Livres</a>
-                            <span class="separator">|</span>
-
-                            <a href="#">Contact</a>
-                            <span class="separator">|</span>
-                            
-                            <a href="{{ path('app_login') }}">Se connecter</a>
-                        {% endif %}
-                    </nav>
+                        {# Formulaire de recherche #}
+                        <form class="search-bar" action="{{ path('app_recherche_livre') }}" method="get">
+                            <input type="text" name="q" placeholder="Rechercher un livre, un auteur..." required>
+                            <button type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </header>
 
