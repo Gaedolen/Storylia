@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Book;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\BookRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -63,6 +64,21 @@ class BookController extends AbstractController
             'page' =>$page,
             'totalPages' => $totalPages,
         ]);
+    }
+
+    #[Route('/recherche-rapide', name: 'livres_recherche_rapide')]
+    public function rechercheRapide(Request $request, BookRepository $bookRepository): JsonResponse
+    {
+        $titleQuery = $request->query->get('q', '');
+        $authorQuery = $request->query->get('author', '');
+
+        if (strlen($titleQuery) < 2) {
+            return $this->json([]);
+        }
+
+        $books = $bookRepository->rechercheRapideSQL($titleQuery, $authorQuery);
+
+        return $this->json($books);
     }
 
     #[Route ('/{id}', name: 'app_book_show', requirements: ['id' => '\d+'])]

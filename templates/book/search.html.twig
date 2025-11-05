@@ -97,10 +97,118 @@
                 <button type="submit" class="btn-filtrer">Appliquer</button>
             </form>
 
-            <a href="{{ path('app_book_add') }}" class="btn-ajouter-livre">
+            <!-- Bouton ouverture modal -->
+            <button id="open-search-book-modal" type="button" class="btn-ajouter-livre">
                 Vous ne trouvez pas votre livre ?
-            </a>
+            </button>
         </aside>
+
+        {# Modal de recherche de livre #}
+        <div id="search-book-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Trouver un livre</h2>
+
+                <div class="form-group">
+                    <label for="search-title">Titre :</label>
+                    <input type="text" id="searchTitle" placeholder="Ex: Harry Potter">
+                </div>
+
+                <div class="form-group">
+                    <label for="search-author">Auteur :</label>
+                    <input type="text" id="searchAuthor" placeholder="Ex: J.K. Rowling">
+                </div>
+
+                <div id="searchResults"></div>
+
+                <button id="book-not-found-btn" type="button" style="display:none;">
+                    Livre introuvable ?
+                </button>
+
+                {# Formulaire de création d'un livre #}
+                <div id="creationBookForm" class="hidden">
+                    <h2>Créer un nouveau livre</h2>
+                    <form id="formBookCreation">
+                        <div class="form-group">
+                            <label for="title">Titre</label>
+                            <input type="text" name="title" id="title" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="author">Auteur</label>
+                            <input type="text" name="author" id="author" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="genre">Genre littéraire</label>
+                            <select name="genre" id="genre" required>
+                                <option value="">Choisir un genre</option>
+                                {% set categories = {
+                                    'Fiction': {
+                                    'Science-Fiction': 'scifi',
+                                    'Fantastique': 'fantastique',
+                                    'Fantasy': 'fantasy',
+                                    'Dystopie': 'dystopie',
+                                    'Steampunk': 'steampunk'
+                                },
+                                'Policier / Suspense': {
+                                    'Policier': 'policier',
+                                    'Thriller': 'thriller',
+                                    'Espionnage': 'espionnage',
+                                    'Horreur': 'horreur'
+                                },
+                                'Romance & Jeunesse': {
+                                    'Aventure': 'aventure',
+                                    'Young Adult': 'young_adult'
+                                },
+                                'Romance et roman adulte': {
+                                    'Romance': 'romance',
+                                    'Érotique': 'erotique',
+                                    'Chick-lit': 'chicklit'
+                                },
+                                'Culture, Histoire & Documentaire': {
+                                    'Essai': 'essai',
+                                    'Biographie': 'biographie',
+                                    'Philosophie': 'philosophie',
+                                    'Historique': 'historique',
+                                    'Science': 'science',
+                                    'Sociologie': 'sociologie'
+                                },
+                                'Arts & Littérature': {
+                                    'Poésie': 'poesie',
+                                    'Théâtre': 'theatre'
+                                },
+                                'Mythes et Légendes': {
+                                    'Contes et légendes': 'conte_legend',
+                                    'Mythologie': 'mythologie'
+                                },
+                                'Graphique': {
+                                    'Roman Graphique': 'graphic_novel',
+                                    'Bande dessinée': 'bd',
+                                    'Manga': 'manga'
+                                }
+                                } %}
+
+                                {% for group, genres in categories %}
+                                    <optgroup label="{{ group }}">
+                                        {% for label, value in genres %}
+                                           <option value="{{ value }}">{{label}}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="parutionDate">Date de parution</label>
+                            <input type="date" name="parutionDate" id="parutionDate" required>
+                        </div>
+
+                        <button type="submit" class="btn-principal">Créer le livre</button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <!-- Colonne centrale : résultats -->
         <main class="resultats">
@@ -149,4 +257,9 @@
             {% endif %}
         </aside>
     </div>
+
+    {% block javascripts %}
+        {{ parent() }}
+        <script src="{{ asset('js/addBookModal.js') }}"></script>
+    {% endblock %}
 {% endblock %}

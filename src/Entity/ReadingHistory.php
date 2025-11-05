@@ -17,7 +17,7 @@ class ReadingHistory
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $readingDate = null;
 
-    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'readingHistory')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Utilisateur $utilisateur = null;
 
@@ -49,7 +49,7 @@ class ReadingHistory
         return $this->utilisateur;
     }
 
-    public function setUtilisateur(?Utilisateur $utilisateur): static
+    public function setUtilisateur(?Utilisateur $utilisateur): self
     {
         $this->utilisateur = $utilisateur;
         return $this;

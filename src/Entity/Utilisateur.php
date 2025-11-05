@@ -74,7 +74,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     /** 
      * @var Collection<int, Club> 
     */
-    #[ORM\OneToMany(mappedBy: 'createur', targetEntity: Club::class)]
+    #[ORM\OneToMany(mappedBy: 'creator', targetEntity: Club::class)]
     private Collection $clubsCrees;
 
     #[ORM\ManyToMany(targetEntity: Club::class, inversedBy: 'membres')]
@@ -87,10 +87,10 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Review::class)]
     private Collection $review;
 
-    #[ORM\OneToMany(mappedBy: 'auteur', targetEntity: Report::class)]
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Report::class)]
     private Collection $signalementsFaits;
 
-    #[ORM\OneToMany(mappedBy: 'signale', targetEntity: Report::class)]
+    #[ORM\OneToMany(mappedBy: 'reported', targetEntity: Report::class)]
     private Collection $signalementsRecus;
 
     #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: ReadingHistory::class)]
