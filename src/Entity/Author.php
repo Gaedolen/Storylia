@@ -16,11 +16,8 @@ class Author
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $familyName = null;
-
-    #[ORM\Column(length: 50, nullable: true)]
-    private ?string $firstName = null;
+   #[ORM\Column(length: 255)]
+    private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
@@ -40,26 +37,14 @@ class Author
         return $this->id;
     }
 
-    public function getFamilyName(): ?string
+    public function getName(): ?string
     {
-        return $this->familyName;
+        return $this->name;
     }
 
-    public function setFamilyName(string $familyName): static
+    public function setName(string $name): static
     {
-        $this->familyName = $familyName;
-
-        return $this;
-    }
-
-    public function getFirstName(): ?string
-    {
-        return $this->firstName;
-    }
-
-    public function setFirstName(?string $firstName): static
-    {
-        $this->firstName = $firstName;
+        $this->name = $name;
 
         return $this;
     }

@@ -109,21 +109,23 @@
                 <span class="close">&times;</span>
                 <h2>Trouver un livre</h2>
 
-                <div class="form-group">
-                    <label for="search-title">Titre :</label>
-                    <input type="text" id="searchTitle" placeholder="Ex: Harry Potter">
-                </div>
+                <form id="bookSearchForm">
+                    <div class="form-group">
+                        <label for="search-title">Titre :</label>
+                        <input type="text" id="searchTitle" placeholder="Ex: Harry Potter">
+                    </div>
 
-                <div class="form-group">
-                    <label for="search-author">Auteur :</label>
-                    <input type="text" id="searchAuthor" placeholder="Ex: J.K. Rowling">
-                </div>
+                    <div class="form-group">
+                        <label for="search-author">Auteur :</label>
+                        <input type="text" id="searchAuthor" placeholder="Ex: J.K. Rowling">
+                    </div>
 
-                <div id="searchResults"></div>
+                    <div id="searchResults"></div>
 
-                <button id="book-not-found-btn" type="button" style="display:none;">
-                    Livre introuvable ?
-                </button>
+                    <button id="book-not-found-btn" type="button" style="display:none;">
+                        Livre introuvable ?
+                    </button>
+                </form>
 
                 {# Formulaire de création d'un livre #}
                 <div id="creationBookForm" class="hidden">
@@ -203,6 +205,11 @@
                             <label for="parutionDate">Date de parution</label>
                             <input type="date" name="parutionDate" id="parutionDate" required>
                         </div>
+
+                        <p class="warning-message">
+                            Avant de valider l'ajout de ce livre, merci de bien vérifier l'orthographe du titre, de l'auteur et l'exactitude de la date de parution.<br>
+                            Pour les livres d'une série, vous pouvez le présenter ainsi : <em>ex : "Harry Potter : L'école des sorciers, Tome 1"</em>
+                        </p>;
 
                         <button type="submit" class="btn-principal">Créer le livre</button>
                     </form>

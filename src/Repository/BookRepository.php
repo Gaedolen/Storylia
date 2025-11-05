@@ -23,17 +23,14 @@ class BookRepository extends ServiceEntityRepository
         // Requête SQL brute avec my_unaccent pour UTF-8
         $sql = "
             SELECT b.title, 
-                CONCAT(a.first_name, ' ', a.family_name) AS author
+               a.name AS author
             FROM book b
             JOIN author a ON b.author_id = a.id
             WHERE my_unaccent(LOWER(b.title)) LIKE my_unaccent(:title)
         ";
 
         if (strlen($authorQuery) >= 2) {
-            $sql .= " AND (
-                my_unaccent(LOWER(a.family_name)) LIKE my_unaccent(:author)
-                OR my_unaccent(LOWER(a.first_name)) LIKE my_unaccent(:author)
-            )";
+            $sql .= " AND my_unaccent(LOWER(a.name)) LIKE my_unaccent(:author)";
         }
 
         $sql .= " LIMIT 5";

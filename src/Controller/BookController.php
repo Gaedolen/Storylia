@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Book;
+use DateTime;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\BookRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -93,5 +94,37 @@ class BookController extends AbstractController
     public function add(Request $request, EntityManagerInterface $em): Response
     {
         return $this->render('book/add.html.twig');
+    }
+
+    #[Route ('/creation', name:'livres_creation', methods:['POST'])]
+    public function creation(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        // On récupère le corps de la requête HTTP en JSON et on le transforme en tableau PHP
+        $data = json_decode($request->getContent(), true);
+
+        // Tous les champs sont obligatoires
+        if (empty($data['title']) || empty($data['author']) || empty($data['genre']) || empty($data['parutionDate'])) {
+            return new JsonResponse(['success' => false, 'message' => 'Veuillez remplir tous les champs.'], 400);
+        }
+
+        // On crée une nouvelle instance Book
+        $book = new Book();
+
+        // On remplit l'objet avec les valeurs envoyées par le formulaire
+        $book->setTitle($data['title']);
+        $book->setAuthor($data['author']);
+        $book->setGenre($data['genre']);
+        $book->setPublicationDate(new DateTime($data['parutionDate']));
+
+        // Enregistrement en BDD
+        $em->persist($book); // Préparation de l'objet
+        $em->flush(); // Exécution
+
+        // Réponse JSON
+        return new JsonResponse([
+            'success' => true,
+            'message' => 'Livre créé avec succès !',
+            'bookId' => $book->getId(),
+        ]);
     }
 }

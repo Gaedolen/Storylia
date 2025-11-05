@@ -6,9 +6,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchAuthor = document.getElementById('searchAuthor'); // Champ de saisie auteur
     const searchResults = document.getElementById('searchResults') // Résultats recherche
     const notFoundBtn = document.getElementById('book-not-found-btn'); // Bouton "livre introuvable"
+    const creationForm = document.getElementById('creationBookForm'); // formulaire création
+    const searchForm = document.getElementById('bookSearchForm'); // wrapper formulaire recherche
+    const formBookCreation = document.getElementById('formBookCreation'); // formulaire création submit
 
     // Si l'un des élèments essentiels n'existe pas, on arrête le script
-    if (!openBtn || !modal || !closeBtn) return;
+    if (!openBtn || !modal || !closeBtn || !searchForm || !creationForm || !formBookCreation) return;
 
     // Fonction de débouncing
     function debounce(func, delay) {
@@ -27,6 +30,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // On vide les champs de saisie pour recommencer une recherche
         searchTitle.value = '';
         searchAuthor.value = '';
+        // Forcer le formulaire à être caché
+        creationForm.classList.add('hidden');
+        searchForm.style.display = 'block';
     });
 
     // Gestion de la fermeture de la modal
@@ -94,4 +100,47 @@ document.addEventListener('DOMContentLoaded', function() {
     const debouncedSearch = debounce(performSearch, 300);
     searchTitle.addEventListener('input', debouncedSearch);
     searchAuthor.addEventListener('input', debouncedSearch);
+
+    // Lors du clic sur le btn "livre introuvable"
+    notFoundBtn.addEventListener('click', () => {
+        // On cache le formulaire de recherche
+        searchForm.style.display = 'none';
+        // On affiche le formulaire
+        creationForm.classList.remove('hidden');
+        // On cache le btn "livre introuvable"
+        notFoundBtn.style.display = 'none';
+    });
+
+    // Soumission du formulaire
+    formBookCreation.addEventListener('submit', async (e) => {
+        e.preventDefault(); // On empêche le rechargement de la page
+
+        // On récupère les valeurs saisies
+        const formData = {
+            title: document.getElementById('title').value,
+            author: document.getElementById('author').value,
+            genre: document.getElementById('genre').value,
+            parutionDate: document.getElementById('parutionDate').value,
+        };
+
+        // On envoie ces données vers le serveur avec une requête POST en JSON
+        try {
+            const response = await fetch('/livres/creation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert(data.message);
+                modal.classList.add('hidden');
+                window.location.href = `/livres/${data.bookId}`;
+            } else {
+                alert(data.message || 'Erreur lors de la création du livre.');
+            }
+        } catch (err) {
+            console.error('Erreur création livre :', err);
+            alert('Erreur de connexion.');
+        }
+    });
 });
