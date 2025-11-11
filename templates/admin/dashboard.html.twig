@@ -12,15 +12,13 @@
         <li>Superviser la base de données</li>
     </ul>
 
-    <a href="{{ path('add_book_api') }}">Importer un livre depuis l’API</a>
-    <a href="{{ path('import_books') }}" class="btn btn-primary">
-        Importer les livres depuis l'API
+    <a href="{{ path('import_books') }}" class="btn btn-success">
+        Importer des livres
     </a>
 
-    <a href="{{ path('import_all_books') }}" class="btn btn-primary">
-        Importer tous les livres
+    <a href="{{ path('update_books') }}" class="btn btn-primary">
+        Mettre à jour les livres existants
     </a>
-
 
     {% for label, messages in app.flashes %}
         {% for message in messages %}

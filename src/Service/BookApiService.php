@@ -28,7 +28,7 @@ class BookApiService
             $query .= '+inauthor:' . $author;
         }
 
-        // URL de recherche Google Books (limité à 1 résultat)
+        // URL de recherche Google Books (limité à 1 résultat, langue française)
         $url = 'https://www.googleapis.com/books/v1/volumes?q=' . urlencode($query) . '&langRestrict=fr&maxResults=1';
 
         try {
@@ -51,10 +51,15 @@ class BookApiService
             // On prend le premier livre trouvé
             $info = $data['items'][0]['volumeInfo'] ?? [];
 
+            // On ne garde que les livres dont la langue est française
+            if (($info['language'] ?? '') !== 'fr') {
+                return null;
+            }
+
             // Retour d’un tableau simplifié
             return [
-                'title' => $info['title'] ?? 'Titre inconnu',
-                'voTitle' => $info['subtitle'] ?? $info['title'] ?? '',
+                'title' => $info['title'] ?? 'Titre inconnu', // titre principal en français
+                'voTitle' => $info['subtitle'] ?? '',          // VO si dispo
                 'author' => $info['authors'][0] ?? 'Auteur inconnu',
                 'isbn' => $info['industryIdentifiers'][0]['identifier'] ?? null,
                 'publishers' => [$info['publisher'] ?? 'Inconnu'],
@@ -72,6 +77,7 @@ class BookApiService
 
     /**
      * Récupère une liste de livres depuis Google Books
+     * On ne garde que ceux en français et ayant un ISBN
      *
      * @return array
      */
@@ -79,7 +85,6 @@ class BookApiService
     {
         $subjectsList = $subjects ?? $this->fetchAllSubjects();
         $books = [];
-        $count = 0;
 
         foreach ($subjectsList as $subject) {
             $currentIndex = $startIndex;
@@ -87,7 +92,7 @@ class BookApiService
             while (true) {
                 $url = 'https://www.googleapis.com/books/v1/volumes?' . http_build_query([
                     'q' => 'subject:' . $subject,
-                    'langRestrict' => 'fr',
+                    'langRestrict' => 'fr', // langue française
                     'startIndex' => $currentIndex,
                     'maxResults' => $maxResults,
                 ]);
@@ -101,19 +106,24 @@ class BookApiService
 
                 foreach ($data['items'] as $item) {
                     $info = $item['volumeInfo'] ?? [];
+
+                    // On ne garde que les livres en français
+                    if (($info['language'] ?? '') !== 'fr') continue;
+
+                    // Vérifie que l'ISBN existe pour éviter les doublons
                     $isbn = $info['industryIdentifiers'][0]['identifier'] ?? null;
                     if (!$isbn) continue;
 
                     $books[] = [
                         'title' => $info['title'] ?? 'Titre inconnu',
-                        'voTitle' => $info['subtitle'] ?? $info['title'] ?? '',
+                        'voTitle' => $info['subtitle'] ?? '',
                         'author' => $info['authors'][0] ?? 'Auteur inconnu',
                         'isbn' => $isbn,
                         'publishers' => [$info['publisher'] ?? 'Inconnu'],
                         'summary' => $info['description'] ?? '',
                         'pages' => $info['pageCount'] ?? null,
                         'genres' => array_slice($info['categories'] ?? [], 0, 3),
-                        'subjects' => array_slice($info['categories'] ?? array_slice($subjectsList, 0, 10), 0, 10),
+                        'subjects' => array_slice($info['categories'] ?? [], 0, 10),
                         'publicationDate' => $info['publishedDate'] ?? null,
                         'cover' => $info['imageLinks']['thumbnail'] ?? '/images/default_cover.jpg',
                         'format' => $this->guessFormat($info),
@@ -157,37 +167,20 @@ class BookApiService
     /**
      * Retourne une liste de sujets pour compléter les livres
      */
-    private function fetchAllSubjects(): array
+    public function fetchAllSubjects(): array
     {
         return [
-            // Fiction
-        'Science-fiction', 'Fantastique', 'Fantasy', 'Dystopie', 'Steampunk', 'Aventure', 'Uchronie',
-
-        // Policier / Suspense
-        'Policier', 'Thriller', 'Espionnage', 'Horreur', 'Roman noir', 'Suspense psychologique',
-
-        // Romance & Jeunesse
-        'Young Adult', 'Romance jeunesse', 'Amitié', 'Coming of Age',
-
-        // Romance et roman adulte
-        'Romance contemporaine', 'Romance historique', 'Romance érotique', 'Chick-lit', 'Drame',
-
-        // Culture, Histoire & Documentaire
-        'Essai', 'Biographie', 'Philosophie', 'Historique', 'Histoire', 'Science', 'Sociologie',
-        'Psychologie', 'Politique', 'Économie', 'Spiritualité', 'Religion',
-
-        // Arts & Littérature
-        'Poésie', 'Théâtre', 'Musique', 'Cinéma', 'Photographie', 'Art',
-
-        // Mythes et Légendes
-        'Contes et légendes', 'Mythologie', 'Folklore', 'Épopée',
-
-        // Graphique
-        'Roman graphique', 'Bande dessinée', 'Manga', 'Comics', 'Webtoon',
-
-        // Autres
-        'Cuisine', 'Voyage', 'Nature', 'Animaux', 'Développement personnel',
-        'Éducation', 'Sport', 'Technologie'
+            'Science-fiction', 'Fantastique', 'Fantasy', 'Dystopie', 'Steampunk', 'Aventure', 'Uchronie',
+            'Policier', 'Thriller', 'Espionnage', 'Horreur', 'Roman noir', 'Suspense psychologique',
+            'Young Adult', 'Romance jeunesse', 'Amitié', 'Coming of Age',
+            'Romance contemporaine', 'Romance historique', 'Romance érotique', 'Chick-lit', 'Drame',
+            'Essai', 'Biographie', 'Philosophie', 'Historique', 'Histoire', 'Science', 'Sociologie',
+            'Psychologie', 'Politique', 'Économie', 'Spiritualité', 'Religion',
+            'Poésie', 'Théâtre', 'Musique', 'Cinéma', 'Photographie', 'Art',
+            'Contes et légendes', 'Mythologie', 'Folklore', 'Épopée',
+            'Roman graphique', 'Bande dessinée', 'Manga', 'Comics', 'Webtoon',
+            'Cuisine', 'Voyage', 'Nature', 'Animaux', 'Développement personnel',
+            'Éducation', 'Sport', 'Technologie'
         ];
     }
 }

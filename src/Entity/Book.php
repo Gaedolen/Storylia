@@ -3,6 +3,9 @@
 namespace App\Entity;
 
 use App\Repository\BookRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use App\Entity\Review;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -50,6 +53,15 @@ class Book
 
     #[ORM\Column(type:"string", length:50, nullable:true)]
     private ?string $format = null;
+
+    #[ORM\OneToMany(mappedBy: 'book', targetEntity: Review::class, cascade: ['remove'])]
+    private Collection $reviews;
+
+    // Constructeur
+    public function __construct()
+    {
+        $this->reviews = new ArrayCollection();
+    }
 
     // Getters & Setters
 
@@ -189,5 +201,54 @@ class Book
     {
         $this->format = $format;
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Review>
+     */
+    public function getReviews(): Collection
+    {
+        return $this->reviews;
+    }
+
+    public function addReview(Review $review): self
+    {
+        if (!$this->reviews->contains($review)) {
+            $this->reviews->add($review);
+            $review->setBook($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReview(Review $review): self
+    {
+        if ($this->reviews->removeElement($review)) {
+            if ($review->getBook() === $this) {
+                $review->setBook(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getAverageRating(): ?float
+    {
+        if ($this->reviews->isEmpty()) {
+            return null;
+        }
+
+        $total = 0;
+        $count = 0;
+
+        foreach ($this->reviews as $review) {
+            $rating = $review->getRating();
+            if ($rating !== null) {
+                $total += $rating;
+                $count++;
+            }
+        }
+
+        return $count > 0 ? round($total / $count, 1) : null;
     }
 }

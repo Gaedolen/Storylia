@@ -256,16 +256,39 @@
             {% if livres is empty %}
                 <p>Aucun livre trouvé.</p>
             {% else %}
-                <div class="livres-grid">
+                <div class="livres-list">
                     {% for livre in livres %}
-                        <div class="livre-card">
-                            <img src="{{ livre.cover }}" alt="{{ livre.title }}">
-                            <div class="livre-info">
-                                <h4>{{ livre.title }}</h4>
-                                <p class="auteur">{{ livre.author.name }}</p>
-                                <p class="note">Note : {{ livre.rating ?? 'N/A' }} ★</p>
+                        <a href='#' {# "{{ path('app_livre_detail', {id: livre.id}) }}" #} class="livre-card">
+                            <div class="cover">
+                                <img src="{{ livre.cover }}" alt="{{ livre.title }}">
                             </div>
-                        </div>
+                            <div class="info">
+                                <h4 class="title">{{ livre.title }}</h4>
+                                {% if livre.voTitle %}
+                                    <h5 class="vo-title">{{ livre.voTitle }}</h5>
+                                {% endif %}
+                                <div class="note">
+                                    {% set rating = livre.averageRating ?? 0 %}
+                                    {% for i in 1..5 %}
+                                        {% if i <= rating %}
+                                            <span class="star full">★</span>
+                                        {% else %}
+                                            <span class="star empty">☆</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="score">{{ livre.averageRating ? livre.averageRating ~ '/5' : 'N/A' }}</span>
+                                </div>
+                                <p class="author">Par {{ livre.author.name }}</p>
+                                <div class="meta">
+                                    {% if livre.publishers is not empty %}
+                                        <span class="publisher">{{ livre.publishers[0] }}</span>
+                                    {% endif %}
+                                    {% if livre.publicationDate %}
+                                        <span class="date">{{ livre.publicationDate|date('d/m/Y') }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </a>
                     {% endfor %}
                 </div>
 
@@ -285,14 +308,20 @@
         <!-- Colonne droite : auteurs -->
         <aside class="auteurs">
             <h3>Auteurs populaires</h3>
+
             {% if auteurs is empty %}
                 <p>Aucun auteur correspondant.</p>
             {% else %}
-                <ul>
+                <div class="auteurs-list">
                     {% for auteur in auteurs %}
-                        <li>{{ auteur.name }}</li>
+                        <a href='#' {#"{{ path('app_auteur_detail', { id: auteur.id }) }}"#} class="auteur-card">
+                            <div class="auteur-info">
+                                <h4>{{ auteur.name }}</h4>
+                                <p class="livres-count">{{ auteur.books|length }} livre{% if auteur.books|length > 1 %}s{% endif %}</p>
+                            </div>
+                        </a>
                     {% endfor %}
-                </ul>
+                </div>
             {% endif %}
         </aside>
     </div>

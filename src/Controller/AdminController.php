@@ -84,131 +84,96 @@ class AdminController extends AbstractController
     #[Route('/import-books', name: 'import_books', methods: ['GET'])]
     public function importBooks(BookApiService $apiService, BookCreationService $creationService, EntityManagerInterface $em): Response
     {
-        set_time_limit(0); // Permet un import long
+        set_time_limit(0); // désactive la limite de temps pour l'import massif
+        ini_set('memory_limit', '2048M'); // augmente la mémoire disponible
 
-        // Récupération de la liste de livres depuis Google Books
-        $booksData = $apiService->fetchBookList();
-
-        // Debug rapide pour vérifier ce que renvoie l'API
-        // dump($booksData);
-        // dd('stop');
-
-        $imported = [];
-        $updated = [];
-        $count = 0;
         $batchSize = 50;
+        $totalImported = 0;
 
-        foreach ($booksData as $bookData) {
-            // Création ou mise à jour du livre
-            $book = $creationService->createOrUpdateBookFromApi($bookData);
+        // Récupère tous les ISBN existants en une seule requête pour éviter les doublons
+        $existingIsbns = $em->getRepository(Book::class)
+                            ->createQueryBuilder('b')
+                            ->select('b.isbn')
+                            ->getQuery()
+                            ->getArrayResult();
+        $existingIsbns = array_column($existingIsbns, 'isbn');
 
-            if ($book) {
-                // Vérifier si le livre est déjà en base
-                $isNew = $em->getUnitOfWork()->isScheduledForInsert($book);
+        // Liste complète des sujets pour diversifier les livres
+        $subjects = $apiService->fetchAllSubjects();
 
-                if ($isNew) {
-                    $imported[] = $book->getTitle();
-                } else {
-                    $updated[] = $book->getTitle();
+        foreach ($subjects as $subject) {
+            $startIndex = 0;
+
+            while (true) {
+                // Google Books API ne renvoie que max 40 résultats par requête
+                $booksData = $apiService->fetchBookList($startIndex, 40, [$subject]);
+
+                if (empty($booksData)) break;
+
+                foreach ($booksData as $bookData) {
+                    // Si ISBN vide ou déjà présent, on saute
+                    if (empty($bookData['isbn']) || in_array($bookData['isbn'], $existingIsbns)) {
+                        continue;
+                    }
+
+                    $book = $creationService->createOrUpdateBookFromApi($bookData);
+                    if ($book) {
+                        $em->persist($book);
+                        $existingIsbns[] = $bookData['isbn']; // évite les doublons dans ce batch
+                        $totalImported++;
+                    }
+
+                    // Flush par batch pour éviter les problèmes mémoire
+                    if ($totalImported % $batchSize === 0) {
+                        $em->flush();
+                        $em->clear();
+                    }
                 }
 
-                $count++;
+                // Flush final pour ce lot
+                $em->flush();
+                $em->clear();
 
-                // Flush par lots pour optimiser la mémoire
-                if ($count % $batchSize === 0) {
-                    $em->flush();
-                    $em->clear();
-                }
+                $startIndex += 40; // passe au batch suivant pour ce sujet
             }
         }
 
-        // Flush final pour les derniers éléments
-        $em->flush();
-
-        // Messages flash
-        if (count($imported) > 0) {
-            $this->addFlash('success', count($imported) . ' livre(s) importé(s) avec succès !');
-        }
-
-        if (count($updated) > 0) {
-            $this->addFlash('info', count($updated) . ' livre(s) mis à jour avec succès !');
-        }
-
-        if (count($imported) === 0 && count($updated) === 0) {
-            $this->addFlash('warning', 'Aucun livre n’a été importé depuis l’API.');
-        }
-
+        $this->addFlash('success', "$totalImported livre(s) importé(s).");
         return $this->redirectToRoute('admin_dashboard');
     }
 
-    #[Route('/import-all-books', name: 'import_all_books', methods: ['GET'])]
-    public function importAllBooks(
-        BookApiService $apiService,
-        BookCreationService $creationService,
-        EntityManagerInterface $em
-    ): Response
+    #[Route('/update-books', name: 'update_books', methods: ['GET'])]
+    public function updateBooks(BookApiService $apiService, BookCreationService $creationService, EntityManagerInterface $em): Response
     {
-        set_time_limit(0); // Évite le timeout
-        ini_set('memory_limit', '2048M'); // Augmente la mémoire si nécessaire
+        set_time_limit(0);
+        ini_set('memory_limit', '2048M');
 
-        $totalImported = 0;
-        $totalUpdated = 0;
-        $batchSize = 50; 
-        $maxResultsPerRequest = 40; 
-        $startIndex = 0;
+        $books = $em->getRepository(Book::class)->findAll();
+        $batchSize = 50;
+        $count = 0;
 
-        // Liste des ISBN déjà traités pour ce batch
-        $processedIsbns = [];
+        foreach ($books as $book) {
+            // Récupère les données depuis Google Books API pour mise à jour
+            $bookData = $apiService->fetchBook($book->getTitle(), $book->getAuthor()?->getName());
+            if (!$bookData) continue;
 
-        while (true) {
-            $booksData = $apiService->fetchBookList($startIndex, $maxResultsPerRequest);
+            // Met à jour le livre existant
+            $creationService->updateBookFromApi($book, $bookData);
+            $em->persist($book);
+            $count++;
 
-            if (empty($booksData)) break; // Plus de résultats, fin de l'import
-
-            $count = 0;
-
-            foreach ($booksData as $bookData) {
-                $isbn = $bookData['isbn'] ?? null;
-                if (!$isbn) continue; // Ignore si pas d'ISBN
-                if (in_array($isbn, $processedIsbns)) continue; // Ignore les doublons dans le batch
-
-                // Vérifie si le livre existe déjà en BDD
-                $existingBook = $em->getRepository(Book::class)->findOneBy(['isbn' => $isbn]);
-
-                if ($existingBook) {
-                    // Livre déjà en BDD → on ne le recrée pas, mais on peut le mettre à jour si tu veux
-                    $creationService->updateBookFromApi($existingBook, $bookData);
-                    $totalUpdated++;
-                } else {
-                    // Livre non présent → création
-                    $creationService->createOrUpdateBookFromApi($bookData);
-                    $totalImported++;
-                }
-
-                $processedIsbns[] = $isbn;
-                $count++;
-
-                // Flush par lots pour éviter surcharge mémoire
-                if ($count % $batchSize === 0) {
-                    $em->flush();
-                    $em->clear();
-                    $processedIsbns = []; // réinitialise la liste après clear()
-                }
+            // Flush par batch pour éviter les problèmes mémoire
+            if ($count % $batchSize === 0) {
+                $em->flush();
+                $em->clear();
             }
-
-            // Flush final pour le batch
-            $em->flush();
-            $em->clear();
-            $processedIsbns = [];
-
-            $startIndex += $maxResultsPerRequest;
         }
 
-        $this->addFlash(
-            'success',
-            "Import terminé : $totalImported livre(s) importé(s), $totalUpdated livre(s) mis à jour."
-        );
+        // Flush final
+        $em->flush();
+        $em->clear();
 
+        $this->addFlash('success', "$count livre(s) mis à jour.");
         return $this->redirectToRoute('admin_dashboard');
     }
 }
