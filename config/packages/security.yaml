@@ -16,16 +16,22 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            custom_authenticators:
+                 - App\Security\LoginFormAuthenticator
+            entry_point: App\Security\LoginFormAuthenticator
+
             form_login:
                 login_path: app_login
                 check_path: app_login
                 default_target_path: homepage
                 remember_me: true
+
             remember_me:
                 secret:   '%kernel.secret%'
                 lifetime: 604800
                 path:     /
                 secure: auto
+
             logout:
                 path: logout
                 csrf_token_id: logout
@@ -40,8 +46,8 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/profile, roles: ROLE_USER }
 
 when@test:
     security:

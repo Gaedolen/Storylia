@@ -14,57 +14,113 @@ class BookCreationService
 
     public function __construct(EntityManagerInterface $em, AuthorRepository $authorRepository)
     {
-        $this->em = $em; // Pour sauvegarder les entités en BDD
+        $this->em = $em;
         $this->authorRepository = $authorRepository;
     }
 
-     /**
-     * Crée un livre et son auteur si nécessaire
-     * @param array $bookData Tableau issu de l'API
+    /**
+     * Crée ou met à jour un livre à partir des données d'une API
+     *
+     * @param array $data Données issues de l'API
      * @return Book|null
      */
-    public function createBookFromApi(array $bookData): ?Book
+    public function createOrUpdateBookFromApi(array $data): ?Book
     {
-        // Si le titre ou l'auteur est manquant, on ne crée rien
-        if(empty($bookData['title']) || empty($bookData['author'])) return null;
+        $isbn = $data['isbn'] ?? null;
+        if (!$isbn) return null;
 
-        $authorName = $bookData['authors'][0]; // On prend le premier auteur
+        // Cherche l'existant
+        $book = $this->em->getRepository(Book::class)->findOneBy(['isbn' => $isbn]);
 
-        // Vérifier si l'auteur existe déjà en BDD
-        $author = $this->authorRepository->findOneBy(['name' => $authorName]);
-        if(!$author) {
-            // Si non, on crée un nouvel auteur
-            $author = new Author();
-            $author->setName($authorName);
-            $this->em->persist($author); // On le prépare pour l'enregistrement
+        if ($book) {
+            return $this->updateBookFromApi($book, $data);
         }
 
-        // Création du livre
         $book = new Book();
-        $book->setTitle($bookData['title']);
-        $book->setAuthor($author); // Lier l'auteur au livre
-        $book->setGenre($bookData['genres'][0] ?? null); // On prend le premier genre si disponible
-        $book->setCover($bookData['cover' ?? null]);
-        $book->setSummary($bookData['summary'] ?? null);
-        $book->setEdition($bookData['edition']);
+        $book->setIsbn($isbn);
+        $this->updateBookFromApi($book, $data);
 
-        // Conversion de l'année en DateTime
-        if (!empty($bookData['publish_date'])) {
-            try {
-                // On essaie de transformer la date en format complet (jour/mois/année)
-                $date = new \DateTime($bookData['publish_date']);
-                $book->setPublicationDate($date);
-            } catch (\Exception $e) {
-                // Si la date est incomplète (ex: juste "1997"), on met le 1er janvier par défaut
-                $year = preg_replace('/[^0-9]/', '', $bookData['publish_date']);
-                $book->setPublicationDate(new \DateTime("$year-01-01"));
+        $this->em->persist($book);
+
+        return $book;
+    }
+
+    /**
+     * Met à jour un livre existant avec les données de l'API
+     */
+    public function updateBookFromApi(Book $book, array $data): Book
+    {
+        $book->setTitle($data['title'] ?? $book->getTitle() ?? 'Titre inconnu');
+        $book->setVoTitle($data['voTitle'] ?? $book->getVoTitle() ?? $book->getTitle());
+        $book->setSummary($data['summary'] ?? $book->getSummary());
+        $book->setPages($data['pages'] ?? $book->getPages());
+        $book->setPublishers($data['publishers'] ?? $book->getPublishers() ?? []);
+        $book->setGenres($data['genres'] ?? $book->getGenres() ?? []);
+        $book->setSubjects($data['subjects'] ?? $book->getSubjects() ?? []);
+
+        if (!empty($data['publicationDate']) && preg_match('/^\d{4}(-\d{2}-\d{2})?$/', $data['publicationDate'])) {
+            $book->setPublicationDate(new \DateTime($data['publicationDate']));
+        } else {
+            $book->setPublicationDate(null);
+        }
+
+        $book->setCover($data['cover'] ?? $book->getCover() ?? '/images/default_cover.jpg');
+        $book->setFormat($data['format'] ?? $book->getFormat() ?? 'Broché');
+
+        // Gestion de l'auteur
+        $authorName = $data['author'] ?? 'Auteur inconnu';
+        $author = $this->authorRepository->findOneBy(['name' => $authorName]);
+
+        if (!$author) {
+            $author = new Author();
+            $author->setName($authorName);
+            $this->em->persist($author);
+        }
+
+        $book->setAuthor($author);
+
+        return $book;
+    }
+
+    /**
+     * Gère l’import massif de plusieurs livres en optimisant les flush()
+     *
+     * @param array $booksData Données de plusieurs livres
+     * @param int $batchSize Nombre de livres par flush
+     * @return array Résumé des actions
+     */
+    public function importBooks(array $booksData, int $batchSize = 50): array
+    {
+        $imported = [];
+        $updated = [];
+        $count = 0;
+
+        foreach ($booksData as $data) {
+            $existingBook = $this->em->getRepository(Book::class)->findOneBy(['isbn' => $data['isbn'] ?? null]);
+
+            if ($existingBook) {
+                $this->updateBookFromApi($existingBook, $data);
+                $updated[] = $existingBook->getTitle();
+            } else {
+                $book = $this->createOrUpdateBookFromApi($data);
+                if ($book) {
+                    $imported[] = $book->getTitle();
+                }
+            }
+
+            $count++;
+            if ($count % $batchSize === 0) {
+                $this->em->flush();
+                $this->em->clear();
             }
         }
 
-        // Persistance en base
-        $this->em->persist($book);
+        // Flush final
         $this->em->flush();
 
-        return $book;
+        return [
+            'imported' => $imported,
+            'updated' => $updated,
+        ];
     }
 }

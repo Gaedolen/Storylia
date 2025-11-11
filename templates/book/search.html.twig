@@ -146,49 +146,81 @@
                             <select name="genre" id="genre" required>
                                 <option value="">Choisir un genre</option>
                                 {% set categories = {
-                                    'Fiction': {
-                                    'Science-Fiction': 'scifi',
-                                    'Fantastique': 'fantastique',
-                                    'Fantasy': 'fantasy',
-                                    'Dystopie': 'dystopie',
-                                    'Steampunk': 'steampunk'
-                                },
-                                'Policier / Suspense': {
-                                    'Policier': 'policier',
-                                    'Thriller': 'thriller',
-                                    'Espionnage': 'espionnage',
-                                    'Horreur': 'horreur'
-                                },
-                                'Romance & Jeunesse': {
-                                    'Aventure': 'aventure',
-                                    'Young Adult': 'young_adult'
-                                },
-                                'Romance et roman adulte': {
-                                    'Romance': 'romance',
-                                    'Érotique': 'erotique',
-                                    'Chick-lit': 'chicklit'
-                                },
-                                'Culture, Histoire & Documentaire': {
-                                    'Essai': 'essai',
-                                    'Biographie': 'biographie',
-                                    'Philosophie': 'philosophie',
-                                    'Historique': 'historique',
-                                    'Science': 'science',
-                                    'Sociologie': 'sociologie'
-                                },
-                                'Arts & Littérature': {
-                                    'Poésie': 'poesie',
-                                    'Théâtre': 'theatre'
-                                },
-                                'Mythes et Légendes': {
-                                    'Contes et légendes': 'conte_legend',
-                                    'Mythologie': 'mythologie'
-                                },
-                                'Graphique': {
-                                    'Roman Graphique': 'graphic_novel',
-                                    'Bande dessinée': 'bd',
-                                    'Manga': 'manga'
-                                }
+                                        'Fiction': {
+                                            'Science-Fiction': 'scifi',
+                                            'Fantastique': 'fantastique',
+                                            'Fantasy': 'fantasy',
+                                            'Dystopie': 'dystopie',
+                                            'Steampunk': 'steampunk',
+                                            'Aventure': 'aventure',
+                                            'Uchronie': 'uchronie'
+                                        },
+                                        'Policier / Suspense': {
+                                            'Policier': 'policier',
+                                            'Thriller': 'thriller',
+                                            'Espionnage': 'espionnage',
+                                            'Horreur': 'horreur',
+                                            'Noir': 'roman_noir',
+                                            'Suspense psychologique': 'psychological_thriller'
+                                        },
+                                        'Romance & Jeunesse': {
+                                            'Young Adult': 'young_adult',
+                                            'Romance Jeunesse': 'romance_jeune',
+                                            'Amitié': 'amitie',
+                                            'Coming of Age': 'coming_of_age'
+                                        },
+                                        'Romance et roman adulte': {
+                                            'Romance Contemporaine': 'romance_contemporaine',
+                                            'Romance Historique': 'romance_historique',
+                                            'Romance Érotique': 'erotique',
+                                            'Chick-lit': 'chicklit',
+                                            'Drame': 'drame'
+                                        },
+                                        'Culture, Histoire & Documentaire': {
+                                            'Essai': 'essai',
+                                            'Biographie': 'biographie',
+                                            'Philosophie': 'philosophie',
+                                            'Historique': 'historique',
+                                            'Histoire': 'histoire',
+                                            'Science': 'science',
+                                            'Sociologie': 'sociologie',
+                                            'Psychologie': 'psychologie',
+                                            'Politique': 'politique',
+                                            'Économie': 'economie',
+                                            'Spiritualité': 'spiritualite',
+                                            'Religion': 'religion'
+                                        },
+                                        'Arts & Littérature': {
+                                            'Poésie': 'poesie',
+                                            'Théâtre': 'theatre',
+                                            'Musique': 'musique',
+                                            'Cinéma': 'cinema',
+                                            'Photographie': 'photographie',
+                                            'Art': 'art'
+                                        },
+                                        'Mythes et Légendes': {
+                                            'Contes et Légendes': 'conte_legend',
+                                            'Mythologie': 'mythologie',
+                                            'Folklore': 'folklore',
+                                            'Épopée': 'epopee'
+                                        },
+                                        'Graphique': {
+                                            'Roman Graphique': 'graphic_novel',
+                                            'Bande dessinée': 'bd',
+                                            'Manga': 'manga',
+                                            'Comics': 'comics',
+                                            'Webtoon': 'webtoon'
+                                        },
+                                        'Autres': {
+                                            'Cuisine': 'cuisine',
+                                            'Voyage': 'voyage',
+                                            'Nature': 'nature',
+                                            'Animaux': 'animaux',
+                                            'Développement personnel': 'developpement_perso',
+                                            'Éducation': 'education',
+                                            'Sport': 'sport',
+                                            'Technologie': 'technologie'
+                                        }
                                 } %}
 
                                 {% for group, genres in categories %}
@@ -227,10 +259,10 @@
                 <div class="livres-grid">
                     {% for livre in livres %}
                         <div class="livre-card">
-                            <img src="{{ asset('uploads/livres/' ~ livre.coverImage) }}" alt="{{ livre.title }}">
+                            <img src="{{ livre.cover }}" alt="{{ livre.title }}">
                             <div class="livre-info">
                                 <h4>{{ livre.title }}</h4>
-                                <p class="auteur">{{ livre.author }}</p>
+                                <p class="auteur">{{ livre.author.name }}</p>
                                 <p class="note">Note : {{ livre.rating ?? 'N/A' }} ★</p>
                             </div>
                         </div>

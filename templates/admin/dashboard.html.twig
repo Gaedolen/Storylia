@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Admin{% endblock %}
+
+{% block body %}
+    <h1>Bienvenue sur le tableau de bord administrateur</h1>
+
+    <p>Depuis cette page, vous pourrez :</p>
+    <ul>
+        <li>Ajouter ou supprimer des livres via l’API</li>
+        <li>Gérer les utilisateurs</li>
+        <li>Superviser la base de données</li>
+    </ul>
+
+    <a href="{{ path('add_book_api') }}">Importer un livre depuis l’API</a>
+    <a href="{{ path('import_books') }}" class="btn btn-primary">
+        Importer les livres depuis l'API
+    </a>
+
+    <a href="{{ path('import_all_books') }}" class="btn btn-primary">
+        Importer tous les livres
+    </a>
+
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} mt-3" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div id="import-result" style="margin-top: 20px;"></div>
+
+    <script src="{{ asset('js/dashboardAdmin.js') }}"></script>
+{% endblock %}

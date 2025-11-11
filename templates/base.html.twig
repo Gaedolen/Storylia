@@ -43,7 +43,7 @@
                         <nav class="menu-nav">
                             {% if app.user %}
                                 {% if is_granted('ROLE_ADMIN') %}
-                                    <a href="#">Accueil</a>
+                                    <a href="{{ path('admin_dashboard') }}">Accueil</a>
                                     <span class="separator">|</span>
 
                                     <a href="#">Gérer les employés</a>

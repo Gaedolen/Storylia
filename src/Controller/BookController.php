@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Book;
+use App\Entity\Author;
 use DateTime;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\BookRepository;
@@ -16,40 +17,63 @@ use Symfony\Component\Routing\Annotation\Route;
 class BookController extends AbstractController
 {
     #[Route('/recherche', name:'app_recherche_livre')]
-    public function search(Request $request, BookRepository $bookRepository) : Response
+    public function search(Request $request, BookRepository $bookRepository, EntityManagerInterface $em) : Response
     {
         // On récupère la valeur du champ de recherche 'q'
-        $query = $request->query->get('q',''); // Si rien n'est envoyé, on met une chaîne vide
+        $query = trim($request->query->get('q', ''));
+
+        // Page actuelle pour la pagination
         $page = $request->query->getInt('page', 1);
+
+        // Nombre dr résultats par page
         $limit = 20;
 
-        // Tableau des résultats de la recherche
+        // Initilisation des variables par défaut
         $livres = [];
         $authors = [];
-
-        // Si une recherche est effectuée
+        $totalPages = 0;
+        
+        // Si une valeur est entrée dans le champ de saisie
         if(!empty($query)) {
-            // Recherche dans la BDD des livres dont l'auteur ou le titre contient le texte recherché
-            $qb = $bookRepository->createQueryBuilder('b')
-                ->where('b.title LIKE :query OR b.author LIKE :query')
-                ->setParameter('query', '%'.$query.'%')
-                ->orderBy('b.title', 'ASC'); // Tri par titre
-            // Pagination
+            // Requête initiale
+            $qb = $em->createQueryBuilder()
+                ->select('b', 'a') // On sélectionne les livres et les auteurs
+                ->from(Book::class, 'b')
+                ->leftJoin('b.author', 'a') // Jointure pour filtrer sur le nom de l'auteur
+                ->where('LOWER(b.title) LIKE LOWER(:query)') // Recherche insensible à la casse sur le titre
+                ->orWhere('LOWER(a.name) LIKE LOWER (:query)') // Recherche insensible à la casse sur le nom de l'auteur
+                -> setParameter('query', '%'. $query .'%')
+                ->orderBy('b.title', 'ASC'); // Tri par ordre alphabétique
+            
+            // Clone de la requête principale pour compter le total sans réécrire la logique
+            $countQb = clone $qb;
+
+            // On retire le ORDER BY du clone
+            $countQb->resetDQLPart('orderBy');
+
+            // expr() pour éviter les erreurs de syntaque DQL
+            $countQb->select(
+                $countQb->expr()->countDistinct('b.id')
+            );
+
+            // Exécution de la requête de comptage
+            $total = (int) $countQb->getQuery()->getSingleScalarResult();
+
+            // Calcul du nb total de pages selon la limite choisie
+            $totalPages = ceil($total / $limit);
+
+            // Requête finale
             $livres = $qb
-                ->setFirstResult(($page - 1) * $limit)
+                ->setFirstResult(($page - 1) * $limit) // Décalage pour la pagination
                 ->setMaxResults($limit)
                 ->getQuery()
                 ->getResult();
-            // Récupérer le total pour créer les pages
-            $total = $qb->select('COUNT(b.id)') // On compte le nb total de résultats
-                ->getQuery()
-                ->getSingleScalarResult();
-            $totalPages = ceil($total / $limit);
-
-            // Récupérer les auteurs
-            $authors = $bookRepository->createQueryBuilder('b')
-                ->select('DISTINCT b.author')
-                ->where('b.title LIKE :query OR b.author LIKE :query')
+            // Requête pour récupérer les auteurs distincts des livres trouvés
+            $authors = $em->createQueryBuilder()
+                ->select('DISTINCT a')
+                ->from(Author::class, 'a')                  // racine = Author
+                ->join('a.books', 'b')                      // relation inverse : Author → Book
+                ->where('LOWER(b.title) LIKE LOWER(:query) OR LOWER(a.name) LIKE LOWER(:query)')
                 ->setParameter('query', '%'.$query.'%')
                 ->getQuery()
                 ->getResult();
@@ -57,13 +81,13 @@ class BookController extends AbstractController
             $totalPages = 0;
         }
 
-        // On renvoie la vue Twig
+        // Affichage des résultats
         return $this->render('book/search.html.twig', [
-            'livres' => $livres, //résultats de recherche
+            'livres' => $livres,
             'auteurs' => $authors,
-            'query' => $query, // texte recherché
-            'page' =>$page,
-            'totalPages' => $totalPages,
+            'query' => $query,
+            'page' => $page,
+            'totalPages' => $totalPages
         ]);
     }
 
@@ -113,7 +137,7 @@ class BookController extends AbstractController
         // On remplit l'objet avec les valeurs envoyées par le formulaire
         $book->setTitle($data['title']);
         $book->setAuthor($data['author']);
-        $book->setGenre($data['genre']);
+        $book->setGenres($data['genre']);
         $book->setPublicationDate(new DateTime($data['parutionDate']));
 
         // Enregistrement en BDD
