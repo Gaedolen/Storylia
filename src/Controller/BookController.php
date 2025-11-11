@@ -17,77 +17,81 @@ use Symfony\Component\Routing\Annotation\Route;
 class BookController extends AbstractController
 {
     #[Route('/recherche', name:'app_recherche_livre')]
-    public function search(Request $request, BookRepository $bookRepository, EntityManagerInterface $em) : Response
+    public function search(Request $request, BookRepository $bookRepository, EntityManagerInterface $em): Response
     {
-        // On récupère la valeur du champ de recherche 'q'
-        $query = trim($request->query->get('q', ''));
+        // Récupération des paramètres de recherche et filtres
+        $query = trim($request->query->get('q', ''));      // Recherche texte sur titre ou auteur
+        $genre = $request->query->get('category');        // Filtre par genre
+        $noteMin = $request->query->get('note_min');      // Filtre par note minimale
+        $dateFilter = $request->query->get('date');      // Tri par date (recent/ancien)
+        $page = $request->query->getInt('page', 1);      // Page actuelle pour la pagination
+        $limit = 20;                                     // Nombre de résultats par page
 
-        // Page actuelle pour la pagination
-        $page = $request->query->getInt('page', 1);
-
-        // Nombre dr résultats par page
-        $limit = 20;
-
-        // Initilisation des variables par défaut
+        // Variables par défaut
         $livres = [];
         $authors = [];
         $totalPages = 0;
-        
-        // Si une valeur est entrée dans le champ de saisie
-        if(!empty($query)) {
-            // Requête initiale
+
+        // Si l'utilisateur a saisi quelque chose dans le champ de recherche
+        if (!empty($query)) {
+            // Création du QueryBuilder
             $qb = $em->createQueryBuilder()
-                ->select('b', 'a') // On sélectionne les livres et les auteurs
+                ->select('b', 'a')                           // On sélectionne les livres et leurs auteurs
                 ->from(Book::class, 'b')
-                ->leftJoin('b.author', 'a') // Jointure pour filtrer sur le nom de l'auteur
-                ->where('LOWER(b.title) LIKE LOWER(:query)') // Recherche insensible à la casse sur le titre
-                ->orWhere('LOWER(a.name) LIKE LOWER (:query)') // Recherche insensible à la casse sur le nom de l'auteur
-                -> setParameter('query', '%'. $query .'%')
-                ->orderBy('b.title', 'ASC'); // Tri par ordre alphabétique
-            
-            // Clone de la requête principale pour compter le total sans réécrire la logique
-            $countQb = clone $qb;
+                ->leftJoin('b.author', 'a')                  // Jointure pour filtrer sur le nom de l'auteur
+                ->where('LOWER(b.title) LIKE LOWER(:query) OR LOWER(a.name) LIKE LOWER(:query)')
+                ->setParameter('query', '%'.$query.'%');
 
-            // On retire le ORDER BY du clone
-            $countQb->resetDQLPart('orderBy');
+            // Filtre par date / tri
+            if ($dateFilter === 'recent') {
+                $qb->orderBy('b.publicationDate', 'DESC');
+            } elseif ($dateFilter === 'ancien') {
+                $qb->orderBy('b.publicationDate', 'ASC');
+            } else {
+                $qb->orderBy('b.title', 'ASC'); // Tri par défaut par titre
+            }
 
-            // expr() pour éviter les erreurs de syntaque DQL
-            $countQb->select(
-                $countQb->expr()->countDistinct('b.id')
-            );
-
-            // Exécution de la requête de comptage
-            $total = (int) $countQb->getQuery()->getSingleScalarResult();
-
-            // Calcul du nb total de pages selon la limite choisie
-            $totalPages = ceil($total / $limit);
-
-            // Requête finale
+            // Exécution de la requête principale avec pagination
             $livres = $qb
-                ->setFirstResult(($page - 1) * $limit) // Décalage pour la pagination
+                ->setFirstResult(($page - 1) * $limit) // Décalage pour pagination
                 ->setMaxResults($limit)
                 ->getQuery()
                 ->getResult();
-            // Requête pour récupérer les auteurs distincts des livres trouvés
+
+            // Filtre note minimale côté PHP (évite GROUP BY PostgreSQL)
+            if (!empty($noteMin)) {
+                $livres = array_filter($livres, function($book) use ($noteMin) {
+                    $avg = $book->getAverageRating(); // Méthode dans Book qui calcule la moyenne des reviews
+                    return $avg !== null && $avg >= (float)$noteMin;
+                });
+                $livres = array_values($livres); // Réindexe le tableau après array_filter
+            }
+
+            // Récupération des auteurs distincts pour les résultats
             $authors = $em->createQueryBuilder()
                 ->select('DISTINCT a')
-                ->from(Author::class, 'a')                  // racine = Author
-                ->join('a.books', 'b')                      // relation inverse : Author → Book
+                ->from(Author::class, 'a')
+                ->join('a.books', 'b')                       // Relation inverse : Author → Book
                 ->where('LOWER(b.title) LIKE LOWER(:query) OR LOWER(a.name) LIKE LOWER(:query)')
                 ->setParameter('query', '%'.$query.'%')
                 ->getQuery()
                 ->getResult();
-        } else {
-            $totalPages = 0;
+
+            // Calcul du nombre total de pages après filtres
+            $total = count($livres);
+            $totalPages = ceil($total / $limit);
         }
 
-        // Affichage des résultats
+        // Rendu du template avec les variables
         return $this->render('book/search.html.twig', [
             'livres' => $livres,
             'auteurs' => $authors,
             'query' => $query,
             'page' => $page,
-            'totalPages' => $totalPages
+            'totalPages' => $totalPages,
+            'genre' => $genre,
+            'noteMin' => $noteMin,
+            'dateFilter' => $dateFilter
         ]);
     }
 

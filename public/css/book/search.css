@@ -88,6 +88,152 @@ h2, h3 {
     background-color: #e6d6bf;
 }
 
+/* == MODAL == */
+/* Cache la modal par défaut */
+.hidden {
+    display: none !important;
+}
+
+/* Fond semi-transparent derrière la modal */
+#search-book-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Contenu de la modal */
+#search-book-modal .modal-content {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    width: 90%;
+    max-width: 700px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Bouton de fermeture */
+#search-book-modal .close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+}
+
+/* Formulaire de recherche */
+#bookSearchForm input {
+    width: calc(50% - 10px);
+    padding: 8px 12px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* Résultats : grille de cartes */
+#searchResults {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* cartes un peu plus petites */
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* Carte de livre */
+#searchResults .book-card {
+    background-color: #fefefe; /* un peu plus clair et neutre */
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-align: center;
+    padding: 8px;
+}
+
+#searchResults .book-card a {
+    text-decoration: none !important; /* enlève le souligné */
+    color: #333 !important;           /* couleur neutre */
+    display: block;                    /* si besoin pour que le clic englobe la carte */
+}
+
+#searchResults .book-card a:hover {
+    color: #333 !important;           /* pas de changement de couleur au hover */
+    text-decoration: none !important;
+}
+
+/* Hover sur carte */
+#searchResults .book-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+/* Couverture */
+#searchResults .book-card img {
+    width: 100%;
+    height: 140px; /* un peu plus petite */
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+/* Titre et auteur */
+#searchResults .book-card .title {
+    font-weight: 600;
+    font-size: 13px;
+    color: #333; /* texte neutre */
+    margin-top: 6px;
+    text-decoration: none !important; /* plus de soulignement */
+}
+
+#searchResults .book-card .author {
+    font-size: 11px;
+    color: #555; /* un peu plus foncé que gris clair */
+    margin-top: 2px;
+}
+
+/* Bouton "Livre introuvable" */
+#book-not-found-btn {
+    display: none;
+    align-items: center;
+    margin-top: 15px;
+    padding: 8px 18px;
+    background-color: #c97c5d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+#book-not-found-btn:hover {
+    background-color: #a65d42;
+}
+
+/* Formulaire création livre */
+#creationBookForm {
+    margin-top: 20px;
+}
+
+#creationBookForm input, #creationBookForm select {
+    width: 100%;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
 /* ======= RÉSULTATS LIVRES ======= */
 .resultats {
     display: flex;

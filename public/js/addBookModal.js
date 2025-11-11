@@ -66,25 +66,42 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 searchResults.innerHTML = ''; // vide les résultats précédents
                 if(data.length > 0) {
-                    // Si on a des résultats, on affiche la liste des 3 premiers
-                    const ul = document.createElement('ul');
                     const seen = new Set(); // Filtrer les doublons côté JS
 
                     data.slice(0, 5).forEach(book => {
                         const key = book.title.toLowerCase() + '|' + book.author.toLowerCase();
-                        if(seen.has(key)) return; // skip si déjà affiché
+                        if (seen.has(key)) return;
                         seen.add(key);
 
-                        const li = document.createElement('li');
-                        li.textContent = `${book.title} - ${book.author}`;
-                        ul.appendChild(li);
+                        const card = document.createElement('div');
+                        card.classList.add('book-card');
+
+                        // Lien vers la page du livre
+                        const link = document.createElement('a');
+                        link.href = `/livres/${book.id}`;
+
+                        // Image
+                        if (book.cover) {
+                            const img = document.createElement('img');
+                            img.src = book.cover;
+                            img.alt = book.title;
+                            img.classList.add('book-cover');
+                            link.appendChild(img);
+                        }
+
+                        // Titre et auteur
+                        const info = document.createElement('div');
+                        info.classList.add('book-info');
+                        info.innerHTML = `<strong>${book.title}</strong><br><em>${book.author}</em>`;
+                        link.appendChild(info);
+
+                        card.appendChild(link);
+                        searchResults.appendChild(card);
                     });
-                    searchResults.appendChild(ul);
 
                     // Affiche le bouton "livre introuvable"
                     notFoundBtn.style.display = 'block';
                 } else {
-                    // Si aucun résultat, affiche un message et le bouton
                     searchResults.innerHTML = '<p>Aucun livre correspondant.</p>';
                     notFoundBtn.style.display = 'block';
                 }

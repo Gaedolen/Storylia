@@ -20,17 +20,18 @@ class BookRepository extends ServiceEntityRepository
     {
         $conn = $this->getEntityManager()->getConnection();
 
-        // Requête SQL brute avec my_unaccent pour UTF-8
+        $titleQuery = mb_strtolower(trim($titleQuery));
+        $authorQuery = mb_strtolower(trim($authorQuery));
+
         $sql = "
-            SELECT b.title, 
-               a.name AS author
+            SELECT b.id, b.title, b.cover, a.name AS author
             FROM book b
             JOIN author a ON b.author_id = a.id
-            WHERE my_unaccent(LOWER(b.title)) LIKE my_unaccent(:title)
+            WHERE LOWER(b.title) LIKE LOWER(:title)
         ";
 
         if (strlen($authorQuery) >= 2) {
-            $sql .= " AND my_unaccent(LOWER(a.name)) LIKE my_unaccent(:author)";
+            $sql .= " AND LOWER(a.name) LIKE LOWER(:author)";
         }
 
         $sql .= " LIMIT 5";
@@ -42,8 +43,16 @@ class BookRepository extends ServiceEntityRepository
         }
 
         $result = $stmt->executeQuery();
+        $books = $result->fetchAllAssociative();
 
-        return $result->fetchAllAssociative();
+        // Encoder l'image BLOB en base64
+        foreach ($result as &$book) {
+            if ($book['cover'] !== null) {
+                $book['cover'] = 'data:image/jpeg;base64,' . base64_encode($book['cover']);
+            }
+        }
+
+        return $books;
     }
 
     //    /**

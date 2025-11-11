@@ -15,7 +15,7 @@
             <form method="get" action="{{ path('app_recherche_livre') }}">
                 <input type="hidden" name="q" value="{{ app.request.get('q') }}">
                 
-                <label>Catégorie :</label>
+                {# <label>Catégorie :</label>
                 <select name="category">
                     <option value="">Toutes</option>
 
@@ -63,9 +63,9 @@
                             'Bande dessinée': 'bd',
                             'Manga': 'manga'
                         }
-                    } %}
+                    } %} #}
 
-                    {% for main, subcats in categories %}
+                    {# {% for main, subcats in categories %}
                         <optgroup label="{{ main }}">
                             {% for label, value in subcats %}
                                 <option value="{{ value }}"
@@ -75,7 +75,7 @@
                             {% endfor %}
                         </optgroup>
                     {% endfor %}
-                </select>
+                </select> #}
 
                 <label>Date de parution :</label>
                 <select name="date">
