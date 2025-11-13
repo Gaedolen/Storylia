@@ -110,9 +110,7 @@ class BookApiService
                     // On ne garde que les livres en français
                     if (($info['language'] ?? '') !== 'fr') continue;
 
-                    // Vérifie que l'ISBN existe pour éviter les doublons
                     $isbn = $info['industryIdentifiers'][0]['identifier'] ?? null;
-                    if (!$isbn) continue;
 
                     $books[] = [
                         'title' => $info['title'] ?? 'Titre inconnu',

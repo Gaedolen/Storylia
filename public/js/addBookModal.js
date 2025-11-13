@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchAuthor = document.getElementById('searchAuthor'); // Champ de saisie auteur
     const searchResults = document.getElementById('searchResults') // Résultats recherche
     const notFoundBtn = document.getElementById('book-not-found-btn'); // Bouton "livre introuvable"
-    const creationForm = document.getElementById('creationBookForm'); // formulaire création
+    const creationForm = document.getElementById('bookCreationForm'); // formulaire création
     const searchForm = document.getElementById('bookSearchForm'); // wrapper formulaire recherche
     const formBookCreation = document.getElementById('formBookCreation'); // formulaire création submit
 
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === 'Escape') modal.classList.add('hidden');
     });
 
-    // Fonction de recherche automatique
+    // ** Fonction de recherche automatique **
     function performSearch() {
         const title = searchTitle.value.trim(); // Récupère le titre
         const author = searchAuthor.value.trim(); // Récupère l'auteur
@@ -128,36 +128,90 @@ document.addEventListener('DOMContentLoaded', function() {
         notFoundBtn.style.display = 'none';
     });
 
-    // Soumission du formulaire
+    // ** Soumission du formulaire **
     formBookCreation.addEventListener('submit', async (e) => {
         e.preventDefault(); // On empêche le rechargement de la page
 
-        // On récupère les valeurs saisies
-        const formData = {
-            title: document.getElementById('title').value,
-            author: document.getElementById('author').value,
-            genre: document.getElementById('genre').value,
-            parutionDate: document.getElementById('parutionDate').value,
-        };
+        const title = document.getElementById('bookTitle').value.trim();
+        const author = document.getElementById('bookAuthor').value.trim();
 
-        // On envoie ces données vers le serveur avec une requête POST en JSON
+
+        if (!title || !author) {
+            alert("Veuillez indiquer le titre et l'auteur du livre que vous cherchez.");
+            return;
+        }
+
         try {
+            // Recherche sur Google Books
+            const query = encodeURIComponent(`${title} ${author}`);
+            const responseGoogle = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${query}`);
+            const googleData = await responseGoogle.json();
+
+            // Variables par défaut
+            let cover = null;
+            let summary = null;
+            let isbn = null;
+            let pages = null;
+            let publishedDate = null;
+            let publishers = [];
+            let genres = [];
+            let subjects = [];
+            let format = null;
+            let voTitle = null;
+
+            // Si un résultat est trouvé
+            if(googleData.item && googleData.item.length > 0) {
+                const book = googleData.item[0].volumeInfo;
+
+                cover = book.imageLinks?.thumbnail || null;
+                summary = book.description || null;
+                isbn = book.industryIdentifiers?.[0]?.identifier || null;
+                pages = book.pageCount || null;
+                publishedDate = book.publishedDate || null;
+                publishers = book.publisher ? [book.publisher] : [];
+                genres = book.categories || [];
+                subjects = book.mainCategory ? [book.mainCategory] : (book.categories || []);
+                format = book.printType || null;
+                voTitle = book.title && book.title !== title ? book.title : null;
+            }
+
+            // Construction de l'objet à envoyer à Symfony
+            const bookData = {
+                title: title,
+                voTitle: voTitle,
+                author: author,
+                publicationDate: publishedDate,
+                genres: genres,
+                subjects: subjects,
+                summary: summary,
+                isbn: isbn,
+                cover: cover,
+                pages: pages,
+                publishers: publishers,
+                format: format
+            };
+
+            // Envoi au back de symfony
             const response = await fetch('/livres/creation', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(bookData)
             });
-            const data = await response.json();
-            if (data.success) {
-                alert(data.message);
-                modal.classList.add('hidden');
-                window.location.href = `/livres/${data.bookId}`;
+
+            const result = await response.json();
+
+            if (result.success) {
+                window.location.href = `/livres/${result.bookId}`;
             } else {
-                alert(data.message || 'Erreur lors de la création du livre.');
+                alert(result.message || 'Erreur lors de la création du livre.');
             }
+
         } catch (err) {
             console.error('Erreur création livre :', err);
-            alert('Erreur de connexion.');
+            alert('Erreur de connexion ou de création du livre.');
         }
     });
 });

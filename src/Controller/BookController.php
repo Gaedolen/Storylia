@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\BookRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -16,6 +18,13 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/livres')]
 class BookController extends AbstractController
 {
+    private string $googleBooksApiKey;
+
+    public function __construct(string $googleBooksApiKey)
+    {
+        $this->googleBooksApiKey = $googleBooksApiKey;
+    }
+
     #[Route('/recherche', name:'app_recherche_livre')]
     public function search(Request $request, BookRepository $bookRepository, EntityManagerInterface $em): Response
     {
@@ -110,49 +119,87 @@ class BookController extends AbstractController
         return $this->json($books);
     }
 
-    #[Route ('/{id}', name: 'app_book_show', requirements: ['id' => '\d+'])]
-    public function show(Book $book): Response
-    {
-        return $this->render('book/details.html.twig', [
-            'book' => $book,
+    #[Route('/creation', name: 'livres_creation', methods: ['POST'])]
+    public function create(Request $request, EntityManagerInterface $em, BookRepository $bookRepository, HttpClientInterface $client): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+
+        $bookTitle = trim($data['title'] ?? '');
+        $authorName = trim($data['author'] ?? '');
+
+        if (!$bookTitle || !$authorName) {
+            return $this->json([
+                'success' => false,
+                'message' => "Le titre et le nom de l'auteur sont obligatoires."
+            ]);
+        }
+
+        // Gestion de l'auteur
+        $author = $em->getRepository(Author::class)->findOneBy(['name' => $authorName]);
+        if (!$author) {
+            $author = new Author();
+            $author->setName($authorName);
+            $em->persist($author);
+        }
+
+        // Requête Google Books
+        $googleResponse = $client->request('GET', 'https://www.googleapis.com/books/v1/volumes', [
+            'query' => [
+                'q' => $bookTitle . ' ' . $authorName,
+                'maxResults' => 1,
+                'key' => $this->googleBooksApiKey,
+                'langRestrict' => 'fr'
+            ]
+        ]);
+
+        $googleData = $googleResponse->toArray();
+        $bookInfo = !empty($googleData['items']) ? $googleData['items'][0]['volumeInfo'] : [];
+
+        $format = $bookInfo['printType'] ?? null;
+
+        // Vérification si le livre existe déjà
+        $existingBook = $em->getRepository(Book::class)->findOneBy([
+            'title' => $bookTitle,
+            'author' => $author,
+            'format' => $format
+        ]);
+
+        if ($existingBook) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Ce livre existe déjà en base.'
+            ]);
+        }
+
+        // Création du livre
+        $book = new Book();
+        $book->setTitle($bookTitle);
+        $book->setAuthor($author);
+        $book->setFormat($format);
+        $book->setIsbn($bookInfo['industryIdentifiers'][0]['identifier'] ?? null);
+        $book->setCover($bookInfo['imageLinks']['thumbnail'] ?? null);
+        $book->setSummary($bookInfo['description'] ?? null);
+        $book->setPages($bookInfo['pageCount'] ?? null);
+        $book->setPublicationDate(!empty($bookInfo['publishedDate']) ? new DateTime($bookInfo['publishedDate']) : null);
+        $book->setPublishers(!empty($bookInfo['publisher']) ? [$bookInfo['publisher']] : []);
+        $book->setGenres($bookInfo['categories'] ?? []);
+        $book->setSubjects($bookInfo['categories'] ?? []);
+
+        $em->persist($book);
+        $em->flush();
+
+        return $this->json([
+            'success' => true,
+            'message' => 'Livre créé avec succès !',
+            'bookId' => $book->getId()
         ]);
     }
 
-    #[Route('/ajouter', name: 'app_book_add')]
-    public function add(Request $request, EntityManagerInterface $em): Response
+    #[Route('/{id}', name: 'app_livre_detail')]
+    public function detail(Book $book): Response
     {
-        return $this->render('book/add.html.twig');
-    }
-
-    #[Route ('/creation', name:'livres_creation', methods:['POST'])]
-    public function creation(Request $request, EntityManagerInterface $em): JsonResponse
-    {
-        // On récupère le corps de la requête HTTP en JSON et on le transforme en tableau PHP
-        $data = json_decode($request->getContent(), true);
-
-        // Tous les champs sont obligatoires
-        if (empty($data['title']) || empty($data['author']) || empty($data['genre']) || empty($data['parutionDate'])) {
-            return new JsonResponse(['success' => false, 'message' => 'Veuillez remplir tous les champs.'], 400);
-        }
-
-        // On crée une nouvelle instance Book
-        $book = new Book();
-
-        // On remplit l'objet avec les valeurs envoyées par le formulaire
-        $book->setTitle($data['title']);
-        $book->setAuthor($data['author']);
-        $book->setGenres($data['genre']);
-        $book->setPublicationDate(new DateTime($data['parutionDate']));
-
-        // Enregistrement en BDD
-        $em->persist($book); // Préparation de l'objet
-        $em->flush(); // Exécution
-
-        // Réponse JSON
-        return new JsonResponse([
-            'success' => true,
-            'message' => 'Livre créé avec succès !',
-            'bookId' => $book->getId(),
+        // Le param converter de Symfony récupère automatiquement le Book depuis l'id
+        return $this->render('book/detail.html.twig', [
+            'book' => $book,
         ]);
     }
 }

@@ -1,0 +1,24 @@
+.book-detail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 700px;
+    margin: auto;
+    padding: 20px;
+}
+
+.book-detail .cover img {
+    width: 200px;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.book-detail h1, .book-detail h2 {
+    text-align: center;
+}
+
+.book-detail p {
+    font-size: 14px;
+    margin: 4px 0;
+}

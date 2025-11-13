@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ book.title }}{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/book/detail.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="book-detail">
+        <div class="cover">
+            <img src="{{ book.cover }}" alt="{{ book.title }}" />
+        </div>
+        <h1>{{ book.title }}</h1>
+        {% if book.voTitle %}
+            <h2>Titre VO : {{ book.voTitle }}</h2>
+        {% endif %}
+        <p><strong>Auteur :</strong> {{ book.author.name }}</p>
+        {% if book.publicationDate %}
+            <p><strong>Date de publication :</strong> {{ book.publicationDate|date('d/m/Y') }}</p>
+        {% endif %}
+        {% if book.isbn %}
+            <p><strong>ISBN :</strong> {{ book.isbn }}</p>
+        {% endif %}
+        {% if book.pages %}
+            <p><strong>Pages :</strong> {{ book.pages }}</p>
+        {% endif %}
+        {% if book.publishers %}
+            <p><strong>Éditeur(s) :</strong> {{ book.publishers|join(', ') }}</p>
+        {% endif %}
+        {% if book.genres %}
+            <p><strong>Genres :</strong> {{ book.genres|join(', ') }}</p>
+        {% endif %}
+        {% if book.subjects %}
+            <p><strong>Thèmes :</strong> {{ book.subjects|join(', ') }}</p>
+        {% endif %}
+        {% if book.summary %}
+            <div class="summary">
+                <h3>Résumé :</h3>
+                <p>{{ book.summary }}</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

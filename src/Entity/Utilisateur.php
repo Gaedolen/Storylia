@@ -84,8 +84,8 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Bookshelf::class)]
     private Collection $bookshelves;
 
-    #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Review::class)]
-    private Collection $review;
+    #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Review::class, cascade: ['remove'])]
+    private Collection $reviews;
 
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Report::class)]
     private Collection $signalementsFaits;
@@ -101,7 +101,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         $this->clubsCrees = new ArrayCollection();
         $this->clubsMembre = new ArrayCollection();
         $this->bookshelves = new ArrayCollection();
-        $this->review = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
         $this->signalementsFaits = new ArrayCollection();
         $this->signalementsRecus = new ArrayCollection();
         $this->readingHistory = new ArrayCollection();
@@ -337,27 +337,32 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getReview(): Collection 
-    { 
-        return $this->review; 
+    /**
+     * @return Collection<int, Review>
+     */
+    public function getReviews(): Collection
+    {
+        return $this->reviews;
     }
 
-    public function addReview(Review $review): self
+    public function addReview(Review $review): static
     {
-        if (!$this->review->contains($review)) {
-            $this->review[] = $review;
+        if (!$this->reviews->contains($review)) {
+            $this->reviews->add($review);
             $review->setUtilisateur($this);
         }
+
         return $this;
     }
 
-    public function removeReview(Review $review): self
+    public function removeReview(Review $review): static
     {
-        if ($this->review->removeElement($review)) {
+        if ($this->reviews->removeElement($review)) {
             if ($review->getUtilisateur() === $this) {
                 $review->setUtilisateur(null);
             }
         }
+
         return $this;
     }
 

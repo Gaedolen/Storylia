@@ -128,122 +128,26 @@
                 </form>
 
                 {# Formulaire de création d'un livre #}
-                <div id="creationBookForm" class="hidden">
-                    <h2>Créer un nouveau livre</h2>
+                <div id="bookCreationForm" class='hidden' style=" margin-top:20px;">
+                    <h3>Ajouter un livre</h3>
                     <form id="formBookCreation">
+
                         <div class="form-group">
-                            <label for="title">Titre</label>
-                            <input type="text" name="title" id="title" required>
+                            <label for="bookTitle">Titre</label>
+                            <input type="text" id="bookTitle" name="title" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="author">Auteur</label>
-                            <input type="text" name="author" id="author" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="genre">Genre littéraire</label>
-                            <select name="genre" id="genre" required>
-                                <option value="">Choisir un genre</option>
-                                {% set categories = {
-                                        'Fiction': {
-                                            'Science-Fiction': 'scifi',
-                                            'Fantastique': 'fantastique',
-                                            'Fantasy': 'fantasy',
-                                            'Dystopie': 'dystopie',
-                                            'Steampunk': 'steampunk',
-                                            'Aventure': 'aventure',
-                                            'Uchronie': 'uchronie'
-                                        },
-                                        'Policier / Suspense': {
-                                            'Policier': 'policier',
-                                            'Thriller': 'thriller',
-                                            'Espionnage': 'espionnage',
-                                            'Horreur': 'horreur',
-                                            'Noir': 'roman_noir',
-                                            'Suspense psychologique': 'psychological_thriller'
-                                        },
-                                        'Romance & Jeunesse': {
-                                            'Young Adult': 'young_adult',
-                                            'Romance Jeunesse': 'romance_jeune',
-                                            'Amitié': 'amitie',
-                                            'Coming of Age': 'coming_of_age'
-                                        },
-                                        'Romance et roman adulte': {
-                                            'Romance Contemporaine': 'romance_contemporaine',
-                                            'Romance Historique': 'romance_historique',
-                                            'Romance Érotique': 'erotique',
-                                            'Chick-lit': 'chicklit',
-                                            'Drame': 'drame'
-                                        },
-                                        'Culture, Histoire & Documentaire': {
-                                            'Essai': 'essai',
-                                            'Biographie': 'biographie',
-                                            'Philosophie': 'philosophie',
-                                            'Historique': 'historique',
-                                            'Histoire': 'histoire',
-                                            'Science': 'science',
-                                            'Sociologie': 'sociologie',
-                                            'Psychologie': 'psychologie',
-                                            'Politique': 'politique',
-                                            'Économie': 'economie',
-                                            'Spiritualité': 'spiritualite',
-                                            'Religion': 'religion'
-                                        },
-                                        'Arts & Littérature': {
-                                            'Poésie': 'poesie',
-                                            'Théâtre': 'theatre',
-                                            'Musique': 'musique',
-                                            'Cinéma': 'cinema',
-                                            'Photographie': 'photographie',
-                                            'Art': 'art'
-                                        },
-                                        'Mythes et Légendes': {
-                                            'Contes et Légendes': 'conte_legend',
-                                            'Mythologie': 'mythologie',
-                                            'Folklore': 'folklore',
-                                            'Épopée': 'epopee'
-                                        },
-                                        'Graphique': {
-                                            'Roman Graphique': 'graphic_novel',
-                                            'Bande dessinée': 'bd',
-                                            'Manga': 'manga',
-                                            'Comics': 'comics',
-                                            'Webtoon': 'webtoon'
-                                        },
-                                        'Autres': {
-                                            'Cuisine': 'cuisine',
-                                            'Voyage': 'voyage',
-                                            'Nature': 'nature',
-                                            'Animaux': 'animaux',
-                                            'Développement personnel': 'developpement_perso',
-                                            'Éducation': 'education',
-                                            'Sport': 'sport',
-                                            'Technologie': 'technologie'
-                                        }
-                                } %}
-
-                                {% for group, genres in categories %}
-                                    <optgroup label="{{ group }}">
-                                        {% for label, value in genres %}
-                                           <option value="{{ value }}">{{label}}</option>
-                                        {% endfor %}
-                                    </optgroup>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="parutionDate">Date de parution</label>
-                            <input type="date" name="parutionDate" id="parutionDate" required>
+                            <label for="bookAuthor">Auteur</label>
+                            <input type="text" id="bookAuthor" name="author" required>
                         </div>
 
                         <p class="warning-message">
-                            Avant de valider l'ajout de ce livre, merci de bien vérifier l'orthographe du titre, de l'auteur et l'exactitude de la date de parution.<br>
-                            Pour les livres d'une série, vous pouvez le présenter ainsi : <em>ex : "Harry Potter : L'école des sorciers, Tome 1"</em>
-                        </p>;
+                            Avant de valider l'ajout de ce livre, merci de bien vérifier l'orthographe du titre et de l'auteur.<br>
+                        </p>
 
-                        <button type="submit" class="btn-principal">Créer le livre</button>
+                        <button type="submit" id="createBookBtn">Créer</button>
+
                     </form>
                 </div>
             </div>
@@ -258,7 +162,7 @@
             {% else %}
                 <div class="livres-list">
                     {% for livre in livres %}
-                        <a href='#' {# "{{ path('app_livre_detail', {id: livre.id}) }}" #} class="livre-card">
+                        <a href="{{ path('app_livre_detail', {id: livre.id}) }}" class="livre-card">
                             <div class="cover">
                                 <img src="{{ livre.cover }}" alt="{{ livre.title }}">
                             </div>

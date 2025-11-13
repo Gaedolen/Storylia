@@ -6,6 +6,8 @@ use App\Entity\Book;
 use App\Entity\Author;
 use App\Repository\AuthorRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
+
 
 class BookCreationService
 {
@@ -21,36 +23,50 @@ class BookCreationService
     /**
      * Crée ou met à jour un livre à partir des données d'une API
      *
-     * @param array $data Données issues de l'API
+     * @param array $data
      * @return Book|null
      */
     public function createOrUpdateBookFromApi(array $data): ?Book
     {
-        $isbn = $data['isbn'] ?? null;
-        if (!$isbn) return null;
+        // Récupération ou création de l'auteur
+        $authorName = $data['author'] ?? 'Auteur inconnu';
+        $author = $this->authorRepository->findOneBy(['name' => $authorName]);
 
-        // Cherche l'existant
-        $book = $this->em->getRepository(Book::class)->findOneBy(['isbn' => $isbn]);
-
-        if ($book) {
-            return $this->updateBookFromApi($book, $data);
+        if (!$author) {
+            $author = new Author();
+            $author->setName($authorName);
+            $this->em->persist($author);
+            $this->em->flush(); // pour que l'ID existe
         }
 
+        // Vérifier si un livre avec la même combinaison title + author + format existe
+        $format = $data['format'] ?? 'Broché';
+        $existingBook = $this->em->getRepository(Book::class)
+            ->findOneBy([
+                'title' => $data['title'] ?? '',
+                'author' => $author,
+                'format' => $format,
+            ]);
+
+        if ($existingBook) {
+            // Mise à jour des champs non-uniques seulement
+            return $this->updateBookFields($existingBook, $data);
+        }
+
+        // Création d'un nouveau livre
         $book = new Book();
-        $book->setIsbn($isbn);
-        $this->updateBookFromApi($book, $data);
+        $book->setTitle($data['title'] ?? '');
+        $book->setAuthor($author);
+        $book->setFormat($format);
 
-        $this->em->persist($book);
-
-        return $book;
+        return $this->updateBookFields($book, $data);
     }
 
     /**
-     * Met à jour un livre existant avec les données de l'API
+     * Met à jour uniquement les champs modifiables d'un livre
      */
-    public function updateBookFromApi(Book $book, array $data): Book
+    public function updateBookFields(Book $book, array $data): Book
     {
-        $book->setTitle($data['title'] ?? $book->getTitle() ?? 'Titre inconnu');
         $book->setVoTitle($data['voTitle'] ?? $book->getVoTitle() ?? $book->getTitle());
         $book->setSummary($data['summary'] ?? $book->getSummary());
         $book->setPages($data['pages'] ?? $book->getPages());
@@ -65,29 +81,14 @@ class BookCreationService
         }
 
         $book->setCover($data['cover'] ?? $book->getCover() ?? '/images/default_cover.jpg');
-        $book->setFormat($data['format'] ?? $book->getFormat() ?? 'Broché');
 
-        // Gestion de l'auteur
-        $authorName = $data['author'] ?? 'Auteur inconnu';
-        $author = $this->authorRepository->findOneBy(['name' => $authorName]);
-
-        if (!$author) {
-            $author = new Author();
-            $author->setName($authorName);
-            $this->em->persist($author);
-        }
-
-        $book->setAuthor($author);
+        $this->em->persist($book);
 
         return $book;
     }
 
     /**
-     * Gère l’import massif de plusieurs livres en optimisant les flush()
-     *
-     * @param array $booksData Données de plusieurs livres
-     * @param int $batchSize Nombre de livres par flush
-     * @return array Résumé des actions
+     * Import massif de livres
      */
     public function importBooks(array $booksData, int $batchSize = 50): array
     {
@@ -96,14 +97,13 @@ class BookCreationService
         $count = 0;
 
         foreach ($booksData as $data) {
-            $existingBook = $this->em->getRepository(Book::class)->findOneBy(['isbn' => $data['isbn'] ?? null]);
+            $book = $this->createOrUpdateBookFromApi($data);
 
-            if ($existingBook) {
-                $this->updateBookFromApi($existingBook, $data);
-                $updated[] = $existingBook->getTitle();
-            } else {
-                $book = $this->createOrUpdateBookFromApi($data);
-                if ($book) {
+            if ($book) {
+                // Déterminer si c'était une mise à jour ou un nouvel import
+                if ($book->getId()) {
+                    $updated[] = $book->getTitle();
+                } else {
                     $imported[] = $book->getTitle();
                 }
             }
@@ -117,6 +117,7 @@ class BookCreationService
 
         // Flush final
         $this->em->flush();
+        $this->em->clear();
 
         return [
             'imported' => $imported,

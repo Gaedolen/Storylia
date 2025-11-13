@@ -10,6 +10,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: BookRepository::class)]
+#[ORM\UniqueConstraint(name: "uniq_book_title_author_format", columns: ["title", "author_id", "format"])]
 class Book
 {
     #[ORM\Id]
@@ -23,8 +24,8 @@ class Book
     #[ORM\Column(type:"string", length:255, nullable:true)]
     private ?string $voTitle = null; // Titre VO si disponible
 
-    #[ORM\ManyToOne(targetEntity: Author::class, cascade:["persist"])]
-    #[ORM\JoinColumn(nullable:false)]
+    #[ORM\ManyToOne(targetEntity: Author::class, inversedBy: 'books', cascade: ['persist'])]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Author $author = null;
 
     #[ORM\Column(type:"date", nullable:true)]
@@ -39,7 +40,7 @@ class Book
     #[ORM\Column(type:"text", nullable:true)]
     private ?string $summary = null;
 
-    #[ORM\Column(type:"string", length:50, unique:true)]
+    #[ORM\Column(type:"string", length:50, nullable:true)]
     private ?string $isbn = null;
 
     #[ORM\Column(type:"string", length:255, nullable:true)]
@@ -152,9 +153,9 @@ class Book
         return $this->isbn;
     }
 
-    public function setIsbn(string $isbn): self
+    public function setIsbn(?string $isbn): self
     {
-        $this->isbn = trim($isbn);
+        $this->isbn = $isbn ? trim($isbn) : null;
         return $this;
     }
 

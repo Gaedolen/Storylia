@@ -23,11 +23,11 @@ class Review
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $date = null;
 
-    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'review')]
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'reviews')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Utilisateur $utilisateur = null;
 
-    #[ORM\ManyToOne(targetEntity: Book::class)]
+    #[ORM\ManyToOne(targetEntity: Book::class, inversedBy: 'reviews')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Book $book = null;
 
