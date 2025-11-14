@@ -1,6 +1,9 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('turbo:load', function() {
+    console.log("JS modal chargé");
     const openBtn = document.getElementById('open-search-book-modal'); // Bouton d'ouverture
     const modal = document.getElementById('search-book-modal'); // Modal
+    if (!openBtn) console.error("Bouton non trouvé !");
+    if (!modal) console.error("Modal non trouvée !");
     const closeBtn = modal.querySelector('.close') // Bouton de fermeture (x)
     const searchTitle = document.getElementById('searchTitle'); // Champ de saisie titre
     const searchAuthor = document.getElementById('searchAuthor'); // Champ de saisie auteur
@@ -24,15 +27,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Gestion de l'ouverture de la modal
     openBtn.addEventListener('click', () => {
-        modal.classList.remove('hidden'); // On retire la classe 'hidden' pour afficher la modal
-        searchResults.innerHTML = ''; // On vide les résultats précédents
-        notFoundBtn.style.display = 'none'; // On cache le bouton "livre introuvable"
-        // On vide les champs de saisie pour recommencer une recherche
-        searchTitle.value = '';
-        searchAuthor.value = '';
-        // Forcer le formulaire à être caché
-        creationForm.classList.add('hidden');
-        searchForm.style.display = 'block';
+        console.log("Ouverture modal");
+        modal.style.display = 'flex';
+    });
+
+    modal.querySelector('.close').addEventListener('click', () => {
+        modal.style.display = 'none';
     });
 
     // Gestion de la fermeture de la modal

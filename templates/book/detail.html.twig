@@ -7,38 +7,95 @@
 {% endblock %}
 
 {% block body %}
-    <div class="book-detail">
-        <div class="cover">
-            <img src="{{ book.cover }}" alt="{{ book.title }}" />
+    <div class="book-top-block">
+        <!-- Boutons principaux à gauche -->
+        <div class="book-actions-left">
+            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYE') %}
+                <button class="btn-main">Modifier</button>
+                <button class="btn-main">Supprimer</button>
+            {% endif %}
+            <button class="btn-main">Ajouter à la bibliothèque</button>
+            {% if isInLibrary %}
+                <button class="btn-main">Laisser un avis</button>
+                <button class="btn-main">Ajouter une date de lecteur</button>
+                <button class="btn-main">Laisser une note</button>
+            {% endif %}
         </div>
-        <h1>{{ book.title }}</h1>
-        {% if book.voTitle %}
-            <h2>Titre VO : {{ book.voTitle }}</h2>
-        {% endif %}
-        <p><strong>Auteur :</strong> {{ book.author.name }}</p>
-        {% if book.publicationDate %}
-            <p><strong>Date de publication :</strong> {{ book.publicationDate|date('d/m/Y') }}</p>
-        {% endif %}
-        {% if book.isbn %}
-            <p><strong>ISBN :</strong> {{ book.isbn }}</p>
-        {% endif %}
-        {% if book.pages %}
-            <p><strong>Pages :</strong> {{ book.pages }}</p>
-        {% endif %}
-        {% if book.publishers %}
-            <p><strong>Éditeur(s) :</strong> {{ book.publishers|join(', ') }}</p>
-        {% endif %}
-        {% if book.genres %}
-            <p><strong>Genres :</strong> {{ book.genres|join(', ') }}</p>
-        {% endif %}
-        {% if book.subjects %}
-            <p><strong>Thèmes :</strong> {{ book.subjects|join(', ') }}</p>
-        {% endif %}
-        {% if book.summary %}
-            <div class="summary">
+
+        <!-- Couverture + Infos Livre -->
+        <div class="livre-container">
+
+            <div class="livre-infos">
+                <img src="{{ asset(book.cover) }}" alt="Couverture du livre">
+
+                <div class="livre-details">
+                    <h2>{{ book.title }}</h2>
+                    {% if book.voTitle %}
+                        <p><strong>Titre VO : </strong> {{ book.voTitle }}</p>
+                    {% endif %}
+                    <p><strong>Auteur : </strong> {{ book.author.name }}</p>
+                    <p><strong>Edition(s) : </strong>
+                        {% for publisher in book.publishers %}
+                            {{ publisher }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                    <p><strong>Pages : </strong> {{ book.pages }}</p>
+                    <p><strong>Date de sortie : </strong> {{ book.publicationDate }}</p>
+                    <p><strong>Genre(s) : </strong>
+                        {% for genre in book.genres %}
+                            {{ genre }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                    <p><strong>Thème(s) : </strong></p>
+                    <div class="tags">
+                        {% for subject in book.subjects %}
+                            <span>{{ subject }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Résumé sous le bloc infos -->
+            <div class="livre-resume">
                 <h3>Résumé :</h3>
                 <p>{{ book.summary }}</p>
             </div>
-        {% endif %}
+
+        </div>
+
+        <!-- Boutons additionnels à droite -->
+        <div class="book-actions-right">
+            <button class="btn-main">Ajouter une couverture</button>
+            <button class="btn-main">Ajouter un thème</button>
+            <button class="btn-main">Mettre à jour le résumé</button>
+        </div>
+    </div>
+
+    <!-- Note globale et avis -->
+    <div class="book-reviews-block">
+        <div class="book-rating">
+            <h3>Note globale</h3>
+            <p>{{ book.averageRating|default('Pas encore noté') }}</p>
+        </div>
+
+        <div class="book-reviews">
+            <h3>Avis</h3>
+            {% for review in reviews %}
+                <div class="review">
+                    <p><strong>{{ review.user.username }}</strong>: {{ review.comment }}</p>
+                    <p>Note: {{ review.rating }}/5</p>
+                </div>
+            {% else %}
+                <p>Aucun avis pour le moment.</p>
+            {% endfor %}
+
+            {% if totalPages > 1 %}
+                <div class="pagination">
+                    {% for i in 1..totalPages %}
+                        <a href="?page={{ i }}" class="{{ i == currentPage ? 'active' : '' }}">{{ i }}</a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
     </div>
 {% endblock %}

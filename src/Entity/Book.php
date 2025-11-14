@@ -55,6 +55,9 @@ class Book
     #[ORM\Column(type:"string", length:50, nullable:true)]
     private ?string $format = null;
 
+    /**
+     * @var Collection<int, Review>
+     */
     #[ORM\OneToMany(mappedBy: 'book', targetEntity: Review::class, cascade: ['remove'])]
     private Collection $reviews;
 

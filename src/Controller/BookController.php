@@ -3,10 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Book;
+use App\Entity\Bookshelf;
 use App\Entity\Author;
 use DateTime;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\BookRepository;
+use App\Repository\BookshelfRepository;
+use App\Repository\ReviewRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -195,11 +198,39 @@ class BookController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_livre_detail')]
-    public function detail(Book $book): Response
+    public function detail(Book $book, ReviewRepository $reviewRepo,  BookshelfRepository $bookshelfRepo, Request $request)
     {
-        // Le param converter de Symfony récupère automatiquement le Book depuis l'id
+        $user = $this->getUser();
+
+        // Pagination reviews
+        $page = $request->query->getInt('page', 1);
+        $reviewsPerPage = 5;
+        $totalReviews = count($book->getReviews());
+        $totalPages = ceil($totalReviews / $reviewsPerPage);
+
+        $reviews = $reviewRepo->findBy(
+            ['book' => $book],
+            ['date' => 'DESC'],
+            $reviewsPerPage,
+            ($page - 1) * $reviewsPerPage
+        );
+
+        // Vérifie si le livre est dans la bibliothèque de l'utilisateur
+        $isInLibrary = false;
+        if ($user) {
+            $isInLibrary = $bookshelfRepo->findOneBy([
+                'book' => $book,
+                'utilisateur' => $user
+            ]) !== null;
+        }
+
         return $this->render('book/detail.html.twig', [
             'book' => $book,
+            'reviews' => $reviews,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'isInLibrary' => $isInLibrary,
+            'user' => $user,
         ]);
     }
 }
