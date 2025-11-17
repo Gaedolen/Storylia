@@ -40,13 +40,16 @@ class BookCreationService
         }
 
         // Vérifier si un livre avec la même combinaison title + author + format existe
-        $format = $data['format'] ?? 'Broché';
+        $title = trim(mb_strtolower($data['title'] ?? ''));
+
         $existingBook = $this->em->getRepository(Book::class)
-            ->findOneBy([
-                'title' => $data['title'] ?? '',
-                'author' => $author,
-                'format' => $format,
-            ]);
+            ->createQueryBuilder('b')
+            ->where('LOWER(b.title) = :title')
+            ->andWhere('b.author = :author')
+            ->setParameter('title', $title)
+            ->setParameter('author', $author)
+            ->getQuery()
+            ->getOneOrNullResult();
 
         if ($existingBook) {
             // Mise à jour des champs non-uniques seulement
@@ -55,9 +58,8 @@ class BookCreationService
 
         // Création d'un nouveau livre
         $book = new Book();
-        $book->setTitle($data['title'] ?? '');
+        $book->setTitle(trim($data['title'] ?? ''));
         $book->setAuthor($author);
-        $book->setFormat($format);
 
         return $this->updateBookFields($book, $data);
     }

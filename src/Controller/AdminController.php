@@ -92,19 +92,20 @@ class AdminController extends AbstractController
         $batchSize = 50;
         $totalImported = 0;
 
-        // Récupère tous les livres existants avec title + author name + format
+        // --- Récupère tous les livres existants avec title + author name ---
         $existingBooks = $em->getRepository(Book::class)
                             ->createQueryBuilder('b')
-                            ->select('b.title, IDENTITY(b.author) AS author_id, b.format')
+                            ->select('b.title, IDENTITY(b.author) AS author_id')
                             ->getQuery()
                             ->getArrayResult();
 
-        // Crée un tableau pour vérifier l’existence rapidement
+        // --- Crée un tableau pour vérifier rapidement l’existence ---
         $existingMap = [];
         foreach ($existingBooks as $b) {
             $author = $em->getRepository(Author::class)->find($b['author_id']);
             $authorName = $author ? strtolower(trim($author->getName())) : '';
-            $key = strtolower(trim($b['title'])) . '||' . $authorName . '||' . strtolower(trim($b['format'] ?? 'broché'));
+            $titleKey = strtolower(trim($b['title']));
+            $key = $titleKey . '||' . $authorName; // uniquement titre + auteur
             $existingMap[$key] = true;
         }
 
@@ -120,25 +121,22 @@ class AdminController extends AbstractController
                 foreach ($booksData as $bookData) {
                     $title = trim($bookData['title'] ?? '');
                     $authorName = strtolower(trim($bookData['author'] ?? 'Auteur inconnu'));
-                    $format = strtolower(trim($bookData['format'] ?? 'Broché'));
-
-                    $key = $title . '||' . $authorName . '||' . $format;
+                    $key = strtolower($title) . '||' . $authorName;
 
                     // Si le livre existe déjà, on saute
-                    if (isset($existingMap[$key])) {
-                        continue;
-                    }
+                    if (isset($existingMap[$key])) continue;
 
                     $book = $creationService->createOrUpdateBookFromApi($bookData);
                     if ($book) {
                         $em->persist($book);
-                        $existingMap[$key] = true;
+                        $existingMap[$key] = true; // marque comme existant
                         $totalImported++;
                     }
 
+                    // Flush par batch
                     if ($totalImported % $batchSize === 0) {
                         $em->flush();
-                        $em->clear(); 
+                        $em->clear();
                     }
                 }
 
@@ -148,6 +146,7 @@ class AdminController extends AbstractController
 
         // Flush final
         $em->flush();
+        $em->clear();
 
         $this->addFlash('success', "$totalImported livre(s) importé(s).");
         return $this->redirectToRoute('admin_dashboard');
@@ -162,7 +161,6 @@ class AdminController extends AbstractController
         $batchSize = 50;
         $count = 0;
 
-        // On utilise un cursor (iterator) pour ne jamais charger tous les livres en mémoire
         $qb = $em->createQueryBuilder()
             ->select('b')
             ->from(Book::class, 'b');
@@ -171,7 +169,7 @@ class AdminController extends AbstractController
 
         foreach ($iterableBooks as $book) {
             $author = $book->getAuthor();
-            if (!$author) continue; // sécurité si jamais un livre n'a pas d'auteur
+            if (!$author) continue;
 
             $bookData = $apiService->fetchBook($book->getTitle(), $author->getName());
             if (!$bookData) continue;
@@ -187,7 +185,6 @@ class AdminController extends AbstractController
             }
         }
 
-        // Flush final
         $em->flush();
         $em->clear();
 

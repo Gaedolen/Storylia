@@ -89,14 +89,17 @@ h2, h3 {
 }
 
 /* == MODAL == */
-/* Cache la modal par défaut */
 .hidden {
-    display: none;
+    display: none !important;
 }
 
-/* Fond semi-transparent derrière la modal */
+/* Modal cachée par défaut */
+#search-book-modal.hidden {
+    display: none !important; /* sert juste au chargement initial */
+}
+
+/* Fond semi-transparent et centrage */
 #search-book-modal {
-    display: none;
     position: fixed;
     top: 0;
     left: 0;
@@ -106,6 +109,12 @@ h2, h3 {
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    display: none; /* on laisse caché par défaut, JS ajoutera .show */
+}
+
+/* Classe pour afficher la modal */
+#search-book-modal.show {
+    display: flex; /* active le display flex pour centrer le contenu */
 }
 
 /* Contenu de la modal */
@@ -204,7 +213,6 @@ h2, h3 {
 
 /* Bouton "Livre introuvable" */
 #book-not-found-btn {
-    display: none;
     align-items: center;
     margin-top: 15px;
     padding: 8px 18px;

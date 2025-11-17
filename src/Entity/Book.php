@@ -9,8 +9,11 @@ use App\Entity\Review;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: BookRepository::class)]
-#[ORM\UniqueConstraint(name: "uniq_book_title_author_format", columns: ["title", "author_id", "format"])]
+#[ORM\Entity]
+#[ORM\Table(name: 'book', uniqueConstraints: [
+    new ORM\UniqueConstraint(name: 'unique_book_title_author', columns: ['title', 'author_id'])
+])]
+
 class Book
 {
     #[ORM\Id]

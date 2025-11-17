@@ -123,7 +123,7 @@ class BookController extends AbstractController
     }
 
     #[Route('/creation', name: 'livres_creation', methods: ['POST'])]
-    public function create(Request $request, EntityManagerInterface $em, BookRepository $bookRepository, HttpClientInterface $client): JsonResponse {
+    public function create(Request $request, EntityManagerInterface $em, HttpClientInterface $client): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
         $bookTitle = trim($data['title'] ?? '');
@@ -142,6 +142,7 @@ class BookController extends AbstractController
             $author = new Author();
             $author->setName($authorName);
             $em->persist($author);
+            $em->flush(); // pour avoir l'id
         }
 
         // Requête Google Books
@@ -157,14 +158,15 @@ class BookController extends AbstractController
         $googleData = $googleResponse->toArray();
         $bookInfo = !empty($googleData['items']) ? $googleData['items'][0]['volumeInfo'] : [];
 
-        $format = $bookInfo['printType'] ?? null;
-
-        // Vérification si le livre existe déjà
-        $existingBook = $em->getRepository(Book::class)->findOneBy([
-            'title' => $bookTitle,
-            'author' => $author,
-            'format' => $format
-        ]);
+        // Vérification si le livre existe déjà (uniquement title + author)
+        $existingBook = $em->getRepository(Book::class)
+            ->createQueryBuilder('b')
+            ->where('LOWER(b.title) = :title')
+            ->andWhere('b.author = :author')
+            ->setParameter('title', mb_strtolower($bookTitle))
+            ->setParameter('author', $author)
+            ->getQuery()
+            ->getOneOrNullResult();
 
         if ($existingBook) {
             return $this->json([
@@ -177,12 +179,19 @@ class BookController extends AbstractController
         $book = new Book();
         $book->setTitle($bookTitle);
         $book->setAuthor($author);
-        $book->setFormat($format);
+        $book->setFormat($bookInfo['printType'] ?? null);
         $book->setIsbn($bookInfo['industryIdentifiers'][0]['identifier'] ?? null);
         $book->setCover($bookInfo['imageLinks']['thumbnail'] ?? null);
         $book->setSummary($bookInfo['description'] ?? null);
         $book->setPages($bookInfo['pageCount'] ?? null);
-        $book->setPublicationDate(!empty($bookInfo['publishedDate']) ? new DateTime($bookInfo['publishedDate']) : null);
+        $publishedDate = $bookInfo['publishedDate'] ?? null;
+
+        if ($publishedDate && preg_match('/^\d{4}(-\d{2}-\d{2})?$/', $publishedDate)) {
+            $book->setPublicationDate(new DateTime($publishedDate));
+        } else {
+            $book->setPublicationDate(null);
+        }
+
         $book->setPublishers(!empty($bookInfo['publisher']) ? [$bookInfo['publisher']] : []);
         $book->setGenres($bookInfo['categories'] ?? []);
         $book->setSubjects($bookInfo['categories'] ?? []);
