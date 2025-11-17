@@ -365,55 +365,256 @@ body {
 }
 
 /* === Champs de sujet === */
+#add-subject-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(20, 20, 20, 0.65);
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.3s ease forwards;
+}
+
+/* Animation d'apparition */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Conteneur modal */
+#add-subject-modal .modal-content {
+    background: #fff8ef;
+    padding: 25px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    position: relative;
+}
+
+/* Titre */
+#add-subject-modal h3 {
+    text-align: center;
+    font-size: 1.4rem;
+    color: #4b2e05;
+    margin-top: 0;
+}
+
+/* Bouton fermer */
+#add-subject-modal .close {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    font-size: 26px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #4b2e05;
+    transition: 0.2s ease;
+}
+
+#add-subject-modal .close:hover {
+    color: #8b5a12;
+    transform: scale(1.15);
+}
+
+/* Container champs */
+#add-subject-modal #subjects-container {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Champ input + bouton "−" ensemble */
 .subject-field {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
+    
 }
 
-.subject-field input {
-    flex: 1;
-    padding: 8px 10px;
-    font-size: 0.95rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+/* Champs input */
+#add-subject-modal .subject-input {
+    flex: 1; /* prend tout l'espace restant */
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #c6a874;
+    font-size: 1rem;
+    box-sizing: border-box;
 }
 
-/* === Boutons + / - === */
-#add-subject-btn,
-.remove-subject-btn {
-    margin-left: 8px;
-    padding: 6px 12px;
-    font-size: 0.9rem;
+/* Bouton retirer un champ */
+#add-subject-modal .remove-subject-btn {
+    width: 35px;       /* largeur fixe */
+    height: 35px;      /* même hauteur que le champ */
+    margin-left: 5px;
+    font-size: 1.2rem;
+    text-align: center;
+    border-radius: 10px;
     border: none;
-    border-radius: 8px;
+    background: #ff6b6b;
+    color: #fff;
     cursor: pointer;
     transition: 0.2s ease;
 }
 
-#add-subject-btn {
-    background-color: #4CAF50;
-    color: #fff;
+#add-subject-modal .remove-subject-btn:hover {
+    background: #ff3b3b;
 }
 
-#add-subject-btn:hover {
-    background-color: #45a049;
+/* Boutons Ajouter un champ et Valider */
+#add-subject-modal #add-subject-btn,
+#add-subject-modal button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
 }
 
-.remove-subject-btn {
-    background-color: #f44336;
-    color: #fff;
+/* Responsive */
+@media (max-width: 450px) {
+    #add-subject-modal .modal-content {
+        width: 92%;
+        padding: 18px;
+    }
+
+    #add-subject-modal h3 {
+        font-size: 1.2rem;
+    }
 }
 
-.remove-subject-btn:hover {
-    background-color: #e53935;
+
+/* == Modal de MAJ d'un résumé == */
+#edit-summary-modal {
+    display: none;                  /* cachée par défaut */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(20, 20, 20, 0.65);   /* fond semi-transparent */
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.3s ease forwards;
 }
 
-.duplicate-error {
-    border: 2px solid #c0392b !important;
-    background: #fbeaea;
+/* Animation d'apparition */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
+/* Contenu de la modal */
+#edit-summary-modal .modal-content {
+    background: #fff8ef;
+    padding: 25px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    animation: scaleIn 0.25s ease;
+    position: relative;
+}
+
+/* Animation du bloc */
+@keyframes scaleIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Titre */
+#edit-summary-modal h3 {
+    margin-top: 0;
+    text-align: center;
+    font-size: 1.4rem;
+    color: #4b2e05;
+}
+
+/* Bouton fermer */
+#edit-summary-modal .close {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    font-size: 26px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #4b2e05;
+    transition: 0.2s ease;
+}
+
+#edit-summary-modal .close:hover {
+    color: #8b5a12;
+    transform: scale(1.15);
+}
+
+/* Textarea */
+#edit-summary-modal textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #d1c0b0;
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 120px;
+    box-sizing: border-box;
+}
+
+/* Compteur de caractères */
+#edit-summary-modal #char-count {
+    text-align: right;
+    font-size: 0.9rem;
+    color: #4b2e05;
+    margin-top: 5px;
+}
+
+/* Boutons */
+#edit-summary-modal button.btn-main,
+#edit-summary-modal label.btn-main {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+}
+
+/* Boutons : survol */
+#edit-summary-modal button.btn-main:hover,
+#edit-summary-modal label.btn-main:hover {
+    background-color: #a65d42;
+    transition: 0.2s ease;
+}
+
+/* Message d'avertissement du résumé */
+#edit-summary-modal .summary-warning {
+    font-size: 0.95rem;
+    color: #8b5a12;       /* couleur marron foncé assortie à ton thème */
+    margin-bottom: 8px;
+    font-style: italic;
+}
+
+
+/* Responsive */
+@media (max-width: 450px) {
+    #edit-summary-modal .modal-content {
+        width: 92%;
+        padding: 18px;
+    }
+
+    #edit-summary-modal h3 {
+        font-size: 1.2rem;
+    }
+}
 
 /* === Liste des sujets affichés sous forme de badges === */
 .book-subjects {

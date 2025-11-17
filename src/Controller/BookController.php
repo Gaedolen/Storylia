@@ -304,4 +304,36 @@ class BookController extends AbstractController
             'newSubjects' => $allSubjects
         ]);
     }
+
+    #[Route('/{id}/edit-summary', name: 'app_livre_edit_summary', methods: ['POST'])]
+    public function editSummary(Request $request, Book $book, EntityManagerInterface $em): JsonResponse
+    {
+        $summary = trim($request->request->get('summary', ''));
+
+        // Vérifications côté serveur
+        if ($summary === '') {
+            return $this->json([
+                'success' => false,
+                'message' => 'Le résumé ne peut pas être vide.'
+            ]);
+        }
+
+        $maxLength = 1000; // limite à 1000 caractères
+        if (strlen($summary) > $maxLength) {
+            return $this->json([
+                'success' => false,
+                'message' => "Le résumé ne peut pas dépasser $maxLength caractères."
+            ]);
+        }
+
+        // Enregistrement
+        $book->setSummary($summary);
+        $em->flush();
+
+        return $this->json([
+            'success' => true,
+            'summary' => $summary,
+            'message' => 'Résumé mis à jour avec succès !'
+        ]);
+    }
 }

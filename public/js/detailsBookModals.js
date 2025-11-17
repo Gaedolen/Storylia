@@ -89,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
             input.type = 'text';
             input.name = 'subjects[]';
             input.placeholder = "Nouveau thème";
+            input.className = 'subject-input';
 
             // Vérification doublons en live
             input.addEventListener('input', () => {
@@ -141,6 +142,62 @@ document.addEventListener('DOMContentLoaded', () => {
                 formSubj.reset();
                 container.innerHTML = ""; // Effacer les champs créés
                 subjectModal.style.display = 'none';
+            }
+        });
+    }
+
+    // ==== MODAL MODIFIER / AJOUTER RÉSUMÉ ====
+    const summaryModal = document.getElementById('edit-summary-modal');
+
+    if(summaryModal) {
+        const closeBtn = summaryModal.querySelector('.close');
+        const form = document.getElementById('edit-summary-form');
+        const textarea = form.querySelector('textarea');
+        const updateBtn = document.querySelector('button.btn-main[data-modal="edit-summary-modal"]') || document.querySelector('button.btn-main:last-of-type');
+
+        // Ouvrir modal
+        updateBtn.addEventListener('click', () => {
+            summaryModal.style.display = 'flex';
+            textarea.focus();
+
+            // Initialiser le compteur de caractères dès l'ouverture
+            const counter = summaryModal.querySelector('#char-count');
+            if(counter) counter.textContent = `${textarea.value.length} / 1000`;
+        });
+
+        // Compteur de caractères en temps réel
+        textarea.addEventListener('input', () => {
+            const maxLength = 1000;
+            const count = textarea.value.length;
+            const counter = summaryModal.querySelector('#char-count');
+            if(counter) counter.textContent = `${count} / ${maxLength}`;
+        });
+
+        // Fermer modal
+        closeBtn.addEventListener('click', () => summaryModal.style.display = 'none');
+        window.addEventListener('click', e => {
+            if(e.target === summaryModal) summaryModal.style.display = 'none';
+        });
+
+        // Soumission AJAX
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            if(data.success){
+                // Mettre à jour directement le résumé sur la page
+                const summaryBlock = document.querySelector('.livre-resume p');
+                if(summaryBlock) summaryBlock.textContent = data.summary;
+
+                summaryModal.style.display = 'none';
+            } else {
+                alert(data.message || "Erreur lors de la mise à jour du résumé.");
             }
         });
     }
