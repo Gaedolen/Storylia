@@ -266,3 +266,166 @@ body {
     background-color: #c19a6b;
     color: white;
 }
+
+/* == MODALS == */
+.modal {
+    display: none;                  /* cachée par défaut */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(20, 20, 20, 0.65);   /* fond foncé semi-transparent */
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    backdrop-filter: blur(3px);      /* un petit effet blur classe */
+    animation: fadeIn 0.3s ease forwards;
+}
+
+/* Animation d'apparition */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* --- CONTENEUR DE LA MODALE --- */
+.modal-content {
+    background: #fff8ef;                          /* ton beige clair Storylia */
+    padding: 25px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    animation: scaleIn 0.25s ease;
+    position: relative;
+}
+
+/* Animation du bloc */
+@keyframes scaleIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* --- TITRE --- */
+.modal-content h3 {
+    margin-top: 0;
+    text-align: center;
+    font-size: 1.4rem;
+    color: #4b2e05;
+}
+
+/* --- BOUTON CLOSE --- */
+.modal-content .close {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    font-size: 26px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #4b2e05;
+    transition: 0.2s ease;
+}
+
+.modal-content .close:hover {
+    color: #8b5a12;
+    transform: scale(1.15);
+}
+
+/* --- AFFICHAGE DU NOM DU FICHIER --- */
+.modal-content .file-name {
+    text-align: center;
+    font-size: 0.95rem;
+    color: #4b2e05;
+    font-style: italic;
+}
+
+/* --- BOUTONS --- */
+.modal-content button,
+.modal-content label.btn-main {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 450px) {
+    .modal-content {
+        width: 92%;
+        padding: 18px;
+    }
+
+    .modal-content h3 {
+        font-size: 1.2rem;
+    }
+}
+
+/* === Champs de sujet === */
+.subject-field {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.subject-field input {
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 0.95rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+/* === Boutons + / - === */
+#add-subject-btn,
+.remove-subject-btn {
+    margin-left: 8px;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+#add-subject-btn {
+    background-color: #4CAF50;
+    color: #fff;
+}
+
+#add-subject-btn:hover {
+    background-color: #45a049;
+}
+
+.remove-subject-btn {
+    background-color: #f44336;
+    color: #fff;
+}
+
+.remove-subject-btn:hover {
+    background-color: #e53935;
+}
+
+.duplicate-error {
+    border: 2px solid #c0392b !important;
+    background: #fbeaea;
+}
+
+
+/* === Liste des sujets affichés sous forme de badges === */
+.book-subjects {
+    margin-top: 15px;
+}
+
+.book-subjects .subject-item {
+    display: inline-block;
+    background-color: #f0e5d8;
+    color: #4b2e05;
+    padding: 5px 10px;
+    margin: 3px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}

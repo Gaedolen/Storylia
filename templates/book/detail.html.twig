@@ -26,7 +26,7 @@
         <div class="livre-container">
 
             <div class="livre-infos">
-                <img src="{{ asset(book.cover) }}" alt="Couverture du livre">
+                <img src="{% if book.cover starts with 'data:' %}{{ book.cover }}{% else %}{{ asset(book.cover) }}{% endif %}" alt="{{ book.title }}">
 
                 <div class="livre-details">
                     <h2>{{ book.title }}</h2>
@@ -40,16 +40,16 @@
                         {% endfor %}
                     </p>
                     <p><strong>Pages : </strong> {{ book.pages }}</p>
-                    <p><strong>Date de sortie : </strong> {{ book.publicationDate }}</p>
+                    <p><strong>Date de sortie : </strong> {{ book.publicationDate|date('Y-m-d') }}</p>
                     <p><strong>Genre(s) : </strong>
                         {% for genre in book.genres %}
                             {{ genre }}{% if not loop.last %}, {% endif %}
                         {% endfor %}
                     </p>
                     <p><strong>Thème(s) : </strong></p>
-                    <div class="tags">
+                    <div class="tags" id="subject-list">
                         {% for subject in book.subjects %}
-                            <span>{{ subject }}</span>
+                            <span class="subject-item">{{ subject }}</span>
                         {% endfor %}
                     </div>
                 </div>
@@ -65,8 +65,49 @@
 
         <!-- Boutons additionnels à droite -->
         <div class="book-actions-right">
-            <button class="btn-main">Ajouter une couverture</button>
-            <button class="btn-main">Ajouter un thème</button>
+            <button class="btn-main" data-modal="edit-cover-modal">Modifier la couverture</button>
+
+            <div class="modal" id="edit-cover-modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h3>Modifier la couverture</h3>
+
+                    <form action="{{ path('app_livre_edit_cover', {'id': book.id}) }}" method="POST" enctype="multipart/form-data">
+                        <!-- Input fichier -->
+                        <label class="btn-main" for="cover-input">Sélectionner une nouvelle couverture</label>
+                        <input type="file" name="cover" id="cover-input" accept="image/*" style="display:none;">
+                        <p class="file-name" style="margin-top:8px;color:#4b2e05;"></p>
+
+                        <button type="submit" class="btn-main" style="margin-top:15px;">Valider</button>
+                    </form>
+                </div>
+            </div>
+
+            {% if book.subjects|length < 10 %}
+                <button class="btn-main" data-modal="add-subject-modal">Ajouter un thème</button>
+            {% endif %}
+
+            <div class="modal" id="add-subject-modal" data-available="{{ availableSlots }}">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h3>Ajouter un ou plusieurs thèmes</h3>
+
+                    {% if availableSlots > 0 %}
+                        <form id="edit-subjects-form" action="{{ path('app_livre_edit_subjects', {'id': book.id}) }}" method="POST">
+                            <div id="subjects-container">
+                                <div class="subject-field">
+                                    <input type="text" name="subjects[]" placeholder="Nouveau thème" class="subject-input">
+                                </div>
+                            </div>
+                            <button type="button" id="add-subject-btn" class="btn-secondary">+ Ajouter un champ</button>
+                            <button type="submit" class="btn-main">Valider</button>
+                        </form>
+                    {% else %}
+                        <p>Le livre a déjà le nombre maximum de thèmes.</p>
+                    {% endif %}
+                </div>
+            </div>
+
             <button class="btn-main">Mettre à jour le résumé</button>
         </div>
     </div>
@@ -98,4 +139,10 @@
             {% endif %}
         </div>
     </div>
+
 {% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/detailsBookModals.js') }}"></script>
+ {% endblock %}

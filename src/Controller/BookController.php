@@ -202,6 +202,10 @@ class BookController extends AbstractController
     {
         $user = $this->getUser();
 
+        $maxSubjects = 10;
+        $currentSubjects = $book->getSubjects();
+        $availableSlots = $maxSubjects - count($currentSubjects);
+
         // Pagination reviews
         $page = $request->query->getInt('page', 1);
         $reviewsPerPage = 5;
@@ -231,6 +235,73 @@ class BookController extends AbstractController
             'totalPages' => $totalPages,
             'isInLibrary' => $isInLibrary,
             'user' => $user,
+            'availableSlots' => $availableSlots,
+        ]);
+    }
+
+    #[Route('/{id}/edit-cover', name: 'app_livre_edit_cover', methods: ['POST'])]
+    public function editCover(Request $request, Book $book, EntityManagerInterface $em): JsonResponse
+    {
+        $file = $request->files->get('cover');
+
+        if ($file) {
+            $imageData = file_get_contents($file->getPathname());
+            $book->setCover('data:' . $file->getMimeType() . ';base64,' . base64_encode($imageData));
+            $em->flush();
+
+            if ($request->isXmlHttpRequest()) {
+                return $this->json([
+                    'success' => true,
+                    'newCover' => $book->getCover()
+                ]);
+            }
+        }
+
+        return $this->json([
+            'success' => false,
+            'message' => 'Aucun fichier sélectionné'
+        ]);
+    }
+
+    #[Route('/{id}/edit-subjects', name: 'app_livre_edit_subjects', methods: ['POST'])]
+    public function editSubjects(Request $request, Book $book, EntityManagerInterface $em): JsonResponse
+    {
+        $maxSubjects = 10;
+        $currentSubjects = $book->getSubjects();
+        $availableSlots = $maxSubjects - count($currentSubjects);
+
+        if ($availableSlots <= 0) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Le livre a déjà le nombre maximum de thèmes.'
+            ]);
+        }
+
+        // Récupère les sujets via FormData
+        $newSubjects = $request->request->all('subjects');
+
+        if (!is_array($newSubjects)) $newSubjects = [];
+
+        // Nettoyage
+        $newSubjects = array_filter($newSubjects, fn($s) => trim($s) !== '');
+        $newSubjects = array_map('trim', $newSubjects);
+
+        // Supprimer doublons
+        $newSubjects = array_unique($newSubjects);
+
+        // Limite
+        $newSubjects = array_slice($newSubjects, 0, $availableSlots);
+
+        // Fusion propre
+        $allSubjects = array_merge($currentSubjects, $newSubjects);
+
+        // Enregistrer
+        $book->setSubjects($allSubjects);
+        $em->flush();
+
+        return $this->json([
+            'success' => true,
+            'newSubjects' => $allSubjects
         ]);
     }
 }

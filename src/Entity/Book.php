@@ -43,8 +43,8 @@ class Book
     #[ORM\Column(type:"string", length:50, nullable:true)]
     private ?string $isbn = null;
 
-    #[ORM\Column(type:"string", length:255, nullable:true)]
-    private ?string $cover = null;
+    #[ORM\Column(type: "text", nullable: false)]
+    private $cover;
 
     #[ORM\Column(type:"integer", nullable:true)]
     private ?int $pages = null;
