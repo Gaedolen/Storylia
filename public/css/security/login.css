@@ -62,7 +62,7 @@ h1 {
 }
 
 /* Champs de formulaire */
-.conteneur-login input[type="text"],
+.conteneur-login input[type="email"],
 .conteneur-login input[type="password"] {
     width: 100%;
     padding: 10px;

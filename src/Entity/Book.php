@@ -10,9 +10,12 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[ORM\Table(name: 'book', uniqueConstraints: [
-    new ORM\UniqueConstraint(name: 'unique_book_title_author', columns: ['title', 'author_id'])
-])]
+#[ORM\Table(
+    name: "book",
+    uniqueConstraints: [
+        new ORM\UniqueConstraint(name: "unique_title", columns: ["title"])
+    ]
+)]
 
 class Book
 {

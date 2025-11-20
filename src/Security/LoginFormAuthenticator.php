@@ -57,7 +57,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         }
 
         // Par défaut : page d’accueil du site
-        return new RedirectResponse($this->urlGenerator->generate('home'));
+        return new RedirectResponse(url: $this->urlGenerator->generate('homepage'));
     }
 
     protected function getLoginUrl(Request $request): string

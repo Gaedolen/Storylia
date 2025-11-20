@@ -8,6 +8,7 @@ use App\Entity\Author;
 use DateTime;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\BookRepository;
+use App\Repository\ReadingStatusRepository;
 use App\Repository\BookshelfRepository;
 use App\Repository\ReviewRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -207,7 +208,7 @@ class BookController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_livre_detail')]
-    public function detail(Book $book, ReviewRepository $reviewRepo,  BookshelfRepository $bookshelfRepo, Request $request)
+    public function detail(Book $book, ReviewRepository $reviewRepo,  BookshelfRepository $bookshelfRepo, Request $request, ReadingStatusRepository $readingStatusRepository)
     {
         $user = $this->getUser();
 
@@ -228,6 +229,9 @@ class BookController extends AbstractController
             ($page - 1) * $reviewsPerPage
         );
 
+        // Récupérer tous les statuts de lecture
+        $readingStatuses = $readingStatusRepository->findAll();
+
         // Vérifie si le livre est dans la bibliothèque de l'utilisateur
         $isInLibrary = false;
         if ($user) {
@@ -243,6 +247,7 @@ class BookController extends AbstractController
             'currentPage' => $page,
             'totalPages' => $totalPages,
             'isInLibrary' => $isInLibrary,
+            'readingStatuses' => $readingStatuses,
             'user' => $user,
             'availableSlots' => $availableSlots,
         ]);

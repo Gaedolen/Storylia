@@ -1,5 +1,7 @@
-import { startStimulusApp } from '@symfony/stimulus-bundle';
+import './styles/app.css'; // si tu as du CSS
+import { Application } from 'stimulus';
+import { definitionsFromContext } from 'stimulus/webpack-helpers';
 
-const app = startStimulusApp();
-// register any custom, 3rd party controllers here
-// app.register('some_controller_name', SomeImportedController);
+const application = Application.start();
+const context = require.context('./controllers', true, /\.js$/);
+application.load(definitionsFromContext(context));

@@ -74,73 +74,144 @@ nav.profil-menu-horizontal .profil-links li a:active {
     text-decoration: none !important;
 }
 
-/* Bloc catégorie */
+.bibliotheque-container {
+    display: flex;
+    font-family: 'Comfortaa', sans-serif;
+    flex-direction: column;
+    gap: 25px;
+    padding: 0px;
+    box-shadow: 
+        inset 0 4px 10px rgba(0,0,0,0.15),
+        0 4px 10px rgba(0,0,0,0.15); 
+}
+
+/* --- Catégories --- */
 .bibliotheque-categories {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 25px;
 }
 
 .category {
     background-color: #A67856;
-    border-radius: 20px;
-    padding: 15px;
+    padding: 0px;
+    box-shadow: 
+        inset 0 4px 10px rgba(0,0,0,0.15),
+        0 4px 10px rgba(0,0,0,0.15); 
 }
 
 .category h2 {
     color: #FAF3E0;
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    margin-bottom: 10px;
+    margin: 10px 0 10px 10px;
 }
 
-/* Bloc interne des livres */
+.books-container {
+    background-color: #E8CBAE;
+    padding: 0px;
+    font-family: 'Comfortaa', sans-serif;
+}
+
+/* --- Grille livres --- */
 .category-books {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(5, 1fr); /* 5 colonnes fixes */
     gap: 15px;
-    background-color: #E8CBAE;
-    padding: 10px;
-    border-radius: 15px;
 }
 
-/* Carte livre */
+/* Pour les tablettes */
+@media (max-width: 1024px) {
+    .category-books {
+        grid-template-columns: repeat(4, 1fr); /* 4 colonnes */
+    }
+}
+
+/* Pour les mobiles */
+@media (max-width: 600px) {
+    .category-books {
+        grid-template-columns: repeat(2, 1fr); /* 2 colonnes */
+    }
+}
+
+/* --- Carte livre --- */
 .book-card {
     display: flex;
-    border-radius: 12px;
-    overflow: hidden;
-    background-color: #fff8f0;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    flex-direction: row;
+    align-items: center;
+    margin: 20px 20px 20px 20px;
+    width: 400px;
+    height: 280px;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+/* Couverture */
+.cover {
+    flex-shrink: 0; /* empêche la couverture de se réduire */
 }
 
 .cover img {
-    width: 70px;
-    height: 100px;
+    width: 180px;
+    height: 280px;
     object-fit: cover;
 }
 
+/* Conteneur infos */
 .info {
-    padding: 5px 10px;
+    background-color: #fff8f0;
+    height: 240px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    box-shadow:
+        inset -6px 0 10px rgba(0, 0, 0, 0.15),
+        6px 6px 12px rgba(0, 0, 0, 0.15),
+        0 8px 12px rgba(0, 0, 0, 0.10);
 }
 
 .info h3 {
-    font-weight: 600;
-    color: #714B2F;
-    margin: 0 0 5px 0;
+    font-size: 20px;
+    font-weight: 700;
+    text-align: justify;
+    color: #4a2d12;
+    margin: 0 0 8px 0; /* petit espace sous le titre */
+    letter-spacing: 0.5px;
 }
 
 .info p {
-    font-size: 0.85rem;
-    color: #714B2F;
-    margin: 0 0 10px 0;
+    margin: 0 0 6px 0; /* spacing régulier */
+    font-size: 15px;
+    line-height: 1.4;
+    color: #5c4630;
 }
 
+/* Pour mettre en valeur une info importante (ex: auteur) */
+.info p strong {
+    font-weight: 600;
+    color: #3a2310;
+}
+
+/* Liens dans le bloc info */
+.info a {
+    text-decoration: none;       /* enlève le souligné */
+    color: #4a2d12;              /* même couleur que le titre */
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.info a:hover {
+    color: #8b5a2e;              /* joli effet hover */
+}
+
+/* Boutons en bas */
 .buttons {
     display: flex;
-    gap: 5px;
+    gap: 8px;
+    justify-content: flex-end;
 }
 
 .buttons button {
@@ -156,23 +227,23 @@ nav.profil-menu-horizontal .profil-links li a:active {
     color: #A67856;
 }
 
-/* --- Responsive tablette et mobile --- */
+/* --- Empty state --- */
+.empty-library {
+    text-align: center;
+    font-style: italic;
+    color: #714B2F;
+    padding: 20px;
+}
+
+/* --- Responsive --- */
 @media (max-width: 1024px) {
-    .profil-menu-horizontal {
-        flex-wrap: wrap; /* les liens passent sous la photo si pas assez de place */
-        justify-content: center;
+    .category-books {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
 }
 
 @media (max-width: 600px) {
-    .profil-menu-horizontal {
-        flex-direction: column; /* photo au-dessus des liens */
-        align-items: center;
-        gap: 10px;
-    }
-    .profil-links {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 8px;
+    .category-books {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     }
 }

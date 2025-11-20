@@ -90,8 +90,19 @@ class ProfilController extends AbstractController
             'envies' => [],
         ];
 
-        foreach($bookshelves as $book) {
-            $categories[$book->getReadingStatus()][] = $book;
+        /** 
+         * @var \App\Entity\Utilisateur $utilisateur
+         * @var \App\Entity\Bookshelf[] $bookshelves
+         */
+        foreach($bookshelves as $bookshelf) {
+            $status = $bookshelf->getReadingStatus()?->getLabel();
+            $book = $bookshelf->getBook(); // récupère le livre associé
+
+            if (!$status || !array_key_exists($status, $categories)) {
+                $status = 'envies'; // catégorie par défaut
+            }
+
+            $categories[$status][] = $book;
         }
 
         return $this->render('profil/bibliotheque.html.twig', [
