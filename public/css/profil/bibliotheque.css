@@ -235,6 +235,167 @@ nav.profil-menu-horizontal .profil-links li a:active {
     padding: 20px;
 }
 
+/* Modals */
+.modal {
+    display: none; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(3px);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.25s ease;
+}
+
+/* --- MODAL CONTENT --- */
+.modal-content {
+    background: #fff;
+    width: 90%;
+    max-width: 380px;
+    padding: 25px 30px;
+    border-radius: 15px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    position: relative;
+    text-align: center;
+    animation: slideUp 0.25s ease;
+}
+
+/* Format plus "petite modal" */
+.small-modal {
+    max-width: 340px;
+}
+
+/* --- CLOSE BUTTON --- */
+.modal-content .close {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    transition: 0.2s;
+}
+
+.modal-content .close:hover {
+    color: #000;
+}
+
+/* --- TEXT --- */
+.modal-content p {
+    font-size: 1.2rem;
+    margin: 20px 0;
+    font-weight: 600;
+    color: #3a2310;
+}
+
+/* --- BUTTONS --- */
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+/* Boutons */
+.btn-danger,
+.btn-secondary {
+    background-color: #c97c5d !important;
+    color: white !important;
+    border: none;
+    padding: 12px 15px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    transition: background-color 0.2s;
+}
+
+.btn-danger:hover,
+.btn-secondary:hover {
+    background-color: #a65d42 !important;
+    transform: translateY(-2px);
+}
+
+/* --- ANIMATIONS --- */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(25px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* --- BOUTONS DE STATUT DE LECTURE VERTICAUX --- */
+.reading-status-options {
+    display: flex;
+    flex-direction: column; /* empile verticalement */
+    gap: 12px; /* espace entre chaque bouton */
+    margin: 20px 0;
+    align-items: stretch; /* chaque bouton prend toute la largeur */
+}
+
+.status-btn {
+    width: 100%; /* pleine largeur */
+    padding: 12px 0;
+    border: 2px solid #c97c5d;
+    border-radius: 12px;
+    background-color: #fff8f2;
+    color: #3a2310;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: center;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+.status-btn:hover {
+    background-color: #f7e8df;
+    border-color: #b56b48;
+    transform: translateY(-2px);
+}
+
+.status-btn.active {
+    background-color: #c97c5d;
+    border-color: #c97c5d;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* --- BOUTON VALIDER DE LA MODAL DE DÉPLACEMENT --- */
+#bookshelf-move-confirm {
+    margin-top: 15px;
+    padding: 12px 0;
+    border: none;
+    border-radius: 12px;
+    background-color: #c97c5d;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    font-size: 1rem;
+    transition: all 0.25s ease;
+}
+
+#bookshelf-move-confirm:hover {
+    background-color: #a65d42;
+    transform: translateY(-2px);
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 480px) {
+    .status-btn {
+        flex: 1 1 100%;
+    }
+}
+
 /* --- Responsive --- */
 @media (max-width: 1024px) {
     .category-books {

@@ -3,62 +3,121 @@
 {% block title %}Ma bibliothèque{% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('css/profil/bibliotheque.css') }}">
+<link rel="stylesheet" href="{{ asset('css/profil/bibliotheque.css') }}">
 {% endblock %}
 
 {% block body %}
-<div class="bibliotheque-container">
+    <div class="bibliotheque-container">
 
-    {# --- Menu profil inchangé --- #}
-    <nav class="profil-menu-horizontal">
-        <div class="profil-user">
-            <img src="{{ asset('uploads/profiles/' ~ app.user.profilePicture) }}" alt="Photo de profil">
-            <span class="pseudo">{{ app.user.pseudo }}</span>
-        </div>
+        {# --- Menu profil inchangé --- #}
+        <nav class="profil-menu-horizontal">
+            <div class="profil-user">
+                <img src="{{ asset('uploads/profiles/' ~ app.user.profilePicture) }}" alt="Photo de profil">
+                <span class="pseudo">{{ app.user.pseudo }}</span>
+            </div>
 
-        <ul class="profil-links">
-            <li><a href="{{ path('app_profil') }}" class="{{ app.request.get('_route') == 'app_profil' ? 'active' : '' }}">Profil</a></li>
-            <li><a href="{{ path('app_profil_bibliotheque') }}" class="{{ app.request.get('_route') == 'app_profil_bibliotheque' ? 'active' : '' }}">Bibliothèque</a></li>
-            <li><a href="{{ path('app_profil_clubs') }}" class="{{ app.request.get('_route') == 'app_profil_clubs' ? 'active' : '' }}">Clubs</a></li>
-            <li><a href="{{ path('app_profil_historique') }}" class="{{ app.request.get('_route') == 'app_profil_historique' ? 'active' : '' }}">Historique</a></li>
-        </ul>
-    </nav>
+            <ul class="profil-links">
+                <li><a href="{{ path('app_profil') }}" class="{{ app.request.get('_route') == 'app_profil' ? 'active' : '' }}">Profil</a></li>
+                <li><a href="{{ path('app_profil_bibliotheque') }}" class="{{ app.request.get('_route') == 'app_profil_bibliotheque' ? 'active' : '' }}">Bibliothèque</a></li>
+                <li><a href="{{ path('app_profil_clubs') }}" class="{{ app.request.get('_route') == 'app_profil_clubs' ? 'active' : '' }}">Clubs</a></li>
+                <li><a href="{{ path('app_profil_historique') }}" class="{{ app.request.get('_route') == 'app_profil_historique' ? 'active' : '' }}">Historique</a></li>
+            </ul>
+        </nav>
 
-    <div class="bibliotheque-categories">
-        {% for status, books in categories %}
-            <div class="category">
-                <h2>{{ status|replace({'_':' '})|capitalize }}</h2>
-                <div class="books-container">
-                    <div class="category-books">
-                        {% for bookShelf in books %}
-                            <div class="book-card">
-                                <div class="cover">
-                                    <a href="{{ path('app_livre_detail', {'id': bookShelf.id}) }}">
-                                        <img src="{{ bookShelf.cover }}" alt="{{ bookShelf.title }}">
-                                    </a>
-                                </div>
-                                <div class="info">
-                                    <div>
-                                        <h3>
-                                            <a href="{{ path('app_livre_detail', {'id': bookShelf.id}) }}">
-                                                {{ bookShelf.title }}
-                                            </a>
-                                        </h3>
-                                        <p><a href="#">{{ bookShelf.author.name }}</a></p>
+        <div class="bibliotheque-categories">
+            {% for status, books in categories %}
+                <div class="category" data-status-key="{{ status }}">
+                    <h2>{{ status|replace({'_':' '})|capitalize }}</h2>
+                    <div class="books-container">
+                        <div class="category-books">
+                            {% for bookshelf in books %}
+                                <div class="book-card" data-book-id="{{ bookshelf.book.id }}">
+                                    <div class="cover">
+                                        <a href="{{ path('app_livre_detail', {'id': bookshelf.book.id}) }}">
+                                            <img src="{{ bookshelf.book.cover|replace({'http://':'https://'}) }}" alt="{{ bookshelf.book.title }}">
+                                        </a>
                                     </div>
-                                    <div class="buttons">
-                                        <button title="Déplacer"><i class="fa-solid fa-arrow-right"></i></button>
-                                        <button title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+                                    <div class="info">
+                                        <div>
+                                            <h3>
+                                                <a href="{{ path('app_livre_detail', {'id': bookshelf.book.id}) }}">
+                                                    {{ bookshelf.book.title }}
+                                                </a>
+                                            </h3>
+                                            <p><a href="#">{{ bookshelf.book.author.name }}</a></p>
+                                        </div>
+                                        <div class="buttons">
+                                            <button
+                                                class="bookshelf-move-btn"
+                                                data-book-id="{{ bookshelf.book.id }}"
+                                                data-current-status-key="{{ bookshelf.readingStatus ? bookshelf.readingStatus.label : 'envies' }}"
+                                                data-move-url="{{ path('livres_deplacer', {'id': bookshelf.id}) }}">
+                                                <i class="fa-solid fa-crosshairs"></i>
+                                            </button>
+
+                                            <button 
+                                                class="bookshelf-remove-btn"
+                                                data-book-id="{{ bookshelf.id }}">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        {% endfor %}
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% else %}
-            <p class="empty-library">Votre bibliothèque est vide pour l’instant.</p>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
-</div>
+
+    {# Modal de suppression d'un livre en bibli #}
+    <div id="confirm-remove-modal" class="modal">
+        <div class="modal-content small-modal">
+            <span class="close">&times;</span>
+            <p>Voulez-vous retirer ce livre de votre bibliothèque ?</p>
+
+            <div class="modal-buttons">
+                <button id="confirm-remove-cancel" class="btn-secondary">Non</button>
+                <button id="confirm-remove-yes" class="btn-danger">Oui</button>
+            </div>
+        </div>
+    </div>
+
+    {# Modal de déplacement #}
+    <div id="bookshelf-move-modal" class="modal">
+        <div class="modal-content small-modal">
+            <span class="close">&times;</span>
+            <h3>Déplacer le livre</h3>
+
+            <div class="reading-status-options">
+                {% set prettyStatuses = {
+                    'en_train_de_lire': 'En train de lire',
+                    'coup_de_coeur': 'Coup de coeur',
+                    'adore': 'J\'adore',
+                    'apprecie': 'Apprécié',
+                    'mitige': 'Mitigé',
+                    'pas_aime': 'Pas aimé',
+                    'lu_aussi': 'Lu',
+                    'pal': 'Pile à lire',
+                    'envies': 'Mes envies',
+                } %}
+
+                {% for status in readingStatuses %}
+                    <button class="status-btn" 
+                            data-status-id="{{ status.id }}" 
+                            data-status-key="{{ status.label }}">
+                        {{ prettyStatuses[status.label] ?? status.label }}
+                    </button>
+                {% endfor %}
+            </div>
+
+            <button id="bookshelf-move-confirm" class="btn-primary">Valider</button>
+        </div>
+    </div>
+
+    {% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/BookshelfActions.js') }}"></script>
+    {% endblock %}
 {% endblock %}

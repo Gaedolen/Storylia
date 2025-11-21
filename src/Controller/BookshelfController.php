@@ -5,10 +5,14 @@ namespace App\Controller;
 use App\Entity\Bookshelf;
 use App\Entity\Book;
 use App\Entity\ReadingStatus;
+use App\Repository\BookshelfRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/bibliotheque')]
@@ -51,5 +55,68 @@ class BookshelfController extends AbstractController
         $em->flush();
 
         return $this->json(['success' => true, 'message' => 'Livre ajouté ou mis à jour avec succès !']);
+    }
+
+    #[Route('/supprimer', name: 'bookshelf_remove', methods: ['POST'])]
+    public function remove(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['success' => false, 'message' => 'Non connecté'], 403);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $bookId = $data['bookId'] ?? null;
+
+        if (!$bookId) {
+            return $this->json(['success' => false, 'message' => 'ID du livre manquant']);
+        }
+
+        // Récupérer l'objet Book
+        $book = $em->getRepository(Book::class)->find($bookId);
+        if (!$book) {
+            return $this->json(['success' => false, 'message' => 'Livre introuvable']);
+        }
+
+        $entry = $em->getRepository(Bookshelf::class)->findOneBy([
+            'utilisateur' => $user,
+            'book' => $book
+        ]);
+
+        if (!$entry) {
+            return $this->json(['success' => false, 'message' => 'Livre non trouvé dans votre bibliothèque']);
+        }
+
+        $em->remove($entry);
+        $em->flush();
+
+        return $this->json(['success' => true]);
+    }
+
+    #[Route('/livres/{id}/deplacer', name: 'livres_deplacer', methods: ['POST'])]
+    public function moveBook(int $id, Request $request, EntityManagerInterface $em, LoggerInterface $logger): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $statusId = $data['readingStatusId'] ?? null;
+
+        $logger->info('DEBUG moveBook', ['bookshelfId' => $id, 'data' => $data]);
+
+        // Récupération du Bookshelf
+        $bookshelf = $em->getRepository(Bookshelf::class)->find($id);
+        if (!$bookshelf) {
+            return $this->json(['success' => false, 'message' => 'Livre introuvable dans votre bibliothèque.']);
+        }
+
+        // Récupération du statut
+        $status = $em->getRepository(ReadingStatus::class)->find($statusId);
+        if (!$status) {
+            return $this->json(['success' => false, 'message' => 'Statut introuvable.']);
+        }
+
+        // Mise à jour du statut
+        $bookshelf->setReadingStatus($status);
+        $em->flush();
+
+        return $this->json(['success' => true, 'message' => 'Livre déplacé avec succès !']);
     }
 }

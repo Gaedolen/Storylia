@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Utilisateur;
+use App\Repository\ReadingStatusRepository;
 use App\Form\ProfilType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -68,7 +69,7 @@ class ProfilController extends AbstractController
     }
 
     #[Route('/profil/bibliotheque', name: 'app_profil_bibliotheque')]
-    public function bibliotheque(): Response
+    public function bibliotheque(ReadingStatusRepository $readingStatusRepository): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
         /** @var Utilisateur $utilisateur */
@@ -90,10 +91,7 @@ class ProfilController extends AbstractController
             'envies' => [],
         ];
 
-        /** 
-         * @var \App\Entity\Utilisateur $utilisateur
-         * @var \App\Entity\Bookshelf[] $bookshelves
-         */
+        /** @var \App\Entity\Bookshelf[] $bookshelves */
         foreach($bookshelves as $bookshelf) {
             $status = $bookshelf->getReadingStatus()?->getLabel();
             $book = $bookshelf->getBook(); // récupère le livre associé
@@ -102,12 +100,16 @@ class ProfilController extends AbstractController
                 $status = 'envies'; // catégorie par défaut
             }
 
-            $categories[$status][] = $book;
+            $categories[$status][] = $bookshelf; // on passe le Bookshelf, pas juste le Book
         }
+
+        // Récupère tous les statuts de lecture pour le modal
+        $readingStatuses = $readingStatusRepository->findAll();
 
         return $this->render('profil/bibliotheque.html.twig', [
             'categories' => $categories,
             'utilisateur' => $utilisateur,
+            'readingStatuses' => $readingStatuses,
         ]);
     }
 
