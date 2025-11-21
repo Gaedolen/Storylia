@@ -717,6 +717,25 @@ body {
     background-color: #a65d42;
 }
 
+/* === Modal laisser un avis === */
+#leave-review-modal textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #c6a874;
+    font-size: 14px;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+#leave-review-modal .char-count {
+    text-align: right;
+    font-size: 12px;
+    color: #4b2e05;
+    margin-top: 5px;
+}
+
 /* Responsive */
 @media (max-width: 450px) {
     #bookshelf-modal .modal-content {

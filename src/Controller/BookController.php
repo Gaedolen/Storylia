@@ -208,7 +208,7 @@ class BookController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_livre_detail')]
-    public function detail(Book $book, ReviewRepository $reviewRepo,  BookshelfRepository $bookshelfRepo, Request $request, ReadingStatusRepository $readingStatusRepository)
+    public function detail(Book $book, ReviewRepository $reviewRepo, BookshelfRepository $bookshelfRepo, Request $request, ReadingStatusRepository $readingStatusRepository) 
     {
         $user = $this->getUser();
 
@@ -216,7 +216,7 @@ class BookController extends AbstractController
         $currentSubjects = $book->getSubjects();
         $availableSlots = $maxSubjects - count($currentSubjects);
 
-        // Pagination reviews
+        // Pagination des reviews
         $page = $request->query->getInt('page', 1);
         $reviewsPerPage = 5;
         $totalReviews = count($book->getReviews());
@@ -229,13 +229,22 @@ class BookController extends AbstractController
             ($page - 1) * $reviewsPerPage
         );
 
-        // Récupérer tous les statuts de lecture
+        // Tous les statuts de lecture
         $readingStatuses = $readingStatusRepository->findAll();
 
-        // Vérifie si le livre est dans la bibliothèque de l'utilisateur
+        // Vérifie si le livre est dans la bibliothèque
         $isInLibrary = false;
         if ($user) {
             $isInLibrary = $bookshelfRepo->findOneBy([
+                'book' => $book,
+                'utilisateur' => $user
+            ]) !== null;
+        }
+
+        // Vérifie si l'utilisateur a déjà laissé un avis
+        $avisExiste = false;
+        if ($user) {
+            $avisExiste = $reviewRepo->findOneBy([
                 'book' => $book,
                 'utilisateur' => $user
             ]) !== null;
@@ -250,6 +259,7 @@ class BookController extends AbstractController
             'readingStatuses' => $readingStatuses,
             'user' => $user,
             'availableSlots' => $availableSlots,
+            'avisExiste' => $avisExiste,
         ]);
     }
 

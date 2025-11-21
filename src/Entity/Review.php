@@ -17,7 +17,7 @@ class Review
     #[ORM\Column(type: Types::TEXT)]
     private ?string $comment = null;
 
-    #[ORM\Column(type: Types::SMALLINT)]
+    #[ORM\Column(type: Types::SMALLINT, nullable: true)]
     private ?int $rating = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
@@ -59,10 +59,9 @@ class Review
         return $this->rating;
     }
 
-    public function setRating(int $rating): static
+    public function setRating(?int $rating): static
     {
         $this->rating = $rating;
-
         return $this;
     }
 

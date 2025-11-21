@@ -63,7 +63,16 @@
             </div>
 
             {% if isInLibrary %}
-                <button class="btn-main">Laisser un avis</button>
+                {% if avisExiste %}
+                    <button class="btn-main" disabled>Avis laissé ✓</button>
+                {% else %}
+                    <button class="btn-main" 
+                            data-modal="leave-review-modal"
+                            data-book-id="{{ book.id }}">
+                        Laisser un avis
+                    </button>
+                {% endif %}
+
                 <button class="btn-main">Ajouter une date de lecteur</button>
                 <button class="btn-main">Laisser une note</button>
             {% endif %}
@@ -201,7 +210,7 @@
             <h3>Avis</h3>
             {% for review in reviews %}
                 <div class="review">
-                    <p><strong>{{ review.user.username }}</strong>: {{ review.comment }}</p>
+                    <p><strong>{{ review.utilisateur.pseudo }}</strong>: {{ review.comment }}</p>
                     <p>Note: {{ review.rating }}/5</p>
                 </div>
             {% else %}
@@ -215,6 +224,19 @@
                     {% endfor %}
                 </div>
             {% endif %}
+        </div>
+    </div>
+
+    {# Modal d'avis #}
+    <div id="leave-review-modal" class="modal" style="display:none;" data-book-id="{{ book.id }}">>
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Laisser un avis</h3>
+            <form id="leave-review-form">
+                <textarea id="review-text" name="review" rows="6" maxlength="1000" placeholder="Écris ton avis..." required></textarea>
+                <div id="char-count-review">0 / 1000</div>
+                <button type="submit" class="btn-main">Valider</button>
+            </form>
         </div>
     </div>
 

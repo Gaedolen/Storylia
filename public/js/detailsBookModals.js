@@ -233,4 +233,78 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Modal d'avis
+    const reviewModal = document.getElementById('leave-review-modal');
+    const reviewForm = document.getElementById('leave-review-form');
+
+    if (reviewModal && reviewForm) {
+
+        const textarea = reviewForm.querySelector('#review-text');
+        const counter = reviewModal.querySelector('#char-count-review');
+
+        // Compteur dynamique
+        textarea.addEventListener('input', () => {
+            if (counter) counter.textContent = `${textarea.value.length} / 1000`;
+        });
+
+        // Envoi
+        reviewForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const bookId = reviewForm.dataset.bookId || reviewModal.dataset.bookId;
+            const reviewText = textarea.value.trim();
+
+            if (!bookId) {
+                alert("Livre introuvable.");
+                return;
+            }
+
+            if (reviewText.length === 0) {
+                alert("Veuillez écrire un avis avant de valider.");
+                return;
+            }
+
+            try {
+                const resp = await fetch('/laisser-avis', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest' 
+                    },
+                    body: JSON.stringify({
+                        bookId: bookId,
+                        review: reviewText
+                    })
+                });
+
+                const result = await resp.json();
+
+                if (result.success) {
+                    const submitBtn = reviewForm.querySelector('button[type="submit"]');
+
+                    submitBtn.textContent = 'Avis laissé ✔';
+                    submitBtn.disabled = true;
+
+                    textarea.value = '';
+                    if (counter) counter.textContent = '0 / 1000';
+
+                    closeModal(reviewModal);
+
+                    // Cherche le bouton extérieur
+                    const externalBtn = document.querySelector('[data-modal="leave-review-modal"]');
+
+                    if (externalBtn) {
+                        externalBtn.textContent = 'Avis laissé ✓';
+                        externalBtn.classList.add('disabled-review-btn');
+                        externalBtn.disabled = true;
+                    }
+                } else {
+                    alert(result.message || "Erreur lors de l'enregistrement.");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Erreur réseau, réessayez.");
+            }
+        });
+    }
 });
