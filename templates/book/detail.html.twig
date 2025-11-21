@@ -73,7 +73,12 @@
                     </button>
                 {% endif %}
 
-                <button class="btn-main">Ajouter une date de lecteur</button>
+                {% if dateLectureExiste %}
+                    <button class="btn-main" disabled>Date laissée ✓</button>
+                {% else %}
+                    <button class="btn-main" id="add-reading-date-btn">Date de lecture</button>
+                {% endif %}
+
                 <button class="btn-main">Laisser une note</button>
             {% endif %}
         </div>
@@ -236,6 +241,31 @@
                 <textarea id="review-text" name="review" rows="6" maxlength="1000" placeholder="Écris ton avis..." required></textarea>
                 <div id="char-count-review">0 / 1000</div>
                 <button type="submit" class="btn-main">Valider</button>
+            </form>
+        </div>
+    </div>
+
+    {# Modal date de lecture #}
+    <div id="reading-date-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+
+            <h3>Ajouter une date de lecture</h3>
+
+            <form id="reading-date-form" data-book-id="{{ book.id }}">
+
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" id="reading-today">
+                    J’ai lu ce livre aujourd’hui
+                </label>
+
+                <div class="or-divider">ou</div>
+
+                <label>Date de lecture :</label>
+                <input type="date" id="reading-date-picker" max="{{ "now"|date("Y-m-d") }}">
+
+                <button type="submit" class="btn-main">Valider</button>
+
             </form>
         </div>
     </div>

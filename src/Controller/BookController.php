@@ -9,6 +9,7 @@ use DateTime;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\BookRepository;
 use App\Repository\ReadingStatusRepository;
+use App\Repository\ReadingHistoryRepository;
 use App\Repository\BookshelfRepository;
 use App\Repository\ReviewRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -208,7 +209,7 @@ class BookController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_livre_detail')]
-    public function detail(Book $book, ReviewRepository $reviewRepo, BookshelfRepository $bookshelfRepo, Request $request, ReadingStatusRepository $readingStatusRepository) 
+    public function detail(Book $book, ReviewRepository $reviewRepo, BookshelfRepository $bookshelfRepo, ReadingHistoryRepository $readingHistoryRepo, Request $request, ReadingStatusRepository $readingStatusRepository) 
     {
         $user = $this->getUser();
 
@@ -250,6 +251,15 @@ class BookController extends AbstractController
             ]) !== null;
         }
 
+        // Vérifie si l'utilisateur a déjà ajouté une date de lecture
+        $dateLectureExiste = false;
+        if ($user) {
+            $dateLectureExiste = $readingHistoryRepo->findOneBy([
+                'book' => $book,
+                'utilisateur' => $user
+            ]) !== null;
+        }
+
         return $this->render('book/detail.html.twig', [
             'book' => $book,
             'reviews' => $reviews,
@@ -260,6 +270,7 @@ class BookController extends AbstractController
             'user' => $user,
             'availableSlots' => $availableSlots,
             'avisExiste' => $avisExiste,
+            'dateLectureExiste' => $dateLectureExiste,
         ]);
     }
 

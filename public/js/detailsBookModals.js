@@ -307,4 +307,74 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Modal date de lecture
+    const readingModal = document.getElementById('reading-date-modal');
+    const readingForm = document.getElementById('reading-date-form');
+
+    if (readingModal && readingForm) {
+
+        const checkboxToday = document.getElementById('reading-today');
+        const datePicker = document.getElementById('reading-date-picker');
+
+        // Empêche d'utiliser les deux options
+        checkboxToday.addEventListener('change', () => {
+            if (checkboxToday.checked) {
+                datePicker.value = "";
+                datePicker.disabled = true;
+            } else {
+                datePicker.disabled = false;
+            }
+        });
+
+        datePicker.addEventListener('input', () => {
+            if (datePicker.value) {
+                checkboxToday.checked = false;
+            }
+        });
+
+        readingForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const bookId = readingForm.dataset.bookId;
+            let chosenDate = null;
+
+            if (checkboxToday.checked) {
+                chosenDate = new Date().toISOString().split('T')[0];
+            } 
+            else if (datePicker.value) {
+                chosenDate = datePicker.value;
+            } 
+            else {
+                alert("Veuillez choisir une date.");
+                return;
+            }
+
+            try {
+                const resp = await fetch('/ajouter-date-lecture', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        bookId: bookId,
+                        readingDate: chosenDate
+                    })
+                });
+
+                const result = await resp.json();
+
+                if (result.success) {
+                    closeModal(readingModal);
+                    alert("Date de lecture enregistrée !");
+                } else {
+                    alert(result.message || "Erreur.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Erreur réseau.");
+            }
+        });
+    }
 });
