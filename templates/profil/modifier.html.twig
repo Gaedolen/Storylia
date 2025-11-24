@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le profil{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/profil/modifier.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="profil-main">
+
+    <div class="profil-header">
+        <h2>Modifier mon profil</h2>
+        <div class="header-line"></div>
+    </div>
+
+    {{ form_start(form, {'attr': {'class': 'form-profil'}}) }}
+
+    <div class="form-section">
+        <div class="form-group">
+            {{ form_label(form.pseudo) }}
+            {{ form_widget(form.pseudo, {'attr': {'placeholder': 'Votre pseudo'}}) }}
+            {{ form_errors(form.pseudo) }}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.password) }}
+            <div class="password-fields">
+                {{ form_widget(form.password.first, {'attr': {'placeholder': 'Nouveau mot de passe'}}) }}
+                {{ form_errors(form.password.first) }}
+
+                {{ form_widget(form.password.second, {'attr': {'placeholder': 'Confirmez le mot de passe'}}) }}
+                {{ form_errors(form.password.second) }}
+            </div>
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.profilePicture) }}
+            {{ form_widget(form.profilePicture) }}
+            {{ form_errors(form.profilePicture) }}
+        </div>
+    </div>
+
+    <div class="form-group preferences-section">
+        <label>Préférences</label>
+
+        <div class="preferences-grid">
+            {% for child in form.preferences %}
+                <div class="pref-item">
+                    {{ form_widget(child) }}
+                    {{ form_label(child) }}
+                </div>
+            {% endfor %}
+        </div>
+
+        {{ form_errors(form.preferences) }}
+    </div>
+
+    <button type="submit" class="btn-save">Enregistrer</button>
+
+    {{ form_end(form) }}
+</div>
+{% endblock %}

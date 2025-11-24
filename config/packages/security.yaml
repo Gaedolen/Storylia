@@ -33,7 +33,7 @@ security:
                 secure: auto
 
             logout:
-                path: logout
+                path: /logout
                 csrf_token_id: logout
                 target: homepage
 

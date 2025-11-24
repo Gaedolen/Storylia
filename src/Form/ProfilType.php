@@ -3,45 +3,59 @@
 namespace App\Form;
 
 use App\Entity\Utilisateur;
-use App\Entity\Role;
-use Dom\Text;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\EntityType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ProfilType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('familyName', TextType::class, [
-                'label' => "Nom",
-                'required' => true,
-                'placeholder' => 'Votre nom',
-            ])
-            ->add('firstName', TextType::class, [
-                'label' => 'Prénom',
-                'required' => true,
-                'placeholder' => "Votre prénom",
-            ])
             ->add('pseudo', TextType::class, [
                 'label' => 'Pseudo',
                 'required' => true,
-                'placeholder' => 'Votre pseudo',
-            ])
-            ->add('presentation', TextType::class, [
-                'label' => 'Présentez-vous',
-                'required' => false,
                 'attr' => [
-                    'placeholder' => 'Parlez un peu de vous...',
-                    'rows' => 5,
+                    'placeholder' => 'Votre pseudo',
+                ],
+            ])
+            ->add('password', RepeatedType::class, [
+                'type' => PasswordType::class,
+                'mapped' => false,
+                'required' => false,
+                'first_options'  => ['label' => 'Nouveau mot de passe'],
+                'second_options' => ['label' => 'Confirmer le mot de passe'],
+                'invalid_message' => 'Les mots de passe doivent correspondre.',
+                'constraints' => [
+                    new Assert\Length([
+                        'min' => 8,
+                        'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
+                        'max' => 4096,
+                    ]),
+                    new Assert\Regex([
+                        'pattern' => '/[A-Z]/',
+                        'message' => 'Votre mot de passe doit contenir au moins une lettre majuscule',
+                    ]),
+                    new Assert\Regex([
+                        'pattern' => '/[a-z]/',
+                        'message' => 'Votre mot de passe doit contenir au moins une lettre minuscule',
+                    ]),
+                    new Assert\Regex([
+                        'pattern' => '/\d/',
+                        'message' => 'Votre mot de passe doit contenir au moins un chiffre',
+                    ]),
+                    new Assert\Regex([
+                        'pattern' => '/[\W_]/',
+                        'message' => 'Votre mot de passe doit contenir au moins un caractère spécial',
+                    ]),
                 ],
             ])
             ->add('preferences', ChoiceType::class, [
@@ -54,7 +68,7 @@ class ProfilType extends AbstractType
                         'Dystopie' => 'dystopie',
                         'Steampunk' => 'steampunk',
                     ],
-                    'Policier / Suspence' => [
+                    'Policier / Suspense' => [
                         'Policier' => 'policier',
                         'Thriller' => 'thriller',
                         'Espionnage' => 'espionnage',
@@ -78,7 +92,7 @@ class ProfilType extends AbstractType
                         'Sociologie' => 'sociologie',
                     ],
                     'Arts & Littérature' => [
-                        'Poésie' => "poesie",
+                        'Poésie' => 'poesie',
                         'Théâtre' => 'theatre',
                     ],
                     'Mythes et Légendes' => [
@@ -101,13 +115,12 @@ class ProfilType extends AbstractType
                 'required' => false,
                 'constraints' => [
                     new File([
-                        'mawSize' => "2M",
-                        'mimeType' => ['image/jpeg', 'image/png'],
-                        'mimeTypeMessage' => 'Veuillez uploader un fichier image valide (jpg ou png)',
+                        'maxSize' => '10M',
+                        'mimeTypes' => ['image/jpeg', 'image/png'],
+                        'mimeTypesMessage' => 'Veuillez uploader un fichier image valide (jpg ou png)',
                     ])
                 ],
             ]);
-        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

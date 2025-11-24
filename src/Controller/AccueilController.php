@@ -14,60 +14,68 @@ class AccueilController extends AbstractController
     #[Route('/accueil', name: 'app_accueil')]
     public function index(BookRepository $bookRepository, EntityManagerInterface $em): Response
     {
-        // Afficher les coups de coeur de la communauté
+        // Afficher les coups de coeur de la communauté avec note moyenne
         $favoritesQuery = $em->createQuery(
             'SELECT b, AVG(r.rating) AS avgRating
-            FROM App\Entity\Book b
-            JOIN App\Entity\Review r WITH r.book = b
-            GROUP BY b.id
-            ORDER BY avgRating DESC'
+             FROM App\Entity\Book b
+             JOIN App\Entity\Review r WITH r.book = b
+             GROUP BY b.id
+             ORDER BY avgRating DESC'
         )->setMaxResults(20);
 
-        $favorites = $favoritesQuery->getResult();
+        $favoritesRaw = $favoritesQuery->getResult();
+
+        // Transformer le résultat pour Twig
+        $favorites = [];
+        foreach ($favoritesRaw as $row) {
+            $favorites[] = [
+                'book' => $row[0],       // objet Book
+                'avgRating' => $row['avgRating'], // note moyenne
+            ];
+        }
 
         // Fixe la timezone
         date_default_timezone_set('Europe/Paris');
         $now = new \DateTimeImmutable('now');
         
-        // Afficher les sorties du mois précédent
+        // Livres du mois précédent
         $lastMonthStart = $now->modify('first day of last month')->setTime(0,0,0);
         $lastMonthEnd   = $now->modify('last day of last month')->setTime(23,59,59);
 
-        $lastMonthBooks = $bookRepository->createQueryBuilder('b') // Requête SQL via Doctrine
-            ->where('b.publicationDate BETWEEN :start AND :end') // On récupère les livres dont la publication est comprise entre les param :start et :end
+        $lastMonthBooks = $bookRepository->createQueryBuilder('b')
+            ->where('b.publicationDate BETWEEN :start AND :end')
             ->setParameter('start', $lastMonthStart->format('Y-m-d'))
             ->setParameter('end', $lastMonthEnd->format('Y-m-d'))
-            ->orderBy('b.publicationDate', 'DESC') // On les sélectionne dans l'ordre de sortie (décroissant)
-            ->setMaxResults(20) // Limite de 20 livres
-            ->getQuery() // Exécution
-            ->getResult(); // Renvoie le résultat
+            ->orderBy('b.publicationDate', 'DESC')
+            ->setMaxResults(20)
+            ->getQuery()
+            ->getResult();
 
-        // Afficher les sorties du mois courant
+        // Livres du mois courant
         $currentMonthStart = $now->modify('first day of this month')->setTime(0,0,0);
         $currentMonthEnd   = $now->modify('last day of this month')->setTime(23,59,59);
 
-        $currentMonthBooks = $bookRepository->createQueryBuilder('b') // Requête SQL via Doctrine
-            ->where('b.publicationDate BETWEEN :start AND :end') // On récupère les livres dont la publication est comprise entre les param :start et :end
+        $currentMonthBooks = $bookRepository->createQueryBuilder('b')
+            ->where('b.publicationDate BETWEEN :start AND :end')
             ->setParameter('start', $currentMonthStart->format('Y-m-d'))
             ->setParameter('end', $currentMonthEnd->format('Y-m-d'))
-            ->orderBy('b.publicationDate', 'DESC') // On les sélectionne dans l'ordre de sortie (décroissant)
-            ->setMaxResults(20) // Limite de 20 livres
-            ->getQuery() // Exécution
-            ->getResult(); // Renvoie le résultat
+            ->orderBy('b.publicationDate', 'DESC')
+            ->setMaxResults(20)
+            ->getQuery()
+            ->getResult();
 
-        // Afficher les sorties du mois prochain
+        // Livres du mois prochain
         $nextMonthStart = $now->modify('first day of next month')->setTime(0,0,0);
         $nextMonthEnd   = $now->modify('last day of next month')->setTime(23,59,59);
 
-        $nextMonthBooks = $bookRepository->createQueryBuilder('b') // Requête SQL via Doctrine
-            ->where('b.publicationDate BETWEEN :start AND :end') // On récupère les livres dont la publication est comprise entre les param :start et :end
+        $nextMonthBooks = $bookRepository->createQueryBuilder('b')
+            ->where('b.publicationDate BETWEEN :start AND :end')
             ->setParameter('start', $nextMonthStart->format('Y-m-d'))
             ->setParameter('end', $nextMonthEnd->format('Y-m-d'))
-            ->orderBy('b.publicationDate', 'DESC') // On les sélectionne dans l'ordre de sortie (décroissant)
-            ->setMaxResults(20) // Limite de 20 livres
-            ->getQuery() // Exécution
-            ->getResult(); // Renvoie le résultat
-        
+            ->orderBy('b.publicationDate', 'DESC')
+            ->setMaxResults(20)
+            ->getQuery()
+            ->getResult();
 
         return $this->render('accueil/index.html.twig', [
             'controller_name' => 'AccueilController',

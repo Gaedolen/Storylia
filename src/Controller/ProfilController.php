@@ -4,9 +4,12 @@ namespace App\Controller;
 
 use App\Entity\Utilisateur;
 use App\Repository\ReadingStatusRepository;
+use App\Repository\UtilisateurRepository;
 use App\Form\ProfilType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -14,44 +17,83 @@ use Symfony\Component\Routing\Annotation\Route;
 class ProfilController extends AbstractController
 {
     #[Route('/profil', name: 'app_profil')]
-    public function index(): Response
+    public function index(UtilisateurRepository $userRepo): Response
     {
-        // Empêcher l'accès si non connecté
         $this->denyAccessUnlessGranted('ROLE_USER');
 
-        // Récupération de l'utilisateur connecté
+        /** @var \App\Entity\Utilisateur $utilisateur */
         $utilisateur = $this->getUser();
+
+        // Récupérer les coups de coeur
+        $coupsDeCoeur = $utilisateur->getBookshelves()
+                            ->filter(fn($shelf) => $shelf->getReadingStatus()->getLabel() === 'coup_de_coeur');
+        
+        // Lecture en cours (statut = 'en_train_de_lire')
+        $lectureEnCours = $utilisateur->getBookshelves()
+            ->filter(fn($shelf) => $shelf->getReadingStatus()->getLabel() === 'en_train_de_lire')
+            ->first(); // retourne le premier élément ou false
+
+        // Si false, mettre null pour Twig
+        if (!$lectureEnCours) {
+            $lectureEnCours = null;
+        }
 
         return $this->render('profil/profil.html.twig', [
             'utilisateur' => $utilisateur,
+            'coupsDeCoeur' => $coupsDeCoeur,
+            'lectureEnCours' => $lectureEnCours,
         ]);
     }
 
+
     #[Route('/modifier', name: 'app_profil_edit')]
-    public function edit(Request $request, EntityManagerInterface $em): Response
+    public function edit(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher, UtilisateurRepository $utilisateurRepository ): Response 
     {
         // Empêche l'accès si non connecté
         $this->denyAccessUnlessGranted('ROLE_USER');
+
         /** @var Utilisateur $utilisateur */
         $utilisateur = $this->getUser();
 
-        // Création du formulaire basé sur ProfilType
+        // Création du formulaire
         $form = $this->createForm(ProfilType::class, $utilisateur);
         $form->handleRequest($request);
 
-        // Si le formulaire est soumis ET valide, on sauvegarde les modifications en base
-        if($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            // --- Vérification du pseudo unique ---
+            $nouveauPseudo = $form->get('pseudo')->getData();
+            if ($nouveauPseudo !== $utilisateur->getPseudo()) {
+                $exist = $utilisateurRepository->findOneBy(['pseudo' => $nouveauPseudo]);
+                if ($exist) {
+                    $form->get('pseudo')->addError(new FormError('Ce pseudo est déjà utilisé.'));
+                    return $this->render('profil/modifier.html.twig', [
+                        'form' => $form->createView(),
+                    ]);
+                }
+                $utilisateur->setPseudo($nouveauPseudo);
+            }
+
+            // --- Hash du mot de passe si renseigné ---
+            $plainPassword = $form->get('password')->getData();
+            if (!empty($plainPassword)) {
+                // RepeatedType renvoie directement la valeur string si remplie
+                $hashedPassword = $passwordHasher->hashPassword($utilisateur, $plainPassword);
+                $utilisateur->setPassword($hashedPassword);
+            }
+
+            // --- Upload de la photo de profil ---
             $pictureFile = $form->get('profilePicture')->getData();
             if ($pictureFile) {
-                // Supprimer l'ancien fichier si existant et différent du default
+                // Supprimer l'ancien fichier si différent du default
                 if ($utilisateur->getProfilePicture() && $utilisateur->getProfilePicture() !== 'default.png') {
-                    $oldFile = $this->getParameter('profiles_directory').'/'.$utilisateur->getProfilePicture();
+                    $oldFile = $this->getParameter('profiles_directory') . '/' . $utilisateur->getProfilePicture();
                     if (file_exists($oldFile)) {
                         unlink($oldFile);
                     }
                 }
 
-                $newFileName = uniqid().'.'.$pictureFile->guessExtension();
+                $newFileName = uniqid() . '.' . $pictureFile->guessExtension();
                 $pictureFile->move(
                     $this->getParameter('profiles_directory'),
                     $newFileName
@@ -59,10 +101,20 @@ class ProfilController extends AbstractController
                 $utilisateur->setProfilePicture($newFileName);
             }
 
+            // --- Mise à jour des préférences ---
+            $preferences = $form->get('preferences')->getData();
+            $utilisateur->setPreferences($preferences);
+
+            // --- Enregistrement en base ---
             $em->flush();
+
             $this->addFlash('success', 'Profil mis à jour avec succès');
+
+            // --- Redirection vers la page profil ---
             return $this->redirectToRoute('app_profil');
         }
+
+        // Affichage du formulaire avec erreurs éventuelles
         return $this->render('profil/modifier.html.twig', [
             'form' => $form->createView(),
         ]);

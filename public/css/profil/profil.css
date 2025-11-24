@@ -113,22 +113,116 @@ nav.profil-menu-horizontal .profil-links li a:active {
 
 /* Carrousel */
 .carousel {
-    display: flex;
-    overflow-x: auto;
-    gap: 10px;
+    position: relative;
+    width: 100%;
+    overflow: hidden;
 }
 
+/* Chaque "slide" du carrousel */
 .carousel-item {
-    min-width: 100px;
-    flex-shrink: 0;
-    text-align: center;
+    display: flex;
+    justify-content: space-between; /* Espacement uniforme entre les cartes */
+    align-items: flex-start;
+    transition: transform 0.5s ease-in-out;
 }
 
-.carousel-item img {
-    width: 100px;
-    height: 150px;
-    object-fit: cover;
+.carousel-card-link {
+    text-decoration: none; /* Pas de soulignement */
+    color: inherit;        /* Garde la couleur du texte */
+    display: inline-block; /* Pour que le lien prenne toute la carte */
+}
+
+/* Carte livre */
+.carousel-card {
+    width: 180px;          /* Largeur fixe */
+    height: 300px;         /* Hauteur fixe */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     border-radius: 10px;
+    background-color: #FAF3E0;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.carousel-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Image couverture */
+.carousel-card img {
+    width: 100%;            /* Remplit la largeur de la carte */
+    height: auto;           /* Hauteur automatique pour garder proportions */
+    max-height: 200px;      /* Limite la hauteur */
+    object-fit: contain;    /* L'image garde ses proportions */
+    display: block;
+    margin: 0 auto;
+}
+
+/* Contenu texte */
+.carousel-card .card-body {
+    padding: 5px;
+}
+
+.carousel-card .card-title {
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+}
+
+.carousel-card .card-text {
+    font-size: 0.8rem;
+    color: #555;
+}
+
+/* Flèches */
+.carousel-control-prev,
+.carousel-control-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0,0,0,0.4);
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.carousel-control-prev {
+    left: 10px;
+}
+
+.carousel-control-next {
+    right: 10px;
+}
+
+/* Adaptation mobile */
+@media (max-width: 1200px) {
+    .carousel-card {
+        flex: 1 0 22%;
+    }
+}
+
+@media (max-width: 992px) {
+    .carousel-card {
+        flex: 1 0 30%;
+    }
+}
+
+@media (max-width: 768px) {
+    .carousel-card {
+        flex: 1 0 45%;
+    }
+}
+
+@media (max-width: 576px) {
+    .carousel-card {
+        flex: 1 0 90%;
+    }
 }
 
 /* --- Carte informations personnelles */
@@ -141,7 +235,14 @@ nav.profil-menu-horizontal .profil-links li a:active {
     box-shadow: 0 8px 20px rgba(0,0,0,0.08); /* Même ombre */
 }
 
-.personal-info h3 {
+.personal-info-header {
+    display: flex;
+    justify-content: space-between; /* titre à gauche, bouton à droite */
+    align-items: center;           /* centre verticalement par rapport au h3 */
+    margin-bottom: 20px;           /* espace sous le header */
+}
+
+.personal-info-header h3 {
     margin-bottom: 20px;
     font-size: 1.4rem;
     font-weight: 700;
@@ -150,6 +251,21 @@ nav.profil-menu-horizontal .profil-links li a:active {
     border-bottom: 3px solid #A67856;
     display: inline-block;
     padding-bottom: 5px;
+}
+
+.btn-edit-profil {
+    background-color: #C97C5D;
+    color: #fff8f0;
+    padding: 6px 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-edit-profil:hover {
+    background-color: #a65d42;
 }
 
 /* Liste d'informations */
