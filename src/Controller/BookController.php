@@ -260,6 +260,27 @@ class BookController extends AbstractController
             ]) !== null;
         }
 
+        // Vérifie si l'utilisateur a déjà laissé une note
+        $reviewNote = null;
+        if ($user) {
+            $existingReview = $reviewRepo->findOneBy([
+                'book' => $book,
+                'utilisateur' => $user
+            ]);
+            if ($existingReview) {
+                $reviewNote = $existingReview->getRating();
+            }
+        }
+
+        // Détermine le statut actuel si le livre est dans la bibliothèque
+        $bookshelfEntry = null;
+        if ($user) {
+            $bookshelfEntry = $bookshelfRepo->findOneBy([
+                'book' => $book,
+                'utilisateur' => $user
+            ]);
+        }
+
         return $this->render('book/detail.html.twig', [
             'book' => $book,
             'reviews' => $reviews,
@@ -271,6 +292,8 @@ class BookController extends AbstractController
             'availableSlots' => $availableSlots,
             'avisExiste' => $avisExiste,
             'dateLectureExiste' => $dateLectureExiste,
+            'reviewNote' => $reviewNote,
+            'bookshelfEntry' => $bookshelfEntry,
         ]);
     }
 

@@ -183,25 +183,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================
-    // MODAL AJOUTER À LA BIBLIOTHÈQUE
-    // ==========================
+    // Modal d'ajout à la bibliothèque
     const bookshelfModal = document.getElementById('bookshelf-modal');
     const statusSelect = document.getElementById('bookshelf-status-select');
     const saveBtn = document.getElementById('bookshelf-save-btn');
 
     if (bookshelfModal && statusSelect && saveBtn) {
-        // Ouverture depuis n'importe quel bouton
+
+        // Ouvrir modal depuis n'importe quel bouton
         document.querySelectorAll('[data-add-to-bookshelf]').forEach(btn => {
             btn.addEventListener('click', () => {
-                const loginRedirect = btn.dataset.redirectLogin;
-                if (loginRedirect) return window.location.href = loginRedirect;
 
                 const bookId = btn.dataset.bookId;
                 if (!bookId) return;
 
+                // Stocker l'ID du livre et l'ID du bookshelf (si existe)
                 bookshelfModal.dataset.bookId = bookId;
+                bookshelfModal.dataset.bookshelfId = btn.dataset.bookshelfId || '';
+
+                // Afficher le statut actuel dans la modal
+                const currentStatusSpan = bookshelfModal.querySelector('.bookshelf-current-status');
+                if (currentStatusSpan) {
+                    // Si le dataset existe, on l'utilise, sinon "Aucun"
+                    currentStatusSpan.textContent = btn.dataset.currentStatusLabel || 'Aucun';
+                }
+
+                // Reset sélection
                 statusSelect.value = '';
+
+                // Ouvrir modal
                 openModal(bookshelfModal);
             });
         });
@@ -218,18 +228,60 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!statusId) return alert("Choisis un statut.");
 
             try {
-                const resp = await fetch('/bibliotheque/ajouter-ou-mettre-a-jour', {
+                let url, body;
+                const bookshelfId = bookshelfModal.dataset.bookshelfId;
+
+                if (bookshelfId) {
+                    // Déplacer un livre déjà en bibliothèque
+                    url = `/bibliotheque/livres/${bookshelfId}/deplacer`;
+                    body = JSON.stringify({ readingStatusId: statusId });
+                } else {
+                    // Ajouter un nouveau livre
+                    url = '/bibliotheque/ajouter-ou-mettre-a-jour';
+                    body = JSON.stringify({ bookId, readingStatusId: statusId });
+                }
+
+                const resp = await fetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-                    body: JSON.stringify({ bookId, readingStatusId: statusId })
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest' 
+                    },
+                    body
                 });
+
                 const result = await resp.json();
+
                 if (result.success) {
+
+                    // Mettre à jour le bouton principal côté DOM
                     const btn = document.querySelector(`[data-book-id="${bookId}"]`);
-                    if (btn) btn.textContent = "Déjà dans ta bibliothèque ✔";
+                    if (btn) {
+                        btn.textContent = 'Déplacer';
+                        btn.dataset.bookshelfId = result.bookshelfId;
+                        btn.dataset.currentStatusLabel = result.readingStatusLabel; // pour la prochaine ouverture
+                    }
+
+                    // Mettre à jour le badge statut actuel dans la modal
+                    const currentStatusSpan = bookshelfModal.querySelector('.bookshelf-current-status');
+                    if (currentStatusSpan) {
+                        currentStatusSpan.textContent = result.readingStatusLabel;
+                    }
+
+                    // Mettre à jour la data-bookshelf-id dans la modal
+                    bookshelfModal.dataset.bookshelfId = result.bookshelfId;
+
+                    // Fermer modal
                     closeModal(bookshelfModal);
-                } else alert(result.message || "Erreur lors de l'ajout.");
-            } catch { alert("Erreur réseau."); }
+
+                } else {
+                    alert(result.message || "Erreur côté serveur.");
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert("Erreur réseau, réessayez.");
+            }
         });
     }
 
@@ -377,4 +429,66 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Modal de note
+    const leaveBtn = document.getElementById('leave-rating-btn');
+    const rateUrl = leaveBtn.dataset.rateUrl;
+    const modal = document.getElementById('rating-modal');
+    const stars = document.querySelectorAll('#rating-stars .star');
+    const ratingValue = document.getElementById('rating-value');
+    const submitBtn = document.getElementById('submit-rating-btn');
+    let selectedRating = 0;
+
+    leaveBtn?.addEventListener('click', () => openModal(modal));
+
+    document.getElementById('close-rating-btn')
+        ?.addEventListener('click', () => closeModal(modal));
+
+    setupCloseOutside(modal);
+
+    // Hover / Click étoiles
+    stars.forEach(star => {
+        star.addEventListener('mouseover', () => highlightStars(star.dataset.value));
+        star.addEventListener('mouseout', () => highlightStars(selectedRating));
+        star.addEventListener('click', () => {
+            selectedRating = star.dataset.value;
+            ratingValue.textContent = selectedRating;
+            highlightStars(selectedRating);
+        });
+    });
+
+    function highlightStars(val) {
+        stars.forEach(s => {
+            s.textContent = s.dataset.value <= val ? '★' : '☆';
+        });
+    }
+
+    // Envoi de la note
+    submitBtn.addEventListener('click', () => {
+        if (selectedRating == 0) {
+            alert("Veuillez sélectionner une note.");
+            return;
+        }
+
+        fetch(rateUrl, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify({ rating: selectedRating })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                leaveBtn.textContent = "Note laissée ✓";
+                leaveBtn.disabled = true;
+                closeModal(modal);
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(err => console.error(err));
+    });
 });

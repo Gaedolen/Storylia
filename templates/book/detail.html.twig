@@ -15,26 +15,21 @@
                 <button class="btn-main">Supprimer</button>
             {% endif %}
 
-            <button class="btn-main" 
+            {# Bouton Ajouter / Déplacer #}
+            <button 
+                class="btn-main"
                 data-add-to-bookshelf
-                {% if app.user %}
-                    data-book-id="{{ book.id }}"
-                {% else %}
-                    data-redirect-login="{{ path('app_login') }}"
-                {% endif %}
-            >
-                Ajouter à la bibliothèque
+                data-book-id="{{ book.id }}"
+                data-bookshelf-id="{{ bookshelfEntry ? bookshelfEntry.id : '' }}"
+                data-current-status-label="{{ bookshelfEntry ? prettyStatuses[bookshelfEntry.readingStatus.label]|default(bookshelfEntry.readingStatus.label) : 'Aucun' }}">
+                {{ bookshelfEntry ? 'Déplacer' : 'Ajouter' }}
             </button>
 
-            <div id="bookshelf-modal" class="modal">
+            {# Modal bookshelf #}
+            <div id="bookshelf-modal" class="modal" style="display:none;">
                 <div class="modal-content">
                     <span class="close">&times;</span>
 
-                    <h3>Ajouter à ta bibliothèque</h3>
-
-                    <label for="bookshelf-status-select">Choisir un statut :</label>
-
-                    {# Mapping pour afficher les labels correctement #}
                     {% set prettyStatuses = {
                         'en_train_de_lire': 'En train de lire',
                         'coup_de_coeur': 'Coup de coeur',
@@ -47,21 +42,39 @@
                         'envies': 'Mes envies',
                     } %}
 
+                    <h3>{{ bookshelfEntry ? 'Déplacer dans ta bibliothèque' : 'Ajouter à ta bibliothèque' }}</h3>
+
+                    {% if bookshelfEntry %}
+                        <p>Statut actuel : 
+                            <span class="bookshelf-current-status">
+                                {% if bookshelfEntry %}
+                                    {{ prettyStatuses[bookshelfEntry.readingStatus.label]|default(bookshelfEntry.readingStatus.label) }}
+                                {% else %}
+                                    Aucun
+                                {% endif %}
+                            </span>
+                        </p>
+                    {% endif %}
+
+                    <label for="bookshelf-status-select">Choisir un nouveau statut :</label>
+
                     <select name="readingStatus" id="bookshelf-status-select">
-                        <option value="" disabled selected>Choisis un statut</option>
+                        <option value="" disabled {% if not bookshelfEntry %}selected{% endif %}>Choisis un statut</option>
                         {% for status in readingStatuses %}
-                            <option value="{{ status.id }}">
+                            <option value="{{ status.id }}" 
+                                {% if bookshelfEntry and status.id == bookshelfEntry.readingStatus.id %}selected{% endif %}>
                                 {{ prettyStatuses[status.label]|default(status.label) }}
                             </option>
                         {% endfor %}
                     </select>
 
                     <button id="bookshelf-save-btn" class="btn-main">
-                        Ajouter
+                        {{ bookshelfEntry ? 'Déplacer' : 'Ajouter' }}
                     </button>
                 </div>
             </div>
 
+            {# Bouton avis / modification #}
             {% if isInLibrary %}
                 {% if avisExiste %}
                     <button class="btn-main" disabled>Avis laissé ✓</button>
@@ -73,13 +86,19 @@
                     </button>
                 {% endif %}
 
+                {# Bouton Date de lecture / modification #}
                 {% if dateLectureExiste %}
                     <button class="btn-main" disabled>Date laissée ✓</button>
                 {% else %}
                     <button class="btn-main" id="add-reading-date-btn">Date de lecture</button>
                 {% endif %}
 
-                <button class="btn-main">Laisser une note</button>
+                {# Bouton Note / Modification #}
+                {% if reviewNote is not null %}
+                    <button class="btn-main" id="leave-rating-btn" disabled>Note laissée ✓</button>
+                {% else %}
+                    <button class="btn-main" id="leave-rating-btn"  data-rate-url="{{ path('app_review_submit', {'id': book.id}) }}">Laisser une note</button>
+                {% endif %}
             {% endif %}
         </div>
 
@@ -138,7 +157,6 @@
                     <h3>Modifier la couverture</h3>
 
                     <form action="{{ path('app_livre_edit_cover', {'id': book.id}) }}" method="POST" enctype="multipart/form-data">
-                        <!-- Input fichier -->
                         <label class="btn-main" for="cover-input">Sélectionner une nouvelle couverture</label>
                         <input type="file" name="cover" id="cover-input" accept="image/*" style="display:none;">
                         <p class="file-name" style="margin-top:8px;color:#4b2e05;"></p>
@@ -233,7 +251,7 @@
     </div>
 
     {# Modal d'avis #}
-    <div id="leave-review-modal" class="modal" style="display:none;" data-book-id="{{ book.id }}">>
+    <div id="leave-review-modal" class="modal" style="display:none;" data-book-id="{{ book.id }}">
         <div class="modal-content">
             <span class="close">&times;</span>
             <h3>Laisser un avis</h3>
@@ -269,6 +287,32 @@
             </form>
         </div>
     </div>
+
+    {# Modal de note #}
+    <div id="rating-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>Laisser une note</h2>
+
+            <div id="rating-stars">
+                <span class="star" data-value="1">☆</span>
+                <span class="star" data-value="2">☆</span>
+                <span class="star" data-value="3">☆</span>
+                <span class="star" data-value="4">☆</span>
+                <span class="star" data-value="5">☆</span>
+            </div>
+
+            <p>Note sélectionnée : <span id="rating-value">0</span> / 5</p>
+
+            <div class="modal-buttons">
+                <button id="submit-rating-btn" class="confirm-btn">Valider</button>
+                <button id="close-rating-btn" class="cancel-btn">Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const csrfToken = '{{ csrf_token("review_rating") }}';
+    </script>
 
 {% endblock %}
 

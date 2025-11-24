@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Review;
+use App\Entity\Book;
 use App\Repository\BookRepository;
+use App\Repository\ReviewRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -55,5 +57,32 @@ class ReviewController extends AbstractController
         $this->em->flush();
 
         return new JsonResponse(['success' => true, 'message' => 'Avis enregistré !']);
+    }
+
+    #[Route('/book/{id}/review', name: 'app_review_submit', methods: ['POST'])]
+    public function submitReview(Book $book, Request $request, ReviewRepository $reviewRepo, EntityManagerInterface $em) 
+    {
+        $user = $this->getUser();
+        if (!$user) return $this->json(['success' => false, 'message' => 'Utilisateur non connecté.']);
+
+        $data = json_decode($request->getContent(), true);
+        $rating = $data['rating'] ?? null;
+        $comment = $data['comment'] ?? '';
+
+        if (!$rating || $rating < 1 || $rating > 5) {
+            return $this->json(['success' => false, 'message' => 'Note invalide.']);
+        }
+
+        $review = $reviewRepo->findOneBy(['book' => $book, 'utilisateur' => $user]);
+        if (!$review) {
+            $review = new Review();
+            $review->setBook($book)->setUtilisateur($user)->setAuthor($book->getAuthor())->setDate(new \DateTime());
+        }
+
+        $review->setRating($rating)->setComment($comment);
+        $em->persist($review);
+        $em->flush();
+
+        return $this->json(['success' => true]);
     }
 }

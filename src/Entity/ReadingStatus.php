@@ -16,6 +16,9 @@ class ReadingStatus
     #[ORM\Column(length: 50)]
     private ?string $label = null;
 
+    #[ORM\ManyToOne(targetEntity: Book::class)]
+    private ?Book $book = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -30,6 +33,17 @@ class ReadingStatus
     {
         $this->label = $label;
 
+        return $this;
+    }
+
+    public function getBook(): ?Book
+    {
+        return $this->book;
+    }
+
+    public function setBook(?Book $book): static
+    {
+        $this->book = $book;
         return $this;
     }
 }

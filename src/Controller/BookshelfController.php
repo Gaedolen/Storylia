@@ -117,6 +117,23 @@ class BookshelfController extends AbstractController
         $bookshelf->setReadingStatus($status);
         $em->flush();
 
-        return $this->json(['success' => true, 'message' => 'Livre déplacé avec succès !']);
+        // Retour JSON avec label et ID
+        return $this->json([
+            'success' => true,
+            'message' => 'Livre déplacé avec succès !',
+            'bookshelfId' => $bookshelf->getId(),
+            'readingStatusLabel' => match($status->getLabel()) {
+                'en_train_de_lire' => 'En train de lire',
+                'coup_de_coeur' => 'Coup de coeur',
+                'adore' => "J'adore",
+                'apprecie' => 'Apprécié',
+                'mitige' => 'Mitigé',
+                'pas_aime' => 'Pas aimé',
+                'lu_aussi' => 'Lu',
+                'pal' => 'Pile à lire',
+                'envies' => 'Mes envies',
+                default => $status->getLabel(),
+            }
+        ]);
     }
 }
