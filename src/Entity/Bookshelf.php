@@ -25,6 +25,9 @@ class Bookshelf
     #[ORM\JoinColumn(nullable: false)]
     private ?ReadingStatus $readingStatus = null;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $pagesRead = null;
+
     // Getters et setters
 
     public function getId(): ?int
@@ -62,6 +65,17 @@ class Bookshelf
     public function setReadingStatus(?ReadingStatus $readingStatus): static
     {
         $this->readingStatus = $readingStatus;
+        return $this;
+    }
+
+    public function getPagesRead(): ?int
+    {
+        return $this->pagesRead;
+    }
+
+    public function setPagesRead(?int $pagesRead): self
+    {
+        $this->pagesRead = $pagesRead;
         return $this;
     }
 }

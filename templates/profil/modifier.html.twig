@@ -39,6 +39,16 @@
             {{ form_widget(form.profilePicture) }}
             {{ form_errors(form.profilePicture) }}
         </div>
+
+        <div class="form-group bio-box">
+            {{ form_label(form.bio) }}
+            {{ form_widget(form.bio) }}
+            <div class="bio-counter">
+                <span id="bio-count">0</span>/1000 caractères
+            </div>
+            {{ form_errors(form.bio) }}
+        </div>
+
     </div>
 
     <div class="form-group preferences-section">
@@ -61,3 +71,8 @@
     {{ form_end(form) }}
 </div>
 {% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/modifier.js') }}"></script>
+ {% endblock %}

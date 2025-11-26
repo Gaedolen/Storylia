@@ -5,10 +5,12 @@ namespace App\Form;
 use App\Entity\Utilisateur;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -57,6 +59,21 @@ class ProfilType extends AbstractType
                         'message' => 'Votre mot de passe doit contenir au moins un caractère spécial',
                     ]),
                 ],
+            ])
+            ->add('bio', TextareaType::class, [
+                'required' => false,
+                'label' => 'Biographie',
+                'attr' => [
+                    'placeholder' => 'Parlez un peu de vous...',
+                    'class' => 'bio-textarea',
+                    'maxlength' => 1000
+                ],
+                'constraints' => [
+                    new Length([
+                        'max' => 1000,
+                        'maxMessage' => 'La biographie ne peut pas dépasser {{ limit }} caractères.'
+                    ])
+                ]
             ])
             ->add('preferences', ChoiceType::class, [
                 'label' => 'Vos préférences de lecture',

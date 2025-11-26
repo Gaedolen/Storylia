@@ -111,11 +111,91 @@ nav.profil-menu-horizontal .profil-links li a:active {
     border-radius: 15px;
 }
 
+.info-item.bio-box {
+    background: #E8CBAE; /* même fond que les autres cartes */
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column; /* icône+label en haut, texte en dessous */
+    gap: 10px;
+    align-items: flex-start;
+}
+
+/* Header (icône + label sur la ligne du haut) */
+.bio-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Icône */
+.bio-header i {
+    font-size: 20px;
+    color: #C97C5D;
+}
+
+/* Label */
+.bio-header .label {
+    font-weight: 700;
+    color: #3B2F2F;
+}
+
+/* Bloc blanc contenant le texte de la bio */
+.bio-content {
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+
+/* Texte de la bio */
+.bio-text {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: #4a3f35;
+}
+
+.bio-text.empty {
+    font-style: italic;
+    opacity: 0.7;
+}
+
+.preferences-badges {
+    display: flex;
+    flex-wrap: wrap;    /* passe à la ligne si nécessaire */
+    gap: 5px;           /* espace entre les badges */
+    margin-top: 5px;    /* petit espace sous le titre */
+}
+
+.preference-badge {
+    background-color: #C97C5D;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
 /* Carrousel */
 .carousel {
     position: relative;
     width: 100%;
     overflow: hidden;
+}
+
+/* Wrapper du carousel */
+.carousel-inner,
+.carousel-item,
+.d-flex.justify-content-center {
+    overflow: visible !important;
+}
+
+.carousel-wrapper {
+    background-color: #E8CBAE;
+    padding: 20px 0; /* espace au-dessus et en dessous du carousel */
+    border-radius: 10px; /* optionnel pour arrondir le fond */
+    margin: 0 50px; /* laisse un espace pour que les flèches restent hors du fond */
 }
 
 /* Chaque "slide" du carrousel */
@@ -140,7 +220,7 @@ nav.profil-menu-horizontal .profil-links li a:active {
     flex-direction: column;
     overflow: hidden;
     border-radius: 10px;
-    background-color: #FAF3E0;
+    background-color: #fff5ef;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     transition: transform 0.3s;
 }
@@ -355,6 +435,12 @@ nav.profil-menu-horizontal .profil-links li a:active {
     box-shadow: 0 5px 14px rgba(113, 75, 47, 0.25);
 }
 
+.link-card:hover,
+.link-card:hover i,
+.link-card:hover .label {
+    color: #ffffff; /* tout devient blanc */
+}
+
 .link-card i {
     font-size: 1.3rem;
     margin-right: 12px;
@@ -502,4 +588,165 @@ nav.profil-menu-horizontal .profil-links li a:active {
     .card-favorites {
         width: 100%;
     }
+}
+
+/* Lecture en cours */
+.lecture-container {
+    justify-content: space-between;
+    display: flex;
+    align-items: flex-start; /* aligne titre en haut */
+    gap: 30px; /* espace entre les deux blocs */
+}
+
+/* Bloc carte livre */
+.lecture-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+/* Cover et lien */
+.lecture-cover img {
+    width: 180px;
+    height: auto;
+    border-radius: 5px;
+}
+
+.lecture-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 5px;
+    margin-left: 5px; /* très proche de la couverture */
+    flex: 1; /* prend tout l'espace central */
+}
+
+/* Titre et auteur cliquables */
+.lecture-info h4 {
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.lecture-info p {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #555;
+}
+
+.lecture-info h4 a,
+.lecture-info p a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.lecture-info h4 a:hover,
+.lecture-info p a:hover {
+    text-decoration: underline;
+}
+
+/* Cercle de progression circulaire */
+.lecture-container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between; /* espace entre infos et cercle */
+    padding-right: 40px; /* espace pour que le cercle ne touche pas le bord */
+}
+
+.reading-progress-wrapper {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.circle-wrapper, #progressContainer {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    margin: auto;
+    transition: width 0.3s ease, height 0.3s ease;
+}
+
+#progressContainer.large {
+    width: 200px;
+    height: 200px;
+}
+
+.progress-ring {
+    transform: rotate(-90deg);
+}
+
+.progress-ring-progress {
+    transform-origin: 50% 50%;
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+/* Zone centrale scalable */
+.progress-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 70%; /* ne dépasse jamais du cercle */
+    text-align: center;
+}
+
+.progress-input {
+    width: 80px;
+    font-size: 16px;
+    text-align: center;
+    padding: 6px 8px;
+    border: 2px solid #C97C5D;
+    border-radius: 8px;
+    background-color: #fff8f0;
+    color: #5a3c2f;
+    outline: none;
+    transition: all 0.2s ease;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.progress-input:focus {
+    border-color: #a65d42;
+    box-shadow: 0 0 5px rgba(201,124,93,0.5);
+}
+
+.progress-input::placeholder {
+    color: #bfa68e;
+    font-size: 14px;
+}
+
+.total-pages-text {
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Pourcentage sous le cercle */
+.progress-percent {
+    margin-top: 12px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Bouton */
+#updateProgressBtn {
+    margin-top: 10px;
+    padding: 5px 10px;
+    cursor: pointer;
+    background-color: #C97C5D;
+    color: #fff8f0;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+#updateProgressBtn:hover {
+    background-color: #a65d42;
 }

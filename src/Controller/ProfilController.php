@@ -3,9 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Utilisateur;
+use App\Entity\ReadingHistory;
+use App\Entity\Bookshelf;
 use App\Repository\ReadingStatusRepository;
 use App\Repository\UtilisateurRepository;
 use App\Form\ProfilType;
+use App\Repository\BookRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -17,12 +20,43 @@ use Symfony\Component\Routing\Annotation\Route;
 class ProfilController extends AbstractController
 {
     #[Route('/profil', name: 'app_profil')]
-    public function index(UtilisateurRepository $userRepo): Response
+    public function index(UtilisateurRepository $userRepo, BookRepository $bookRepo, EntityManagerInterface $em): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
         /** @var \App\Entity\Utilisateur $utilisateur */
         $utilisateur = $this->getUser();
+
+        // Mapping des préférences
+        $preferenceLabels = [
+            'scifi' => 'Science-Fiction',
+            'fantastique' => 'Fantastique',
+            'fantasy' => 'Fantasy',
+            'dystopie' => 'Dystopie',
+            'steampunk' => 'Steampunk',
+            'policier' => 'Policier',
+            'thriller' => 'Thriller',
+            'espionnage' => 'Espionnage',
+            'horreur' => 'Horreur',
+            'aventure' => 'Aventure',
+            'young_adult' => 'Young Adult',
+            'romance' => 'Romance',
+            'erotique' => 'Érotique',
+            'chicklit' => 'Chick-lit',
+            'essai' => 'Essai',
+            'biographie' => 'Biographie',
+            'philosophie' => 'Philosophie',
+            'historique' => 'Historique',
+            'science' => 'Science',
+            'sociologie' => 'Sociologie',
+            'poesie' => 'Poésie',
+            'theatre' => 'Théâtre',
+            'conte_legend' => 'Contes et légendes',
+            'mythologie' => 'Mythologie',
+            'graphic_novel' => 'Roman Graphique',
+            'bd' => 'Bande dessinée',
+            'manga' => 'Manga',
+        ];
 
         // Récupérer les coups de coeur
         $coupsDeCoeur = $utilisateur->getBookshelves()
@@ -33,18 +67,57 @@ class ProfilController extends AbstractController
             ->filter(fn($shelf) => $shelf->getReadingStatus()->getLabel() === 'en_train_de_lire')
             ->first(); // retourne le premier élément ou false
 
-        // Si false, mettre null pour Twig
         if (!$lectureEnCours) {
             $lectureEnCours = null;
         }
+
+        // Récupérer l'historique pour les dernières lectures
+        $lastRead = $em->getRepository(ReadingHistory::class)
+        ->createQueryBuilder('rh')
+        ->where('rh.utilisateur = :user')
+        ->andWhere('rh.readingDate IS NOT NULL')
+        ->orderBy('rh.readingDate', 'DESC')
+        ->setParameter('user', $utilisateur)
+        ->setMaxResults(20)
+        ->getQuery()
+        ->getResult();
+
+        $uniqueLastRead = [];
+        foreach ($lastRead as $rh) {
+            if (!isset($uniqueLastRead[$rh->getBook()->getId()])) {
+                $uniqueLastRead[$rh->getBook()->getId()] = $rh;
+            }
+        }
+        $lastRead = array_values($uniqueLastRead);
+        $lastRead = array_slice($lastRead, 0, 20);
+
 
         return $this->render('profil/profil.html.twig', [
             'utilisateur' => $utilisateur,
             'coupsDeCoeur' => $coupsDeCoeur,
             'lectureEnCours' => $lectureEnCours,
+            'preferenceLabels' => $preferenceLabels,
+            'lastRead' => $lastRead,
         ]);
     }
 
+    #[Route('/profil/lecture/{id}/pages', name: 'app_update_pages_read', methods: ['POST'])]
+    public function updatePagesRead(Request $request, Bookshelf $bookshelf, EntityManagerInterface $em): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
+        $pagesRead = (int) $request->request->get('pagesRead', 0);
+        $bookshelf->setPagesRead($pagesRead);
+
+        if (!$this->isCsrfTokenValid('update_pages_read'.$bookshelf->getId(), $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF');
+        }
+
+        $em->persist($bookshelf);
+        $em->flush();
+
+        return $this->redirectToRoute('app_profil');
+    }
 
     #[Route('/modifier', name: 'app_profil_edit')]
     public function edit(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher, UtilisateurRepository $utilisateurRepository ): Response 

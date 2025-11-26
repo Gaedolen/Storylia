@@ -56,6 +56,38 @@ input[type="file"] {
     margin-bottom: 10px;
 }
 
+/* === BIO — même style que les champs === */
+.bio-box textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #C97C5D;
+    background: #FFFFFF;
+    border-radius: 8px;
+    color: #3B2F2F;
+    margin-top: 5px;
+    font-size: 15px;
+    min-height: 120px;
+    resize: vertical;
+}
+
+.bio-box label {
+    color: #3B2F2F;
+    font-weight: 600;
+}
+
+.bio-counter {
+    text-align: right;
+    font-size: 13px;
+    margin-top: 4px;
+    color: #5e4a3b;
+    opacity: 0.8;
+}
+
+.bio-counter.too-long {
+    color: #b30000;
+    font-weight: bold;
+}
+
 /* === Section Préférences === */
 .preferences-section label {
     font-weight: 700;

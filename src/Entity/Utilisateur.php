@@ -68,6 +68,9 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 20)]
     private ?string $status = self::STATUS_ACTIF;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $bio = null;
+
     #[ORM\ManyToOne(targetEntity: Role::class, inversedBy: 'utilisateurs')]
     private ?Role $role = null;
 
@@ -241,6 +244,17 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     public function isSuspendu(): bool
     {
         return $this->status === self::STATUS_SUSPENDU;
+    }
+
+    public function getBio(): ?string
+    {
+        return $this->bio;
+    }
+
+    public function setBio(?string $bio): self
+    {
+        $this->bio = $bio;
+        return $this;
     }
 
     public function getRole(): ?Role
