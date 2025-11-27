@@ -32,6 +32,7 @@
             {{ encore_entry_script_tags('app') }}
         {% endblock %}
     </head>
+
     <body>
         <div class="page-container">
             <header class="navbar-custom">
@@ -41,6 +42,15 @@
                     </div>
 
                     <div class='menu-section'>
+
+                        <a href="{{ path('app_recherche_livre') }}" class="icon-search">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </a>
+
+                        <button class="burger-btn" id="burgerBtn">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+
                         <nav class="menu-nav">
                             {% if app.user %}
                                 {% if is_granted('ROLE_ADMIN') %}
@@ -135,5 +145,15 @@
 
         <!-- Bootstrap JS Bundle (Popper inclus) -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+        <script>
+            const burgerBtn = document.getElementById('burgerBtn');
+            const menuNav = document.querySelector('.menu-nav');
+
+            burgerBtn.addEventListener('click', () => {
+                menuNav.classList.toggle('show-menu');
+            });
+        </script>
+
     </body>
 </html>

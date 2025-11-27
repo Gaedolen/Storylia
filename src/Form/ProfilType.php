@@ -37,27 +37,27 @@ class ProfilType extends AbstractType
                 'second_options' => ['label' => 'Confirmer le mot de passe'],
                 'invalid_message' => 'Les mots de passe doivent correspondre.',
                 'constraints' => [
-                    new Assert\Length([
-                        'min' => 8,
-                        'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
-                        'max' => 4096,
-                    ]),
-                    new Assert\Regex([
-                        'pattern' => '/[A-Z]/',
-                        'message' => 'Votre mot de passe doit contenir au moins une lettre majuscule',
-                    ]),
-                    new Assert\Regex([
-                        'pattern' => '/[a-z]/',
-                        'message' => 'Votre mot de passe doit contenir au moins une lettre minuscule',
-                    ]),
-                    new Assert\Regex([
-                        'pattern' => '/\d/',
-                        'message' => 'Votre mot de passe doit contenir au moins un chiffre',
-                    ]),
-                    new Assert\Regex([
-                        'pattern' => '/[\W_]/',
-                        'message' => 'Votre mot de passe doit contenir au moins un caractère spécial',
-                    ]),
+                    new Assert\Length(
+                        min: 8,
+                        minMessage: 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
+                        max: 4096
+                    ),
+                    new Assert\Regex(
+                        pattern: '/[A-Z]/',
+                        message: 'Votre mot de passe doit contenir au moins une lettre majuscule'
+                    ),
+                    new Assert\Regex(
+                        pattern: '/[a-z]/',
+                        message: 'Votre mot de passe doit contenir au moins une lettre minuscule'
+                    ),
+                    new Assert\Regex(
+                        pattern: '/\d/',
+                        message: 'Votre mot de passe doit contenir au moins un chiffre'
+                    ),
+                    new Assert\Regex(
+                        pattern: '/[\W_]/',
+                        message: 'Votre mot de passe doit contenir au moins un caractère spécial'
+                    ),
                 ],
             ])
             ->add('bio', TextareaType::class, [
@@ -69,11 +69,26 @@ class ProfilType extends AbstractType
                     'maxlength' => 1000
                 ],
                 'constraints' => [
-                    new Length([
-                        'max' => 1000,
-                        'maxMessage' => 'La biographie ne peut pas dépasser {{ limit }} caractères.'
-                    ])
+                    new Length(
+                        max: 1000,
+                        maxMessage: 'La biographie ne peut pas dépasser {{ limit }} caractères.',
+                        normalizer: function (?string $value) {
+                            return $value === null ? null : str_replace(["\r\n", "\r"], "\n", $value);
+                        }
+                    )
                 ]
+            ])
+            ->add('profilePicture', FileType::class, [
+                'label' => 'Photo de profil',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File(
+                        maxSize: '10M',
+                        mimeTypes: ['image/jpeg', 'image/png'],
+                        mimeTypesMessage: 'Veuillez uploader un fichier image valide (jpg ou png)'
+                    )
+                ],
             ])
             ->add('preferences', ChoiceType::class, [
                 'label' => 'Vos préférences de lecture',
@@ -125,18 +140,6 @@ class ProfilType extends AbstractType
                 'expanded' => true,
                 'multiple' => true,
                 'required' => false,
-            ])
-            ->add('profilePicture', FileType::class, [
-                'label' => 'Photo de profil',
-                'mapped' => false,
-                'required' => false,
-                'constraints' => [
-                    new File([
-                        'maxSize' => '10M',
-                        'mimeTypes' => ['image/jpeg', 'image/png'],
-                        'mimeTypesMessage' => 'Veuillez uploader un fichier image valide (jpg ou png)',
-                    ])
-                ],
             ]);
     }
 

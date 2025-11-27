@@ -37,12 +37,12 @@
                                     {% for reading in readings %}
                                         <div class="book-card">
                                             <div class="cover">
-                                                <img src="{{ asset('uploads/books/' ~ reading.book.cover) }}" alt="{{ reading.book.title }}">
+                                                <img src={{ reading.book.cover }} alt="{{ reading.book.title }}">
                                             </div>
                                             <div class="info">
                                                 <div>
                                                     <h5>{{ reading.book.title }}</h5>
-                                                    <p>{{ reading.book.author }}</p>
+                                                    <p>{{ reading.book.author.name }}</p>
                                                 </div>
                                                 <div class="buttons">
                                                     <button title="Déplacer">

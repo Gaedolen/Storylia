@@ -8,6 +8,8 @@
 html, body {
     height: 100%;
     margin: 0;
+    font-family: 'Comfortaa', sans-serif;
+    background-color: #FAF3E0;
 }
 
 .page-container {
@@ -20,26 +22,21 @@ html, body {
     flex: 1 0 auto;
 }
 
-body {
-    font-family: 'Comfortaa', sans-serif;
-    background-color: #FAF3E0;
-}
-
-/* Header */
+/* === Header === */
 .navbar-custom {
     background-color: #5F7F5F;
     width: 100%;
+    padding: 10px 0;
     position: relative;
     z-index: 1000;
-    padding-bottom: 10px;
 }
 
 .container-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
-    padding: 0 10px;
+    width: 95%;
+    margin: 0 auto;
 }
 
 .logo-left {
@@ -49,22 +46,27 @@ body {
 }
 
 .logo {
-    height: 100px;
-    margin-right: 2px;
+    height: 80px;
+}
+
+/* Menu */
+.menu-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
 }
 
 .menu-nav {
     display: flex;
-    align-items: center;
     gap: 15px;
 }
 
 .menu-nav a {
     color: white;
     text-decoration: none;
-    font-family: 'Comfortaa', sans-serif;
-    font-size: 22px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    font-size: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     transition: color 0.3s;
 }
 
@@ -74,25 +76,17 @@ body {
 
 .separator {
     color: white;
-    font-family: 'Courier New', monospace;
-    font-size: 28px; 
-    font-weight: 100;
-    display: inline-block;
+    font-size: 24px;
     transform: scaleX(0.5);
-    text-shadow:
-        0 0 1px #fff,
-        0 0 2px #fff,
-        0 0 3px #fff,
-        0 0 1px #aaa;
-    opacity: 0.8;     
+    text-shadow: 0 0 1px #fff,0 0 2px #fff,0 0 3px #fff,0 0 1px #aaa;
+    opacity: 0.8;
 }
 
-/* Section navigation + recherche */
-.menu-section {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
+/* Search */
+.icon-search {
+    color: white;
+    font-size: 22px;
+    margin-right: 10px;
 }
 
 .search-bar {
@@ -101,22 +95,15 @@ body {
     background-color: #FAF3E0;
     border-radius: 30px;
     padding: 5px 10px;
-    width: 300px;
-    transition: box-shadow 0.3s ease;
-}
-
-.search-bar:hover {
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    width: 250px;
 }
 
 .search-bar input {
     flex: 1;
     border: none;
-    background: transparent;
     outline: none;
+    background: transparent;
     font-size: 16px;
-    color: #333;
-    font-family: 'Comfortaa', sans-serif;
 }
 
 .search-bar button {
@@ -125,96 +112,154 @@ body {
     cursor: pointer;
     font-size: 20px;
     color: #333;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4px;
-    transition: transform 0.2s ease, color 0.2s ease;
 }
 
-.search-bar button:hover {
-    transform: scale(1.2);
-    color: #714B2F;
+/* Burger */
+.burger-btn {
+    display: none;
+    font-size: 32px;
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
 }
 
-/* Body */
-.content {
-  flex: 1;
-  font-family: 'Comfortaa', sans-serif;
-background-color: #FAF3E0;
-}
-
-/* Footer */
+/* === Footer === */
 .nav-footer {
     background-color: #5F7F5F;
     padding: 20px 40px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
     position: relative;
 }
 
-/* Container principal */
 .container-footer {
     width: 100%;
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
 }
 
-/* Liens footer */
 .navbar-footer {
     display: flex;
-    flex-direction: column;
-    gap: 5px;
-    margin-left: 0px;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
 }
 
 .navbar-footer a {
     color: white;
     text-decoration: none;
-    font-size: 30px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    transition: color 0.3s;
+    font-size: 20px;
 }
 
 .navbar-footer a:hover {
     color: #E8CBAE;
 }
 
-/* Copyright */
 .copyrigth {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
     color: white;
     font-size: 14px;
     text-align: center;
 }
 
-/* Réseaux sociaux */
 .reseaux-sociaux {
-    text-align: center;
-    margin-right: 10px;
-}
-
-.reseaux-sociaux .retrouvez-nous {
-    margin: 0 0 8px 0;
-    font-size: 30px;
-    font-weight: bold;
-    color: white;
+    display: flex;
+    gap: 15px;
 }
 
 .reseaux-sociaux i {
-    font-size: 35px;
+    font-size: 30px;
     color: white;
-    margin: 0 10px;
-    transition: transform 0.3s ease, color 0.3s ease;
     cursor: pointer;
+    transition: transform 0.3s ease, color 0.3s ease;
 }
 
 .reseaux-sociaux i:hover {
     transform: scale(1.2);
     color: #E8CBAE;
+}
+
+/* === Responsive === */
+
+/* Tablette et mobile */
+@media (max-width: 1024px) {
+    .menu-nav {
+        display: none;
+        flex-direction: column;
+        gap: 12px;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: #5F7F5F;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        width: 220px;
+    }
+
+    .menu-nav.show-menu {
+        display: flex;
+    }
+
+    .burger-btn {
+        display: block;
+    }
+
+    .separator {
+        display: none;
+    }
+
+    .search-bar {
+        display: none;
+    }
+}
+
+/* Mobile spécifique */
+@media (max-width: 425px) {
+    .logo {
+        height: 60px;
+    }
+
+    .menu-nav {
+        width: 180px;
+        top: 90px;
+        right: 5px;
+    }
+}
+
+/* Desktop */
+@media (min-width: 1025px) {
+    .menu-section {
+        display: flex;
+        flex-direction: column; /* menu au dessus, recherche en dessous */
+        align-items: flex-end; /* aligne tout à droite */
+        gap: 10px; /* espace entre menu et barre de recherche */
+    }
+
+    .menu-nav {
+        display: flex !important;
+        flex-direction: row;
+        gap: 15px;
+        background: none;
+        padding: 0;
+        position: static;
+    }
+
+    /* Cacher la loupe */
+    .icon-search {
+        display: none;
+    }
+
+    .burger-btn {
+        display: none;
+    }
+
+    /* Barre de recherche visible et alignée à droite */
+    .search-bar {
+        display: flex;
+        width: 300px; /* tu peux ajuster la largeur */
+        justify-content: flex-end; /* assure que le contenu reste à droite */
+    }
 }
