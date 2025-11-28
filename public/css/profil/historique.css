@@ -76,20 +76,88 @@ nav.profil-menu-horizontal .profil-links li a:active {
 }
 
 /* Grille historique */
+/* Grille historique */
 .grid-historique {
     display: flex;
     flex-direction: column;
     gap: 25px;
 }
 
-/* Carte année */
-.year-card {
-    background-color: #fff3eb;
-    border-radius: 30px;
-    padding: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+/* Carte année et mois */
+.year-card, .month-card {
+    border-radius: 12px;
+    padding: 12px;
+    background: #fff;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
 }
 
+/* En-têtes cliquables */
+.year-header, .month-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+/* Icônes de flèche */
+.arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #714B2F;
+    width: 36px;   /* zone cliquable plus grande */
+    height: 36px;
+}
+
+.arrow-icon {
+    display: block;
+    width: 26px;      /* taille flèche année */
+    height: 26px;
+    transition: transform 0.28s cubic-bezier(.2,.9,.3,1);
+    transform-origin: 50% 50%;
+    color: #714B2F;
+    stroke-width: 2.2;
+}
+
+.month-header .arrow-icon {
+    width: 22px;      /* taille flèche mois */
+    height: 22px;
+    color: #ffffff;
+}
+
+/* Contenu caché par défaut */
+.year-content, .month-content {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.36s ease;
+    margin-top: 10px;
+}
+
+/* Toggle année */
+.year-card.open .year-content {
+    max-height: 2000px;
+}
+.year-card.open .year-header .arrow-icon {
+    transform: rotate(180deg);
+}
+
+/* Toggle mois */
+.month-card.open .month-content {
+    max-height: 2000px;
+}
+.month-card.open .month-header .arrow-icon {
+    transform: rotate(180deg);
+}
+
+/* Hover flèches */
+.year-header:hover .arrow,
+.month-header:hover .arrow {
+    background: rgba(113,75,47,0.06);
+    border-radius: 6px;
+}
+
+/* Titres */
 .year-card h3 {
     margin-bottom: 15px;
     color: #714B2F;
@@ -99,7 +167,6 @@ nav.profil-menu-horizontal .profil-links li a:active {
     padding-bottom: 5px;
 }
 
-/* Carte mois */
 .month-card {
     background-color: #A67856;
     padding: 15px;
@@ -110,98 +177,240 @@ nav.profil-menu-horizontal .profil-links li a:active {
 .month-card h4 {
     color: #FAF3E0;
     margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
 /* Livres du mois */
 .month-books {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 
-/* Livre individuel */
+/* --- Carte livre  --- */
 .book-card {
     display: flex;
-    background-color: #E8CBAE;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 3px 8px rgba(166, 120, 86, 0.2);
+    flex-direction: row;
+    align-items: center;
+    margin: 20px 20px 20px 20px;
+    width: 400px;
+    height: 280px;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
 }
 
-.book-card .cover img {
-    width: 80px;
-    height: 120px;
+/* Couverture */
+.cover {
+    flex-shrink: 0;
+}
+
+.cover img {
+    width: 180px;
+    height: 280px;
     object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
 }
 
-.book-card .info {
-    flex: 1;
+/* Bloc infos */
+.info {
+    background-color: #fff8f0;
+    height: 240px;
     padding: 10px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    box-shadow:
+        inset -6px 0 10px rgba(0, 0, 0, 0.15),
+        6px 6px 12px rgba(0, 0, 0, 0.15),
+        0 8px 12px rgba(0, 0, 0, 0.10);
 }
 
-.book-card .info h5 {
-    margin: 0 0 5px 0;
-    color: #714B2F;
-}
-
-.book-card .info p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #714B2F;
-}
-
-.book-card .buttons {
+.info-content {
     display: flex;
-    gap: 5px;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
-.book-card .buttons button {
-    border: none;
-    background-color: #A67856;
-    color: #FAF3E0;
-    border-radius: 8px;
-    padding: 4px 6px;
-    cursor: pointer;
-    transition: background 0.2s;
+/* Titres */
+.info h3 {
+    font-size: 20px;
+    font-weight: 700;
+    text-align: justify;
+    color: #4a2d12;
+    margin: 0 0 8px 0;
+    letter-spacing: 0.5px;
 }
 
-.book-card .buttons button:hover {
-    background-color: #714B2F;
+/* Texte */
+.info p {
+    margin: 0 0 6px 0;
+    font-size: 15px;
+    line-height: 1.4;
+    color: #5c4630;
 }
 
-/* --- MEDIA QUERIES --- */
-@media (max-width: 1024px) {
-    .month-books {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+.info p strong {
+    font-weight: 600;
+    color: #3a2310;
+}
+
+.reading-date {
+    margin-top: auto;
+    padding-top: 8px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Liens */
+.info a {
+    text-decoration: none;
+    color: #4a2d12;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.info a:hover {
+    color: #8b5a2e;
+}
+
+/* --- Responsive --- */
+/* Mobile */
+@media (max-width: 425px) {
+    /* Masquer la photo et le pseudo du menu */
+    .profil-user {
+        display: none;
     }
-}
 
-@media (max-width: 600px) {
+    /* Menu horizontal verticalisé */
     .profil-menu-horizontal {
         flex-direction: column;
         align-items: flex-start;
-        gap: 15px;
+        gap: 10px;
+        padding: 10px;
     }
 
-    .profil-links {
-        flex-wrap: wrap;
+    /* Liens du menu plus petits */
+    .profil-links li a {
+        font-size: 13px;
+        padding: 6px 10px;
     }
 
+    /* Cartes livres simplifiées */
     .book-card {
         flex-direction: column;
         align-items: center;
+        width: 120px;
+        height: auto;
+        margin: 10px;
+        padding: 0;
+        background: none;
+        box-shadow: none;
+        border-radius: 0;
     }
 
     .book-card .cover img {
         width: 100px;
         height: 150px;
+        object-fit: cover;
+        margin-bottom: 5px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
 
     .book-card .info {
-        padding: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+        background: none;
+        width: 100%;
         text-align: center;
+        height: auto;
+        background: none;
+        flex-direction: column;
+        box-shadow: none;
+    }
+
+    .book-card .info h3 {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .book-card .info h3 a {
+        color: #FAF3E0 !important;
+        text-decoration: none;
+    }
+
+    /* Masquer uniquement les p et reading-date */
+    .book-card .info p,
+    .book-card .info .reading-date {
+        display: none !important;
+    }
+
+    /* Ajuster grille historique */
+    .month-books {
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+}
+
+/* Tablette */
+@media (min-width: 426px) and (max-width: 1024px) {
+    .profil-menu-horizontal { 
+        flex-direction: row; 
+        flex-wrap: wrap; 
+        gap: 15px; 
+    }
+
+    .profil-links { 
+        flex-wrap: wrap; 
+        gap: 10px; 
+    }
+
+    .month-books { 
+        justify-content: flex-start; 
+    }
+
+    .book-card { 
+        flex-direction: row; 
+        width: 48%; 
+        height: 250px; 
+        margin: 10px 1%; 
+    }
+
+    .book-card .cover img { 
+        width: 120px; 
+        height: 180px; 
+    }
+
+    .book-card .info { 
+        padding: 10px; 
+        height: 180px; 
+    }
+}
+
+/* Desktop */
+@media (min-width: 1025px) {
+    .month-books { 
+        justify-content: flex-start; 
+    }
+
+    .book-card { 
+        width: 400px; 
+        height: 280px; 
+        flex-direction: row; 
+        margin: 10px; 
+    }
+
+    .book-card .cover img { 
+        width: 180px; 
+        height: 280px; 
+    }
+    .book-card .info { 
+        height: 240px; 
     }
 }

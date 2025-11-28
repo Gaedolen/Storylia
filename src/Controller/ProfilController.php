@@ -261,33 +261,43 @@ class ProfilController extends AbstractController
     public function historique(): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
+
         /** @var Utilisateur $utilisateur */
         $utilisateur = $this->getUser();
 
-        $historique = []; // regroupe les livres lus
+        $historique = []; // tableau regroupant les livres lus
 
-        $moisFrancais = [ // traduction des mois en français
-            'January'=>'Janvier','February'=>'Février','March'=>'Mars',
-            'April'=>'Avril','May'=>'Mai','June'=>'Juin',
-            'July'=>'Juillet','August'=>'Août','September'=>'Septembre',
-            'October'=>'Octobre','November'=>'Novembre','December'=>'Décembre'
+        // Traduction des mois en français
+        $moisFrancais = [
+            'January' => 'Janvier', 'February' => 'Février', 'March' => 'Mars',
+            'April' => 'Avril', 'May' => 'Mai', 'June' => 'Juin',
+            'July' => 'Juillet', 'August' => 'Août', 'September' => 'Septembre',
+            'October' => 'Octobre', 'November' => 'Novembre', 'December' => 'Décembre'
         ];
 
-        foreach($utilisateur->getReadingHistory() as $reading) { // renvoie tous les livres lus par l'utilisateur
-            $date = $reading->getReadingDate(); // On récupère la date de lecture
-            if(!$date)continue; // si la date est null, on ignore le livre en passant au suivant
+        foreach ($utilisateur->getReadingHistory() as $reading) {
+            $date = $reading->getReadingDate();
+            if (!$date) {
+                continue; // ignore si pas de date
+            }
 
-            $year = $date->format('Y'); // extrait l'année
-            $month = $moisFrancais[$date->format('F')]; // extrait le mois
+            // S'assurer que c'est un objet DateTime
+            if (!$date instanceof \DateTimeInterface) {
+                $date = new \DateTime($date);
+            }
 
-            $historique[$year][$month][] = $reading; // Range le tableau dans l'historique
+            $year = $date->format('Y');
+            $month = $moisFrancais[$date->format('F')];
+
+            // Evite les doublons en utilisant l'ID du livre comme clé
+            $historique[$year][$month][$reading->getBook()->getId()] = $reading;
         }
 
-        // Trier par année décroissante
-        ksort($historique);
+        // Trier les années par ordre décroissant
+        krsort($historique);
 
         return $this->render('profil/historique.html.twig', [
-            'utilsiateur' => $utilisateur,
+            'utilisateur' => $utilisateur,
             'historique' => $historique,
         ]);
     }

@@ -27,37 +27,63 @@
         {# Contenu principal #}
         <div class="grid-historique">
             {% if historique is not empty %}
-                {% for year, months in historique|sort|reverse %}
+                {% for year, months in historique %}
                     <div class="year-card card">
-                        <h3>{{ year }}</h3>
-                        {% for month, readings in months %}
-                            <div class="month-card">
-                                <h4>{{ month }}</h4>
-                                <div class="month-books">
-                                    {% for reading in readings %}
-                                        <div class="book-card">
-                                            <div class="cover">
-                                                <img src={{ reading.book.cover }} alt="{{ reading.book.title }}">
-                                            </div>
-                                            <div class="info">
-                                                <div>
-                                                    <h5>{{ reading.book.title }}</h5>
-                                                    <p>{{ reading.book.author.name }}</p>
-                                                </div>
-                                                <div class="buttons">
-                                                    <button title="Déplacer">
-                                                        <i class="fa-solid fa-arrow-right"></i>
-                                                    </button>
-                                                    <button title="Supprimer">
-                                                        <i class="fa-solid fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
+                        <div class="year-header">
+                            <h3>{{ year }}</h3>
+                            <div class="toggle-year arrow">
+                                <svg class="arrow-icon" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                                </svg>
                             </div>
-                        {% endfor %}
+                        </div>
+
+                        <div class="year-content">
+                            {% for month, readings in months %}
+                                <div class="month-card">
+                                    <div class="month-header">
+                                        <h4>{{ month }}</h4>
+                                        <div class="toggle-month arrow">
+                                            <svg class="arrow-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    <div class="month-content">
+                                        <div class="month-books">
+                                            {% for reading in readings %}
+                                                <div class="book-card" data-book-id="{{ reading.book.id }}">
+                                                    <div class="cover">
+                                                        <a href="{{ path('app_livre_detail', {'id': reading.book.id}) }}">
+                                                            <img src="{{ reading.book.cover|replace({'http://':'https://'}) }}" alt="{{ reading.book.title }}">
+                                                        </a>
+                                                    </div>
+
+                                                    <div class="info">
+                                                        <div class="info-content">
+                                                            <h3>
+                                                                <a href="{{ path('app_livre_detail', {'id': reading.book.id}) }}">
+                                                                    {{ reading.book.title }}
+                                                                </a>
+                                                            </h3>
+
+                                                            <p><a href="#">{{ reading.book.author.name }}</a></p>
+
+                                                            <p class="reading-date">
+                                                                <strong>Lu le :</strong>
+                                                                {{ reading.readingDate is defined and reading.readingDate ? reading.readingDate|date('d/m/Y') : 'Date inconnue' }}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
                 {% endfor %}
             {% else %}
@@ -65,4 +91,32 @@
             {% endif %}
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Toggle des années
+            document.querySelectorAll(".year-header").forEach(header => {
+                header.addEventListener("click", (e) => {
+                // ignore si on clique sur un bouton interne
+                const isInteractive = e.target.closest('button, a, input, .ignore-toggle');
+                if (isInteractive) return;
+                const card = header.closest(".year-card");
+                if (!card) return;
+                card.classList.toggle("open");
+                });
+            });
+
+            // Toggle des mois
+            document.querySelectorAll(".month-header").forEach(header => {
+                header.addEventListener("click", (e) => {
+                const isInteractive = e.target.closest('button, a, input, .ignore-toggle');
+                if (isInteractive) return;
+                const card = header.closest(".month-card");
+                if (!card) return;
+                card.classList.toggle("open");
+                });
+            });
+        });
+    </script>
+
 {% endblock %}
