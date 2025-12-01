@@ -1,5 +1,6 @@
 parameters:
     profiles_directory: '%kernel.project_dir%/public/uploads/profiles'
+    clubs_photos_directory: '%kernel.project_dir%/public/uploads/clubs'
     GOOGLE_BOOKS_API: '%env(GOOGLE_BOOKS_API)%'
 
 services:

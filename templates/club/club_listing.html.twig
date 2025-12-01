@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Clubs{% endblock %}
+
+{% block body %}
+<h1>Clubs de lecture</h1>
+
+{% if is_granted('ROLE_USER') %}
+    <a href="{{ path('club_create') }}" class="btn btn-primary">Créer un club</a>
+{% endif %}
+
+<div class="club-list">
+    {% for club in clubs %}
+        <div class="club-card">
+            <h2>{{ club.name }}</h2>
+            <p>{{ club.description|length > 100 ? club.description|slice(0, 100) ~ '...' : club.description }}</p>
+            <p>Créé par : {{ club.creator.pseudo }}</p>
+            <a href="{{ path('club_show', {'id': club.id}) }}" class="btn btn-secondary">Voir le club</a>
+        </div>
+    {% else %}
+        <p>Aucun club disponible pour le moment.</p>
+    {% endfor %}
+</div>
+{% endblock %}

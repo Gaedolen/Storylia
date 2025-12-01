@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un club{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/club/create.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="club-create-main">
+        <div class="club-create-header">
+            <h2>Créer un nouveau club</h2>
+            <div class="header-line"></div>
+        </div>
+
+        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+            <div class="form-group">
+                {{ form_label(form.name) }}
+                {{ form_widget(form.name, {'attr': {'placeholder': 'Nom du club'}}) }}
+                {{ form_errors(form.name) }}
+            </div>
+
+            <div class="form-group bio-box">
+                {{ form_label(form.description) }}
+                {{ form_widget(form.description, {'attr': {'placeholder': 'Description du club...'}}) }}
+                {{ form_errors(form.description) }}
+                <div class="bio-counter" id="description-counter">0 / 1000</div>
+            </div>
+
+            <div class="form-group preferences-section">
+                <label>Vos préférences de lecture</label>
+                <div class="preferences-grid">
+                    {% for choice in form.preferences %}
+                        <div class="pref-item">
+                            {{ form_widget(choice) }}
+                            {{ form_label(choice) }}
+                        </div>
+                    {% endfor %}
+                </div>
+                {{ form_errors(form.preferences) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.photo) }}
+                {{ form_widget(form.photo) }}
+                {{ form_errors(form.photo) }}
+            </div>
+
+            <button type="submit" class="btn-create-club">Créer le club</button>
+
+        {{ form_end(form) }}
+    </div>
+
+    {% block javascripts %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const descriptionField = document.getElementById('{{ form.description.vars.id }}');
+                const counter = document.getElementById('description-counter');
+                const maxLength = 1000;
+
+                function updateCounter() {
+                    let length = descriptionField.value.length;
+                    counter.textContent = `${length} / ${maxLength}`;
+                    if (length > maxLength) {
+                        counter.classList.add('too-long');
+                    } else {
+                        counter.classList.remove('too-long');
+                    }
+                }
+
+                descriptionField.addEventListener('input', updateCounter);
+                updateCounter();
+            });
+        </script>
+    {% endblock %}
+{% endblock %}

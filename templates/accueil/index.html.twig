@@ -27,8 +27,10 @@
                 <div class="club-existant">
                     <p>Trouvez un club lecture qui vous ressemble !</p>
                     <div class="input-btn-club">
-                        <input type="text" name="club" placeholder="Taper un nom de club" required>
-                        <button class="search">Rechercher</button>
+                        <form action="{{ path('club_index') }}" method="get" class="d-flex">
+                            <input type="text" name="q" placeholder="Taper un nom de club" class="form-control me-2" required>
+                            <button type="submit" class="btn btn-outline-primary">Rechercher</button>
+                        </form>
                     </div>
                     <a href="#" class="all-clubs-link">
                         Voir tous les clubs lectures
@@ -42,7 +44,7 @@
 
                 <div class="new-club">
                     <p>Ou créez le votre à votre image !</p>
-                    <button class="create-club">Créer un club</button>
+                    <a href="{{ path('club_create') }}" class="btn btn-primary create-club">Créer un club</a>
                 </div>
             </div>
         </div>

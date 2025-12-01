@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\ClubRepository;
 use Doctrine\DBAL\Types\Types;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -20,10 +21,29 @@ class Club
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: "Le nom du club est obligatoire.")]
+    #[Assert\Length(
+        min: 3,
+        max: 50,
+        minMessage: "Le nom doit faire au moins {{ limit }} caractères.",
+        maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères."
+    )]
     private ?string $name = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Assert\Length(
+        max: 1000,
+        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères."
+    )]
     private ?string $description = null;
+
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    #[Assert\NotBlank(message: "Veuillez sélectionner au moins une préférence.")]
+    private array $preferences = [];
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $photo = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $creationDate = null;
@@ -38,11 +58,15 @@ class Club
     #[ORM\ManyToMany(targetEntity: Utilisateur::class, mappedBy: 'clubsMembre')]
     private Collection $membres;
 
+    #[ORM\OneToMany(mappedBy: 'club', targetEntity: ClubReadingMonth::class, cascade: ['remove'])]
+    private Collection $readingMonths;
+
     public function __construct()
     {
         $this->creationDate = new \DateTime();
         $this->status = self::STATUS_ACTIF;
         $this->membres = new ArrayCollection();
+        $this->readingMonths = new ArrayCollection();
     }
 
     // Getters et setters
@@ -73,6 +97,28 @@ class Club
     {
         $this->description = $description;
 
+        return $this;
+    }
+
+    public function getPreferences(): array
+    {
+        return $this->preferences;
+    }
+
+    public function setPreferences(array $preferences): self
+    {
+        $this->preferences = $preferences;
+        return $this;
+    }
+
+    public function getPhoto(): ?string
+    {
+        return $this->photo;
+    }
+
+    public function setPhoto(?string $photo): static
+    {
+        $this->photo = $photo;
         return $this;
     }
 
@@ -144,6 +190,33 @@ class Club
     {
         if ($this->membres->removeElement($utilisateur)) {
             $utilisateur->removeClubMembre($this);
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ClubReadingMonth>
+     */
+    public function getReadingMonths(): Collection
+    {
+        return $this->readingMonths;
+    }
+
+    public function addReadingMonth(ClubReadingMonth $readingMonth): self
+    {
+        if (!$this->readingMonths->contains($readingMonth)) {
+            $this->readingMonths->add($readingMonth);
+            $readingMonth->setClub($this);
+        }
+        return $this;
+    }
+
+    public function removeReadingMonth(ClubReadingMonth $readingMonth): self
+    {
+        if ($this->readingMonths->removeElement($readingMonth)) {
+            if ($readingMonth->getClub() === $this) {
+                $readingMonth->setClub(null);
+            }
         }
         return $this;
     }

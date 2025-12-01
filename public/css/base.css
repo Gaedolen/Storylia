@@ -20,6 +20,8 @@ html, body {
 
 .content {
     flex: 1 0 auto;
+    min-height: calc(100vh - 140px);
+    background-color: #FAF3E0;
 }
 
 /* === Header === */
