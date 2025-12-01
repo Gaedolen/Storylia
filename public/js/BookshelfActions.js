@@ -148,4 +148,22 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Erreur réseau. Veuillez réessayer.");
         }
     });
+
+    document.querySelectorAll('.category').forEach(category => {
+
+        const track = category.querySelector('.category-books');
+        const btnLeft = category.querySelector('.carousel-arrow.left');
+        const btnRight = category.querySelector('.carousel-arrow.right');
+
+        if (!track || !btnLeft || !btnRight) return;
+
+        btnLeft.onclick = () => {
+            track.scrollBy({ left: -150, behavior: "smooth" });
+        };
+
+        btnRight.onclick = () => {
+            track.scrollBy({ left: 150, behavior: "smooth" });
+        };
+
+    });
 });

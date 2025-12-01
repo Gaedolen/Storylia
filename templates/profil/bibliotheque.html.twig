@@ -28,6 +28,12 @@
             {% for status, books in categories %}
                 <div class="category" data-status-key="{{ status }}">
                     <h2>{{ status|replace({'_':' '})|capitalize }}</h2>
+
+                    <div class="carousel-arrows">
+                        <button class="carousel-arrow left">❮</button>
+                        <button class="carousel-arrow right">❯</button>
+                    </div>
+
                     <div class="books-container">
                         <div class="category-books">
                             {% for bookshelf in books %}
@@ -117,7 +123,7 @@
     </div>
 
     {% block javascripts %}
-    {{ parent() }}
-    <script src="{{ asset('js/BookshelfActions.js') }}"></script>
+        {{ parent() }}
+        <script src="{{ asset('js/BookshelfActions.js') }}"></script>
     {% endblock %}
 {% endblock %}
