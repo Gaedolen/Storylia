@@ -107,11 +107,13 @@ class ClubReadingMonthRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    public function findRecentBooks(): array
+    public function findRecentBooks(Club $club): array
     {
         $crmList = $this->createQueryBuilder('crm')
             ->join('crm.book', 'b')
             ->addSelect('b')
+            ->andWhere('crm.club = :club')
+            ->setParameter('club', $club) 
             ->orderBy('crm.createdAt', 'DESC')
             ->setMaxResults(20)
             ->getQuery()

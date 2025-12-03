@@ -7,9 +7,15 @@ use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ClubRepository::class)]
+#[UniqueEntity(
+    fields: ['name'],
+    message: 'Ce nom de club existe déjà.'
+)]
 class Club
 {
     public const STATUS_ACTIF = 'actif';
@@ -142,6 +148,14 @@ class Club
         return $this->status;
     }
 
+    /**
+     * @return Collection<int, Book>
+     */
+    public function getBooks(): Collection
+    {
+        return $this->books ?? new ArrayCollection();
+    }
+
     public function setStatus(string $status): static
     {
         if (!in_array($status, [self::STATUS_ACTIF, self::STATUS_INACTIF])) {
@@ -222,5 +236,18 @@ class Club
             }
         }
         return $this;
+    }
+
+    public function getTotalBooksRead(): int
+    {
+        $count = 0;
+
+        foreach ($this->readingMonths as $rm) {
+            if ($rm->getBook() !== null && $rm->getBook()->isVoted()) {
+                $count++;
+            }
+        }
+
+        return $count;
     }
 }

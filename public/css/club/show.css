@@ -21,7 +21,7 @@
 .club-title-actions {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 1rem;
     margin-bottom: 1rem;
 }
 
@@ -31,18 +31,29 @@
 }
 
 .club-actions a {
-    padding: 0.5rem 1rem;
-    background-color: #A67856; /* même couleur que ton bloc livre du mois */
-    color: #FAF3E0;
+    display: inline-block;
+    width: auto;
+    padding: 8px 14px;
+    background-color: #C97C5D;
+    color: white;
+    border-radius: 25px;
     text-decoration: none;
-    border-radius: 5px;
-    font-weight: 500;
-    font-size: 0.9rem;
-    transition: background-color 0.3s;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow:
+        0 6px 10px rgba(0, 0, 0, 0.3),
+        inset 0 4px 6px rgba(0, 0, 0, 0.2);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .club-actions a:hover {
-    background-color: #8f6042; /* un peu plus foncé au hover */
+    background-color: #B46749;
+    transform: translateY(-2px);
+}
+
+.club-actions a + a {
+    margin-left: 0.5rem; /* espace entre les boutons */
 }
 
 .club-description {
@@ -101,19 +112,23 @@
 
 /* Bouton voter */
 .btn-vote {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    background-color: #FAF3E0;
-    color: #A67856;
+    padding: 8px 14px;
+    background-color: #C97C5D;
+    color: white;
+    border-radius: 25px;
     text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: background-color 0.3s, color 0.3s;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow:
+        0 6px 10px rgba(0, 0, 0, 0.3),
+        inset 0 4px 6px rgba(0, 0, 0, 0.2);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .btn-vote:hover {
-    background-color: #f0e9dd;
-    color: #8f6042;
+    background-color: #B46749;
+    transform: translateY(-2px);
 }
 
 /* -- Bloc livre du mois -- */
@@ -231,12 +246,23 @@
 }
 
 .btn-view-all {
-    padding: 0.4rem 0.8rem;
-    background-color: #A67856;
-    color: #FAF3E0;
+    padding: 8px 14px;
+    background-color: #C97C5D;
+    color: white;
+    border-radius: 25px;
     text-decoration: none;
-    border-radius: 5px;
-    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow:
+        0 6px 10px rgba(0, 0, 0, 0.3),
+        inset 0 4px 6px rgba(0, 0, 0, 0.2);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.btn-view-all:hover {
+    background-color: #B46749;
+    transform: translateY(-2px);
 }
 
 .reviews-list {
@@ -276,86 +302,146 @@
     font-size: 0.95rem;
 }
 
+.review-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
 /* Bouton laisser un avis */
 .btn-leave-review {
-    align-self: flex-end;
-    padding: 0.5rem 1rem;
-    background-color: #A67856;
-    color: #FAF3E0;
+    display: inline-block;
+    width: auto;
+    padding: 8px 14px;
+    background-color: #C97C5D;
+    color: white;
+    border-radius: 25px;
     text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
-    margin-top: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow:
+        0 6px 10px rgba(0, 0, 0, 0.3),
+        inset 0 4px 6px rgba(0, 0, 0, 0.2);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.btn-leave-review:hover {
+    background-color: #B46749;
+    transform: translateY(-2px);
 }
 
 .recent-books-carousel {
-    max-width: 1200px;
+    max-width: 1800px;
     margin: 2rem auto;
     padding: 0 1rem;
 }
 
-.recent-books-carousel h2 {
-    font-size: 1.8rem;
+.recent-books-header {
+    display: flex;
+    justify-content: space-between; /* titre à gauche, bouton à droite */
+    align-items: center;            /* verticalement centré */
     margin-bottom: 1rem;
+}
+
+.recent-books-header h2 {
+    margin: 0; /* supprime le margin par défaut du h2 */
+    font-size: 1.8rem;
     color: #3B2F2F;
 }
 
-.carousel-container {
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    padding-bottom: 0.5rem;
+.recent-books-header .btn {
+    padding: 8px 14px;
+    background-color: #C97C5D;
+    color: white;
+    border-radius: 25px;
+    border: none;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow:
+        0 6px 10px rgba(0, 0, 0, 0.3),
+        inset 0 4px 6px rgba(0, 0, 0, 0.2);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.carousel-track {
-    display: flex;
-    gap: 1rem;
+.recent-books-header .btn:hover {
+    background-color: #B46749;
+    transform: translateY(-2px);
+} 
+
+.carousel-container {
+    background-color: #A67856;
+    padding: 15px 15px 15px 15px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1),
+            0 8px 20px rgba(0,0,0,0.15);
+}
+
+.recent-books-carousel {
+    position: relative;
+    width: 100%;
+    padding: 20px 0;
+}
+
+.carousel-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: inline-block;
 }
 
 .carousel-card {
-    flex: 0 0 120px; /* largeur fixe de chaque carte */
-    text-align: center;
-    text-decoration: none;
-    color: #3B2F2F;
+    width: 180px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    background-color: #fff5ef;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     transition: transform 0.3s;
-}
-
-.carousel-card img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 8px;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
 }
 
 .carousel-card:hover {
     transform: translateY(-5px);
 }
 
-.carousel-title {
-    margin-top: 0.5rem;
+.carousel-card img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+}
+
+.carousel-card .card-body {
+    padding: 5px;
+}
+
+.carousel-card .card-title {
     font-size: 0.9rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    margin-bottom: 2px;
+    text-align: center;
 }
 
-/* Scroll buttons (optionnel) */
-.carousel-controls {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 0.5rem;
+.carousel-control-prev,
+.carousel-control-next {
+    width: 35px;
+    height: 35px;
+    background-color: rgba(0,0,0,0.4);
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
-.carousel-controls button {
-    padding: 0.3rem 0.6rem;
-    background-color: #A67856;
-    color: #FAF3E0;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+.carousel-control-prev {
+    left: 15px;
 }
 
-.carousel-controls button:hover {
-    background-color: #8f6042;
+.carousel-control-next {
+    right: 15px;
+}
+
+.carousel-inner {
+    overflow: visible;
 }

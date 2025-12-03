@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Information du club{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/club/informations.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="club-more-info">
+
+        {# --- Créateur --- #}
+        <div class="club-creator-section">
+            <h3>Créateur du club</h3>
+            <div class="creator-card">
+                <img src="{{ asset('uploads/profiles/' ~ club.creator.profilePicture) }}" alt="{{ club.creator.pseudo }}" class="creator-photo">
+                <span class="creator-pseudo">{{ club.creator.pseudo }}</span>
+            </div>
+        </div>
+
+        {# --- Membres --- #}
+        <div class="club-members-section">
+            <h3>Membres ({{ club.membres|length }})</h3>
+            <div class="members-grid">
+                {% for membre in club.membres %}
+                    <div class="member-card">
+                        <img src="{{ asset('uploads/profiles/' ~ membre.profilePicture) }}" alt="{{ membre.pseudo }}" class="member-photo">
+                        <span class="member-pseudo">{{ membre.pseudo }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {# --- Informations du club --- #}
+        <div class="club-details-section">
+            <h3>Informations sur le club</h3>
+            <div class="club-info-card">
+                <img src="{{ asset('uploads/clubs/' ~ club.photo) }}" alt="{{ club.name }}" class="club-photo">
+                <div class="club-info-text">
+                    <h2>{{ club.name }}</h2>
+                    <p>{{ club.description }}</p>
+                    {% set preferenceLabels = {
+                        'scifi': 'Science-Fiction',
+                        'fantastique': 'Fantastique',
+                        'fantasy': 'Fantasy',
+                        'dystopie': 'Dystopie',
+                        'steampunk': 'Steampunk',
+
+                        'policier': 'Policier',
+                        'thriller': 'Thriller',
+                        'espionnage': 'Espionnage',
+                        'horreur': 'Horreur',
+
+                        'aventure': 'Aventure',
+                        'young_adult': 'Young Adult',
+
+                        'romance': 'Romance',
+                        'erotique': 'Érotique',
+                        'chicklit': 'Chick-lit',
+
+                        'essai': 'Essai',
+                        'biographie': 'Biographie',
+                        'philosophie': 'Philosophie',
+                        'historique': 'Historique',
+                        'science': 'Science',
+                        'sociologie': 'Sociologie',
+
+                        'poesie': 'Poésie',
+                        'theatre': 'Théâtre',
+
+                        'conte_legend': 'Contes et légendes',
+                        'mythologie': 'Mythologie',
+
+                        'graphic_novel': 'Roman Graphique',
+                        'bd': 'Bande dessinée',
+                        'manga': 'Manga'
+                    } %}
+                    <p><strong>Préférences :</strong></p>
+                    <div class="preferences-container">
+                        {% for pref in club.preferences %}
+                            <span class="preference-badge">
+                                {{ preferenceLabels[pref] ?? pref }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                    <p><strong>Livres proposés :</strong> {{ club.books|length }}</p>
+                    <p><strong>Livres lus :</strong> 
+                        {{ club.readingMonths|filter(rm => rm.book.voted == true)|length }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

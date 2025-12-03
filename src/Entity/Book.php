@@ -62,6 +62,9 @@ class Book
     #[ORM\Column(type:"string", length:50, nullable:true)]
     private ?string $format = null;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $voted = false;
+
     #[ORM\ManyToOne(targetEntity: Club::class, inversedBy: "books")]
     #[ORM\JoinColumn(nullable: true)]
     private ?Club $club = null;
@@ -215,6 +218,17 @@ class Book
     public function setFormat(?string $format): self
     {
         $this->format = $format;
+        return $this;
+    }
+
+    public function isVoted(): bool
+    {
+        return $this->voted;
+    }
+
+    public function setVoted(bool $voted): static
+    {
+        $this->voted = $voted;
         return $this;
     }
 

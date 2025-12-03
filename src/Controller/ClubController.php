@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Club;
 use App\Entity\Book;
 use App\Form\ClubType;
+use Symfony\Component\Form\FormError;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\BookRepository;
 use App\Repository\ClubReadingMonthRepository;
@@ -144,7 +145,7 @@ class ClubController extends AbstractController
         );
 
         // Récupérer les 20 derniers livres proposés
-        $recentBooks = $clubReadingMonthRepository->findRecentBooks();
+        $recentBooks = $clubReadingMonthRepository->findRecentBooks($club);
 
         return $this->render('club/club_show.html.twig', [
             'club' => $club,
@@ -169,5 +170,93 @@ class ClubController extends AbstractController
         }
 
         return $this->redirectToRoute('club_index');
+    }
+
+    #[Route('/clubs/{id}/edit', name: 'club_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Club $club, EntityManagerInterface $em): Response
+    {
+        // Vérifier que l'utilisateur connecté est le créateur
+        $this->denyAccessUnlessGranted('ROLE_USER'); 
+        if ($this->getUser() !== $club->getCreator()) {
+            throw $this->createAccessDeniedException('Vous ne pouvez modifier que vos clubs.');
+        }
+
+        $form = $this->createForm(ClubType::class, $club);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Vérifier l'unicité du nom du club
+            $existingClub = $em->getRepository(Club::class)->findOneBy(['name' => $club->getName()]);
+            if ($existingClub && $existingClub !== $club) {
+                $form->get('name')->addError(new FormError('Ce nom de club existe déjà.'));
+            } else {
+                // Gérer la photo avant le flush
+                $photoFile = $form->get('photo')->getData();
+                if ($photoFile) {
+                    $newFilename = uniqid() . '.' . $photoFile->guessExtension();
+                    $photoFile->move(
+                        $this->getParameter('clubs_photos_directory'),
+                        $newFilename
+                    );
+                    $club->setPhoto($newFilename);
+                }
+
+                $em->persist($club);
+                $em->flush();
+
+                $this->addFlash('success', 'Club modifié avec succès.');
+                return $this->redirectToRoute('club_show', ['id' => $club->getId()]);
+            }
+        }
+
+        return $this->render('club/edit.html.twig', [
+            'club' => $club,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/clubs/{id}/info', name: 'club_info', methods: ['GET'])]
+    public function info(Club $club): Response
+    {
+        // Créateur
+        $creator = $club->getCreator();
+
+        // Membres
+        $members = $club->getMembres();
+
+        // Nombre total de livres proposés pour ce club
+        $totalBooksProposed = $club->getReadingMonths()->count();
+
+        // Nombre de livres lus (livres sélectionnés pour chaque mois)
+        $totalBooksRead = 0;
+        foreach ($club->getReadingMonths() as $month) {
+            if ($month->getBook() !== null) {
+                $totalBooksRead++;
+            }
+        }
+
+        return $this->render('club/informations.html.twig', [
+            'club' => $club,
+            'creator' => $creator,
+            'members' => $members,
+            'totalBooksProposed' => $totalBooksProposed,
+            'totalBooksRead' => $totalBooksRead,
+        ]);
+    }
+
+    #[Route('/club/{id}/propositions', name: 'club_propositions')]
+    public function propositions(Club $club): Response
+    {
+        // Récupérer tous les ReadingMonths triés du plus récent au plus ancien
+        $readingMonths = $club->getReadingMonths()->toArray();
+
+        usort($readingMonths, function ($a, $b) {
+            return $b->getMonth()->getTimestamp() - $a->getMonth()->getTimestamp();
+        });
+
+        return $this->render('club/propositions.html.twig', [
+            'club' => $club,
+            'readingMonths' => $readingMonths
+        ]);
     }
 }

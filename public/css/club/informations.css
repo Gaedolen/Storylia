@@ -1,0 +1,105 @@
+.club-more-info {
+    margin: 15px 15px 15px 15px;
+}
+
+h3 {
+    color: #714B2F;
+    font-size: 32px;
+    text-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Créateur */
+.club-creator-section .creator-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* Carte générale pour les utilisateurs (créateur et membres) */
+.creator-card,
+.member-card {
+    background-color: #E8CBAE;      /* couleur de fond */
+    width: 250px;                    /* largeur de la carte */
+    height: 100px;                   /* hauteur de la carte */
+    border-radius: 12px;             /* coins arrondis */
+    display: flex;
+    align-items: center;             /* centrer verticalement photo + pseudo */
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    text-align: left;
+    gap: 15px;                       /* espace entre photo et pseudo */
+}
+
+/* Photo de profil */
+.creator-photo,
+.member-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;   /* photo ronde */
+    object-fit: cover;     /* garder le ratio */
+}
+
+/* Pseudo à droite */
+.creator-pseudo,
+.member-pseudo {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #443333;
+}
+
+/* Membres */
+.club-members-section .members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+/* Infos club */
+.club-details-section .club-info-card {
+    display: flex;
+    gap: 20px;
+    padding: 15px;
+    background: #E8CBAE;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.club-photo {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.club-info-text h2 {
+    margin: 0 0 10px 0;
+    color: #5f402a;
+    text-shadow: 0 4px 6px rgba(0,0,0,0.1);
+
+}
+
+.club-info-text p {
+    margin: 5px 0;
+    font-size: 1.1rem;
+    color: #5f402a;
+    text-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.preferences-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.preference-badge {
+    background-color: #C97C5D; /* couleur demandée */
+    color: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
