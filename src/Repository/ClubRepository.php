@@ -28,6 +28,48 @@ class ClubRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function findWithAllFilters(?string $search = null, ?string $preference = null, ?string $sort = null): array
+    {
+        $qb = $this->createQueryBuilder('c')
+                ->leftJoin('c.membres', 'm')
+                ->addSelect('m');
+
+        // Filtre par nom de club
+        if ($search) {
+            $qb->andWhere('LOWER(c.name) LIKE :search')
+            ->setParameter('search', '%'.strtolower($search).'%');
+        }
+
+        // Tri
+        switch ($sort) {
+            case 'recent':
+                $qb->orderBy('c.creationDate', 'DESC');
+                break;
+            case 'old':
+                $qb->orderBy('c.creationDate', 'ASC');
+                break;
+            case 'participants_max':
+                $qb->orderBy('SIZE(c.membres)', 'DESC');
+                break;
+            case 'participants_min':
+                $qb->orderBy('SIZE(c.membres)', 'ASC');
+                break;
+            default:
+                $qb->orderBy('c.creationDate', 'DESC');
+        }
+
+        $clubs = $qb->getQuery()->getResult();
+
+        // Filtre préférences en PHP
+        if ($preference) {
+            $clubs = array_filter($clubs, function($club) use ($preference) {
+                return in_array($preference, $club->getPreferences());
+            });
+        }
+
+        return $clubs;
+    }
+
     //    /**
     //     * @return Club[] Returns an array of Club objects
     //     */

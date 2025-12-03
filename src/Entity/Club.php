@@ -51,6 +51,9 @@ class Club
     #[ORM\Column(length: 50)]
     private ?string $status = self::STATUS_ACTIF;
 
+    #[ORM\OneToMany(mappedBy: "club", targetEntity: Book::class)]
+    private Collection $books;
+
     #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'clubsCrees')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Utilisateur $creator = null;

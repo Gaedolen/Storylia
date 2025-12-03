@@ -1,0 +1,303 @@
+.listing-container {
+    max-width: 1300px;
+    margin: 30px auto;
+    padding: 20px;
+    font-family: 'Comfortaa', sans-serif;
+}
+
+/* === Header === */
+.listing-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.listing-header h2 {
+    font-size: 28px;
+    color: #714B2F; /* Titres principaux */
+}
+
+.search-form {
+    display: flex;
+    gap: 5px;
+}
+
+.search-form input {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 2px solid #C97C5D; /* Accent */
+    outline: none;
+    background-color: #FFFFFF;
+    color: #3B2F2F; /* Texte principal */
+}
+
+.search-form button {
+    padding: 8px 14px;
+    border-radius: 8px;
+    background-color: #C97C5D; /* Bouton / accent */
+    color: #FFFFFF;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.search-form button:hover {
+    background-color: #A65B4C; /* Accent plus foncé au hover */
+}
+
+/* === Layout === */
+.listing-main {
+    display: grid;
+    grid-template-columns: 220px 1fr 220px;
+    gap: 20px;
+}
+
+/* === Filtres === */
+.filters {
+    background-color: #E8CBAE; /* Fond de cartes */
+    padding: 15px;
+    border-radius: 12px;
+}
+
+.filters h3 {
+    color: #714B2F; /* Titres principaux */
+    margin-bottom: 15px;
+}
+
+.filter-group {
+    margin-bottom: 15px;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #3B2F2F; /* Texte principal */
+}
+
+.filter-group select {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 2px solid #C97C5D;
+    background-color: #FFFFFF;
+    color: #3B2F2F;
+}
+
+.btn-filter {
+    width: 100%;
+    padding: 10px;
+    background-color: #C97C5D; /* Bouton */
+    color: #FFFFFF;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-filter:hover {
+    background-color: #A65B4C; /* Accent foncé */
+}
+
+/* === Clubs List === */
+.clubs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.club-card {
+    display: flex;
+    background: #E8CBAE; /* Fond de la carte */
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+    padding: 15px;
+    gap: 15px;
+}
+
+.club-card-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.club-card-left img,
+.club-photo-placeholder {
+    width: 140px;
+    height: 140px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: #FAF3E0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6B6B6B;
+    font-size: 14px;
+    text-align: center;
+}
+
+.club-card-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 13px;
+    color: #3B2F2F;
+    gap: 4px;
+    margin-top: 5px;
+}
+
+.btn-participer {
+    display: inline-block;
+    background: #C97C5D;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-decoration: none;
+    margin-top: 8px;
+    transition: background 0.2s ease-in-out;
+}
+
+.btn-participer:hover {
+    background: #A67856;
+}
+
+
+.club-card-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.club-card-right h3 {
+    color: #714B2F;
+    font-size: 22px;
+    margin: 0 0 10px 0;
+}
+
+.club-description {
+    background: #FAF3E0;
+    padding: 10px;
+    border-radius: 8px;
+    color: #3B2F2F;
+    font-size: 14px;
+    margin-bottom: 10px;
+    min-height: 60px;
+}
+
+.club-preferences {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.pref-badge {
+    display: inline-block;
+    background: #C97C5D;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.btn-participer {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: #fff;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background-color 0.3s, transform 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-participer:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
+.btn-participer:active {
+    transform: translateY(0);
+    background-color: #3e8e41;
+}
+
+/* === Users list === */
+.users-sidebar {
+    background-color: #E8CBAE; /* Fond de cartes */
+    padding: 15px;
+    border-radius: 12px;
+}
+
+.users-list h3 {
+    color: #714B2F; /* Titres principaux */
+    margin-bottom: 15px;
+}
+
+.users-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.user-card {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    background-color: #E8CBAE;
+    padding: 10px;
+    border-radius: 10px;
+    transition: background-color 0.3s;
+    color: #3B2F2F;
+}
+
+.user-card:hover {
+    background-color: #D6B99F;
+}
+
+.user-card img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.user-info .pseudo {
+    font-weight: bold;
+}
+
+.user-info .name {
+    font-size: 0.9em;
+    color: #6B6B6B;
+}
+
+/* === Responsive === */
+@media (max-width: 1024px) {
+    .listing-main {
+        grid-template-columns: 1fr; /* Tout en colonne */
+    }
+
+    .filters, .users-list {
+        order: -1;
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 425px) {
+    .listing-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .search-form input {
+        width: 100%;
+    }
+}

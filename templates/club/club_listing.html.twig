@@ -1,24 +1,174 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Clubs{% endblock %}
+{% block title %}Liste des clubs{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/club/listing.css') }}">
+{% endblock %}
 
 {% block body %}
-<h1>Clubs de lecture</h1>
+<div class="listing-container">
 
-{% if is_granted('ROLE_USER') %}
-    <a href="{{ path('club_create') }}" class="btn btn-primary">Créer un club</a>
-{% endif %}
+    <!-- === Header avec titre et recherche === -->
+    <div class="listing-header">
+        <h2>Liste des clubs{% if search %} - "{{ search }}"{% endif %}</h2>
 
-<div class="club-list">
-    {% for club in clubs %}
-        <div class="club-card">
-            <h2>{{ club.name }}</h2>
-            <p>{{ club.description|length > 100 ? club.description|slice(0, 100) ~ '...' : club.description }}</p>
-            <p>Créé par : {{ club.creator.pseudo }}</p>
-            <a href="{{ path('club_show', {'id': club.id}) }}" class="btn btn-secondary">Voir le club</a>
-        </div>
-    {% else %}
-        <p>Aucun club disponible pour le moment.</p>
-    {% endfor %}
+        <form method="get" action="{{ path('club_index') }}" class="search-form">
+            <input type="text" name="q" placeholder="Rechercher un club ou un utilisateur..." value="{{ search }}">
+            <button type="submit">🔍</button>
+        </form>
+    </div>
+
+    <div class="listing-main">
+        <!-- === Colonne de gauche : filtres === -->
+        <aside class="filters">
+            <h3>Filtres</h3>
+            <form method="get" action="{{ path('club_index') }}">
+                <div class="filter-group">
+                    <label>Préférences :</label>
+                    <select name="preference">
+                        <option value="">Toutes</option>
+                        <option value="scifi">Science-Fiction</option>
+                        <option value="fantastique">Fantastique</option>
+                        <option value="fantasy">Fantasy</option>
+                        <option value="dystopie">Dystopie</option>
+                        <option value="steampunk">Steampunk</option>
+                        <option value="policier">Policier</option>
+                        <option value="thriller">Thriller</option>
+                        <option value="espionnage">Espionnage</option>
+                        <option value="horreur">Horreur</option>
+                        <option value="aventure">Aventure</option>
+                        <option value="young_adult">Young Adult</option>
+                        <option value="romance">Romance</option>
+                        <option value="erotique">Érotique</option>
+                        <option value="chicklit">Chick-lit</option>
+                        <option value="essai">Essai</option>
+                        <option value="biographie">Biographie</option>
+                        <option value="philosophie">Philosophie</option>
+                        <option value="historique">Historique</option>
+                        <option value="science">Science</option>
+                        <option value="sociologie">Sociologie</option>
+                        <option value="poesie">Poésie</option>
+                        <option value="theatre">Théâtre</option>
+                        <option value="conte_legend">Contes et légendes</option>
+                        <option value="mythologie">Mythologie</option>
+                        <option value="graphic_novel">Roman Graphique</option>
+                        <option value="bd">Bande dessinée</option>
+                        <option value="manga">Manga</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Trier par :</label>
+                    <select name="sort">
+                        <option value="recent">Les plus récents</option>
+                        <option value="old">Les moins récents</option>
+                        <option value="participants_max">Plus de participants</option>
+                        <option value="participants_min">Moins de participants</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-filter">Appliquer</button>
+            </form>
+        </aside>
+
+        <!-- === Colonne centrale : liste des clubs === -->
+        <section class="clubs-list">
+            {% for club in clubs %}
+                <div class="club-card">
+                    <div class="club-card-left">
+                        {% if club.photo %}
+                            <img src="{{ asset('uploads/clubs/' ~ club.photo) }}" alt="{{ club.name }}">
+                        {% else %}
+                            <div class="club-photo-placeholder">Aucune photo</div>
+                        {% endif %}
+
+                        <div class="club-card-meta">
+                            <span class="club-participants">{{ club.membres|length }} participants</span>
+                            <span class="creation-date">Créé le {{ club.creationDate|date('d/m/Y') }}</span>
+
+                            {# Bouton de participation #}
+                            {% if app.user 
+                                and app.user != club.creator 
+                                and app.user not in club.membres
+                            %}
+                                <a href="{{ path('club_participer', { id: club.id }) }}" class="btn-participer">
+                                    Participer
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="club-card-right">
+                        <h3>{{ club.name }}</h3>
+
+                        <div class="club-description">
+                            {{ club.description }}
+                        </div>
+
+                        <div class="club-preferences">
+                            {% set preferencesLabels = {
+                                'scifi': 'Science-Fiction',
+                                'fantastique': 'Fantastique',
+                                'fantasy': 'Fantasy',
+                                'dystopie': 'Dystopie',
+                                'steampunk': 'Steampunk',
+                                'policier': 'Policier',
+                                'thriller': 'Thriller',
+                                'espionnage': 'Espionnage',
+                                'horreur': 'Horreur',
+                                'aventure': 'Aventure',
+                                'young_adult': 'Young Adult',
+                                'romance': 'Romance',
+                                'erotique': 'Érotique',
+                                'chicklit': 'Chick-lit',
+                                'essai': 'Essai',
+                                'biographie': 'Biographie',
+                                'philosophie': 'Philosophie',
+                                'historique': 'Historique',
+                                'science': 'Science',
+                                'sociologie': 'Sociologie',
+                                'poesie': 'Poésie',
+                                'theatre': 'Théâtre',
+                                'conte_legend': 'Contes et légendes',
+                                'mythologie': 'Mythologie',
+                                'graphic_novel': 'Roman Graphique',
+                                'bd': 'Bande dessinée',
+                                'manga': 'Manga'
+                            } %}
+
+                            {% for code in club.preferences %}
+                                <span class="pref-badge">{{ preferencesLabels[code] }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p>Aucun club trouvé.</p>
+            {% endfor %}
+        </section>
+
+        <!-- === Colonne de droite : utilisateurs === -->
+        <aside class="users-sidebar">
+            <h3>Utilisateurs</h3>
+            <div class="users-list">
+                {% for user in users %}
+                    <a href="{{ path('app_profil', {'id': user.id}) }}" class="user-card">
+                        {% if user.profilePicture %}
+                            <img src="{{ asset('uploads/profiles/' ~ user.profilePicture) }}" alt="{{ user.pseudo }}">
+                        {% else %}
+                            <img src="{{ asset('uploads/profiles/default.png') }}" alt="Utilisateur sans photo">
+                        {% endif %}
+                        <div class="user-info">
+                            <p class="pseudo">{{ user.pseudo }}</p>
+                        </div>
+                    </a>
+                {% else %}
+                    <p>Aucun utilisateur trouvé.</p>
+                {% endfor %}
+            </div>
+        </aside>
+    </div>
+
 </div>
 {% endblock %}

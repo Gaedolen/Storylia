@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\ClubReadingMonth;
+use App\Entity\Club;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -58,7 +59,7 @@ class ClubReadingMonthRepository extends ServiceEntityRepository
      * Récupère un mois de lecture spécifique d'un club
      *
      * @param int $clubId
-     * @param string $month
+     * @param string $month Format "YYYY-MM"
      * @return ClubReadingMonth|null
      */
     public function findByClubAndMonth(int $clubId, string $month): ?ClubReadingMonth
@@ -70,5 +71,55 @@ class ClubReadingMonthRepository extends ServiceEntityRepository
             ->setParameter('month', $month)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    public function findCurrentMonthByClub(Club $club): ?ClubReadingMonth
+    {
+        // mois courant au format 'YYYY-MM'
+        $currentMonth = date('Y-m');
+
+        return $this->createQueryBuilder('crm')
+            ->andWhere('crm.club = :club')
+            ->andWhere('crm.month = :month')
+            ->setParameter('club', $club)
+            ->setParameter('month', $currentMonth)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findNextMonthByClub(Club $club): ?ClubReadingMonth
+    {
+        // calcul du mois suivant et du bon format 'YYYY-MM'
+        $nextMonth = (int) date('m') + 1;
+        $year = (int) date('Y');
+        if ($nextMonth > 12) {
+            $nextMonth = 1;
+            $year++;
+        }
+        $nextMonthString = sprintf('%04d-%02d', $year, $nextMonth);
+
+        return $this->createQueryBuilder('crm')
+            ->andWhere('crm.club = :club')
+            ->andWhere('crm.month = :month')
+            ->setParameter('club', $club)
+            ->setParameter('month', $nextMonthString)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findRecentBooks(): array
+    {
+        $crmList = $this->createQueryBuilder('crm')
+            ->join('crm.book', 'b')
+            ->addSelect('b')
+            ->orderBy('crm.createdAt', 'DESC')
+            ->setMaxResults(20)
+            ->getQuery()
+            ->getResult();
+
+        // Extraire juste les livres
+        $books = array_map(fn($crm) => $crm->getBook(), $crmList);
+
+        return $books;
     }
 }

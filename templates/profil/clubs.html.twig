@@ -7,6 +7,7 @@
 {% endblock %}
 
 {% block body %}
+
     <div class="clubs-container">
 
         {# Menu de navigation profil #}
@@ -24,4 +25,113 @@
             </ul>
         </nav>
     </div>
+
+    <div class="listing-container">
+
+    {% set preferencesLabels = {
+        'scifi': 'Science-Fiction',
+        'fantastique': 'Fantastique',
+        'fantasy': 'Fantasy',
+        'dystopie': 'Dystopie',
+        'steampunk': 'Steampunk',
+        'policier': 'Policier',
+        'thriller': 'Thriller',
+        'espionnage': 'Espionnage',
+        'horreur': 'Horreur',
+        'aventure': 'Aventure',
+        'young_adult': 'Young Adult',
+        'romance': 'Romance',
+        'erotique': 'Érotique',
+        'chicklit': 'Chick-lit',
+        'essai': 'Essai',
+        'biographie': 'Biographie',
+        'philosophie': 'Philosophie',
+        'historique': 'Historique',
+        'science': 'Science',
+        'sociologie': 'Sociologie',
+        'poesie': 'Poésie',
+        'theatre': 'Théâtre',
+        'conte_legend': 'Contes et légendes',
+        'mythologie': 'Mythologie',
+        'graphic_novel': 'Roman Graphique',
+        'bd': 'Bande dessinée',
+        'manga': 'Manga'
+    } %}
+
+    <div class="clubs-header">
+        <h2>Clubs que j'ai créés</h2>
+        <a href="{{ path('club_create') }}" class="btn-create-club">Créer un club</a>
+    </div>
+        <section class="clubs-list">
+            {% for club in clubsCrees %}
+                <a href="{{ path('club_show', {'id': club.id}) }}" class="club-card">
+                    <div class="club-card-left">
+                        {% if club.photo %}
+                            <img src="{{ asset('uploads/clubs/' ~ club.photo) }}" alt="{{ club.name }}">
+                        {% else %}
+                            <div class="club-photo-placeholder">Aucune photo</div>
+                        {% endif %}
+
+                        <div class="club-card-meta">
+                            <span class="club-participants">{{ club.membres|length }} participants</span>
+                            <span class="creation-date">Créé le {{ club.creationDate|date('d/m/Y') }}</span>
+                        </div>
+                    </div>
+
+                    <div class="club-card-right">
+                        <h3>{{ club.name }}</h3>
+
+                        <div class="club-description">
+                            {{ club.description }}
+                        </div>
+
+                        <div class="club-preferences">
+                            {% for code in club.preferences %}
+                                <span class="pref-badge">{{ preferencesLabels[code] }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </a>
+            {% else %}
+                <p>Vous n'avez créé aucun club.</p>
+            {% endfor %}
+        </section>
+
+        <h2>Clubs dont je suis membre</h2>
+        <section class="clubs-list">
+            {% for club in clubsMembre %}
+                <a href="{{ path('club_show', {'id': club.id}) }}" class="club-card">
+                    <div class="club-card-left">
+                        {% if club.photo %}
+                            <img src="{{ asset('uploads/clubs/' ~ club.photo) }}" alt="{{ club.name }}">
+                        {% else %}
+                            <div class="club-photo-placeholder">Aucune photo</div>
+                        {% endif %}
+
+                        <div class="club-card-meta">
+                            <span class="club-participants">{{ club.membres|length }} participants</span>
+                            <span class="creation-date">Créé le {{ club.creationDate|date('d/m/Y') }}</span>
+                        </div>
+                    </div>
+
+                    <div class="club-card-right">
+                        <h3>{{ club.name }}</h3>
+
+                        <div class="club-description">
+                            {{ club.description }}
+                        </div>
+
+                        <div class="club-preferences">
+                            {% for code in club.preferences %}
+                                <span class="pref-badge">{{ preferencesLabels[code] }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </a>
+            {% else %}
+                <p>Vous n'êtes membre d'aucun club.</p>
+            {% endfor %}
+        </section>
+    </div>
+
 {% endblock %}

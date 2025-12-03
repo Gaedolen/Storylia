@@ -1,0 +1,124 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des clubs{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/club/show.css') }}">
+{% endblock %}
+
+{% block body %}
+    <section class="club-header">
+
+        <div class="club-info">
+            <div class="club-title-actions">
+                <h1>{{ club.name }}</h1>
+
+                <div class="club-actions">
+                    <a href="#{#{{ path('club_more_info', {'id': club.id}) }}#}" class="btn-info">Plus d'informations</a>
+
+                    {% if app.user and app.user == club.creator %}
+                        <a href="#{#{{ path('club_edit', {'id': club.id}) }}#}" class="btn-edit">Modifier</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <p class="club-description">
+                {{ club.description }}
+            </p>
+        </div>
+
+        <!-- Bloc droit : Lecture du mois prochain -->
+        <div class="club-book-of-month">
+            <h2>Livre du mois - {{ nextMonthName }}</h2>
+
+            {% if bookOfNextMonth %}
+                    <div class="book-card">
+                        <a href="{{ path('app_livre_detail', {id: bookOfNextMonth.id}) }}"><img src={{ bookOfNextMonth.cover }} alt="{{ bookOfNextMonth.title }}"><a>
+                        <div class="book-info">
+                            <a href="{{ path('app_livre_detail', {id: bookOfNextMonth.id}) }}"><p class="book-title">{{ bookOfNextMonth.title }}</p></a>
+                            <a href="#"><p class="book-author">{{ bookOfNextMonth.author.name }}</p></a>
+                        </div>
+                    </div>
+                </a>
+            {% else %}
+                <p>Aucun livre prévu pour ce mois.</p>
+            {% endif %}
+
+            <a href="#{#{{ path('club_vote_next_book', {'id': club.id}) }}#}" class="btn-vote">Voter pour le prochain livre</a>
+        </div>
+
+    </section>
+
+    <section class="reading-month-section">
+
+        <!-- Bloc livre du mois -->
+        <div class="book-presentation">
+            <h2>Livre du mois de {{ currentMonthName }}</h2>
+
+            {% if bookOfMonth %}
+                <div class="book-details">
+                    <a href="{{ path('app_livre_detail', {id: bookOfMonth.id}) }}"><img src={{ bookOfMonth.cover }} alt="{{ bookOfMonth.title }}" class="book-cover"></a>
+
+                    <div class="book-info">
+                        <a href="{{ path('app_livre_detail', {id: bookOfMonth.id}) }}"><p class="book-title">{{ bookOfMonth.title }}</p></a>
+                        <a href="#"><p class="book-author">{{ bookOfMonth.author.name }}</p></a>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="book-summary">
+                    <h3>Résumé :</h3>
+                    <p>{{ bookOfMonth.summary }}</p>
+                </div>
+            {% else %}
+                <p>Aucun livre prévu pour ce mois.</p>
+            {% endif %}
+        </div>
+
+        <!-- Bloc avis -->
+        <div class="club-reviews">
+            <div class="reviews-header">
+                <h3>Avis laissés par les membres :</h3>
+                <a href="#{#{{ path('club_all_reviews', {'id': club.id}) }}#}" class="btn-view-all">Voir tous les avis</a>
+            </div>
+
+            <div class="reviews-list">
+                {% for review in lastReviews %}
+                    <div class="review-bubble">
+                        <p class="review-meta"><strong>{{ review.user.pseudo }}</strong> ({{ review.createdAt|date('d/m/Y') }})</p>
+                        <p class="review-comment">{{ review.comment }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <a href="#{#{{ path('club_leave_review', {'id': club.id}) }}#}" class="btn-leave-review">Laisser mon avis</a>
+        </div>
+
+    </section>
+
+    <section class="recent-books-carousel">
+        <h2>Derniers livres proposés</h2>
+
+        {% if recentBooks is empty %}
+            <p>Aucun livre proposé pour le moment.</p>
+        {% else %}
+            <div class="carousel-container">
+                <div class="carousel-track">
+                    {% for book in recentBooks %}
+                        <a href="{{ path('app_livre_detail', {id: book.id}) }}" class="carousel-card">
+                            <img src={{ book.cover }} alt="{{ book.title }}">
+                            <p class="carousel-title">{{ book.title|length > 25 ? book.title[:25] ~ '…' : book.title }}</p>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- Scroll controls -->
+            <div class="carousel-controls">
+                <button class="prev">&laquo;</button>
+                <button class="next">&raquo;</button>
+            </div>
+        {% endif %}
+    </section>
+
+{% endblock %}

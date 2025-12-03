@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\BookRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use App\Entity\Club;
 use App\Entity\Review;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -60,6 +61,10 @@ class Book
 
     #[ORM\Column(type:"string", length:50, nullable:true)]
     private ?string $format = null;
+
+    #[ORM\ManyToOne(targetEntity: Club::class, inversedBy: "books")]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Club $club = null;
 
     /**
      * @var Collection<int, Review>
@@ -210,6 +215,17 @@ class Book
     public function setFormat(?string $format): self
     {
         $this->format = $format;
+        return $this;
+    }
+
+    public function getClub(): ?Club
+    {
+        return $this->club;
+    }
+
+    public function setClub(?Club $club): self
+    {
+        $this->club = $club;
         return $this;
     }
 

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\ClubReview;
+use App\Entity\Club;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -53,5 +54,24 @@ class ClubReviewRepository extends ServiceEntityRepository
             ->setParameter('monthId', $readingMonthId)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+     /**
+     * Récupère les derniers avis d'un club
+     *
+     * @param Club $club
+     * @param int $limit
+     * @return ClubReview[]
+     */
+    public function findLastReviewsForClub(Club $club, int $limit = 3): array
+    {
+        return $this->createQueryBuilder('r')
+            ->join('r.readingMonth', 'rm')
+            ->andWhere('rm.club = :club')
+            ->setParameter('club', $club)
+            ->orderBy('r.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 }

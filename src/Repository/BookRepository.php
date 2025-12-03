@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Book;
+use App\Entity\Club;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -53,6 +54,24 @@ class BookRepository extends ServiceEntityRepository
         }
 
         return $books;
+    }
+
+    // Récupère le livre prévu pour le club et le mois donné
+    
+    public function findNextBookForClub(Club $club, \DateTime $month): ?Book
+    {
+        $start = (clone $month)->modify('first day of this month')->setTime(0, 0, 0);
+        $end   = (clone $month)->modify('last day of this month')->setTime(23, 59, 59);
+
+        return $this->createQueryBuilder('b')
+            ->andWhere('b.club = :club')
+            ->andWhere('b.publicationDate BETWEEN :start AND :end')
+            ->setParameter('club', $club)
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     //    /**

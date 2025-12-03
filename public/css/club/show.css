@@ -1,0 +1,361 @@
+/* -------------------
+   Bloc principal
+------------------- */
+.club-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 2rem 1rem; /* réduire l'espace latéral */
+    max-width: 1800px;
+    margin: 0 auto; /* centrer dans la fenêtre */
+    box-sizing: border-box;
+}
+
+/* -------------------
+   Infos du club
+------------------- */
+.club-info {
+    flex: 1;
+}
+
+.club-title-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.club-title-actions h1 {
+    font-size: 2.5rem; /* un peu plus grand pour le nom du club */
+    margin: 0;
+}
+
+.club-actions a {
+    padding: 0.5rem 1rem;
+    background-color: #A67856; /* même couleur que ton bloc livre du mois */
+    color: #FAF3E0;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.club-actions a:hover {
+    background-color: #8f6042; /* un peu plus foncé au hover */
+}
+
+.club-description {
+    font-size: 1.1rem; /* légèrement plus grand */
+    line-height: 1.6;
+    margin-top: 1rem;
+}
+
+/* -------------------
+   Livre du mois
+------------------- */
+.club-book-of-month {
+    flex: 0 0 350px; /* largeur fixe du bloc droit */
+    background-color: #A67856;
+    color: #FAF3E0;
+    padding: 1.5rem;
+    border-radius: 10px;
+}
+
+.club-book-of-month h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+/* Livre card */
+.book-card {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.book-card img {
+    width: 100px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.book-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.book-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.book-author, .book-proposer {
+    font-size: 0.95rem;
+    margin: 0.2rem 0;
+}
+
+/* Bouton voter */
+.btn-vote {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #FAF3E0;
+    color: #A67856;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-vote:hover {
+    background-color: #f0e9dd;
+    color: #8f6042;
+}
+
+/* -- Bloc livre du mois -- */
+/* Section lecture du mois */
+.reading-month-section {
+    display: flex;
+    justify-content: flex-start;
+    gap: 0;
+    padding: 2rem 1rem;
+    max-width: 1800px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+/* -------- Bloc livre du mois -------- */
+.book-presentation {
+    flex: 0.5;
+    background-color: #E8CBAE; 
+    color: #3B2F2F;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.book-presentation h2 {
+    color: #3B2F2F;
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.book-details {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.book-cover {
+    width: 160px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.book-info {
+    flex: 1;
+}
+
+.book-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.book-author, 
+.book-proposer {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+.book-summary h3 {
+    margin-bottom: 8px;
+    font-size: 1.3rem;
+    color: #3B2F2F;
+}
+
+.book-summary p {
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
+.book-card a,
+.book-details a {
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s;
+}
+
+.book-card a:hover img,
+.book-details a:hover img {
+    transform: scale(1.05);
+}
+
+.book-title a,
+.book-author a {
+    text-decoration: none;
+    color: #3B2F2F;
+    transition: color 0.3s;
+}
+
+.book-title a:hover,
+.book-author a:hover {
+    color: #A67856; /* couleur accentuée au hover */
+}
+
+/* -------- Bloc avis -------- */
+.club-reviews {
+    flex: 1; /* largeur fixe */
+    background-color: #F5E9D7;
+    padding: 1.5rem;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    margin: 0;
+}
+
+.reviews-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.btn-view-all {
+    padding: 0.4rem 0.8rem;
+    background-color: #A67856;
+    color: #FAF3E0;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 0.85rem;
+}
+
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    flex-grow: 1;
+}
+
+.review-bubble {
+    background-color: #E0D9C8;
+    padding: 0.8rem 1rem;
+    border-radius: 15px;
+    position: relative;
+}
+
+.review-bubble::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 20px;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-top-color: #E0D9C8;
+    border-bottom: 0;
+    margin-left: -5px;
+    margin-bottom: -10px;
+}
+
+.review-meta {
+    font-size: 0.85rem;
+    margin-bottom: 0.3rem;
+}
+
+.review-comment {
+    font-size: 0.95rem;
+}
+
+/* Bouton laisser un avis */
+.btn-leave-review {
+    align-self: flex-end;
+    padding: 0.5rem 1rem;
+    background-color: #A67856;
+    color: #FAF3E0;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    margin-top: 1rem;
+}
+
+.recent-books-carousel {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.recent-books-carousel h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #3B2F2F;
+}
+
+.carousel-container {
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding-bottom: 0.5rem;
+}
+
+.carousel-track {
+    display: flex;
+    gap: 1rem;
+}
+
+.carousel-card {
+    flex: 0 0 120px; /* largeur fixe de chaque carte */
+    text-align: center;
+    text-decoration: none;
+    color: #3B2F2F;
+    transition: transform 0.3s;
+}
+
+.carousel-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+.carousel-card:hover {
+    transform: translateY(-5px);
+}
+
+.carousel-title {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Scroll buttons (optionnel) */
+.carousel-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.carousel-controls button {
+    padding: 0.3rem 0.6rem;
+    background-color: #A67856;
+    color: #FAF3E0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.carousel-controls button:hover {
+    background-color: #8f6042;
+}
