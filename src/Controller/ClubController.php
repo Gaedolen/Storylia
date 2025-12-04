@@ -256,8 +256,20 @@ class ClubController extends AbstractController
         // Trier du plus récent au plus ancien
         usort($readingMonths, fn($a, $b) => strtotime($b->getMonth()) - strtotime($a->getMonth()));
 
-        // --- Calculer le mois cible (mois +2) ---
+        // Mois cible
         $targetMonth = (new \DateTimeImmutable('first day of +2 month'))->format('Y-m');
+
+        // --- Nom du mois cible en français ---
+        $dt = new \DateTimeImmutable($targetMonth . '-01');
+        $fmt = new \IntlDateFormatter(
+            'fr_FR',
+            \IntlDateFormatter::FULL,
+            \IntlDateFormatter::NONE,
+            $dt->getTimezone(),
+            \IntlDateFormatter::GREGORIAN,
+            'MMMM yyyy'
+        );
+        $targetMonthName = ucfirst($fmt->format($dt));
 
         // Vérifier si un livre a déjà été proposé pour ce mois
         $existingReadingMonth = null;
@@ -268,7 +280,6 @@ class ClubController extends AbstractController
             }
         }
 
-        // Créer un ClubReadingMonth "virtuel" si le mois n'existe pas encore
         if (!$existingReadingMonth) {
             $rmNext = new ClubReadingMonth();
             $rmNext->setMonth($targetMonth);
@@ -280,13 +291,25 @@ class ClubController extends AbstractController
         // Déterminer si le bouton peut être actif
         $canPropose = $existingReadingMonth->getBook() === null;
 
-        // Re-trier après ajout
-        usort($readingMonths, fn($a, $b) => strtotime($b->getMonth()) - strtotime($a->getMonth()));
+        // --- Ajouter le nom français pour chaque month (lecture) ---
+        foreach ($readingMonths as $rm) {
+            $dtMonth = new \DateTimeImmutable($rm->getMonth() . '-01');
+            $fmtMonth = new \IntlDateFormatter(
+                'fr_FR',
+                \IntlDateFormatter::FULL,
+                \IntlDateFormatter::NONE,
+                $dtMonth->getTimezone(),
+                \IntlDateFormatter::GREGORIAN,
+                'MMMM yyyy'
+            );
+            $rm->monthNameFr = ucfirst($fmtMonth->format($dtMonth));
+        }
 
         return $this->render('club/propositions.html.twig', [
             'club' => $club,
             'readingMonths' => $readingMonths,
             'targetMonth' => $targetMonth,
+            'targetMonthName' => $targetMonthName,
             'canPropose' => $canPropose,
         ]);
     }
