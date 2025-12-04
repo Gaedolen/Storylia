@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ClubReadingMonthRepository;
+use App\Entity\Book;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -36,11 +37,16 @@ class ClubReadingMonth
     #[ORM\OneToMany(mappedBy: 'readingMonth', targetEntity: ClubMessage::class, cascade: ['remove'])]
     private Collection $messages;
 
+    #[ORM\ManyToMany(targetEntity: Book::class)]
+    #[ORM\JoinTable(name: "club_reading_month_proposals")]
+    private Collection $proposedBooks;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->reviews = new ArrayCollection();
         $this->messages = new ArrayCollection();
+        $this->proposedBooks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -141,6 +147,28 @@ class ClubReadingMonth
             }
         }
 
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Book>
+     */
+    public function getProposedBooks(): Collection
+    {
+        return $this->proposedBooks;
+    }
+
+    public function addProposedBook(Book $book): static
+    {
+        if (!$this->proposedBooks->contains($book)) {
+            $this->proposedBooks->add($book);
+        }
+        return $this;
+    }
+
+    public function removeProposedBook(Book $book): static
+    {
+        $this->proposedBooks->removeElement($book);
         return $this;
     }
 }

@@ -121,6 +121,12 @@ class BookController extends AbstractController
 
         $books = $bookRepository->rechercheRapideSQL($titleQuery, $authorQuery);
 
+        foreach ($books as &$book) {
+            if (isset($book['cover'])) {
+                $book['cover'] = str_replace('http://', 'https://', $book['cover']);
+            }
+        }
+
         return $this->json($books);
     }
 

@@ -1,0 +1,20 @@
+<div id="proposerLivreModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Proposer un livre pour {{ month|date("F Y") }}</h2>
+        <input type="text" id="searchBook" placeholder="Rechercher un livre..." />
+        <div id="booksGrid" class="books-grid">
+            {% for book in books %}
+                <div class="book-card" data-title="{{ book.title|lower }}">
+                    <div class="checkbox-container">
+                        <input type="radio" name="selectedBook" value="{{ book.id }}">
+                    </div>
+                    <img src="{{ book.cover|replace({'http://':'https://'}) }}" alt="{{ book.title }}">
+                    <p class="book-title">{{ book.title }}</p>
+                    <p class="book-author">{{ book.author.name }}</p>
+                </div>
+            {% endfor %}
+        </div>
+        <button id="validerBook" data-action="{{ path('club_proposer_livre', {'clubId': club.id, 'month': month}) }}" disabled>Valider</button>
+    </div>
+</div>

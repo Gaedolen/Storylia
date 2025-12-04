@@ -4,10 +4,14 @@ namespace App\Controller;
 
 use App\Entity\Club;
 use App\Entity\Book;
+use App\Entity\User;
+use App\Entity\ClubReadingMonth;
+use App\Entity\ReadingMonthBook;
 use App\Form\ClubType;
 use Symfony\Component\Form\FormError;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\BookRepository;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\ClubReadingMonthRepository;
 use App\Repository\ClubReviewRepository;
 use App\Repository\ClubRepository;
@@ -247,16 +251,148 @@ class ClubController extends AbstractController
     #[Route('/club/{id}/propositions', name: 'club_propositions')]
     public function propositions(Club $club): Response
     {
-        // Récupérer tous les ReadingMonths triés du plus récent au plus ancien
         $readingMonths = $club->getReadingMonths()->toArray();
 
-        usort($readingMonths, function ($a, $b) {
-            return $b->getMonth()->getTimestamp() - $a->getMonth()->getTimestamp();
-        });
+        // Trier du plus récent au plus ancien
+        usort($readingMonths, fn($a, $b) => strtotime($b->getMonth()) - strtotime($a->getMonth()));
+
+        // --- Calculer le mois cible (mois +2) ---
+        $targetMonth = (new \DateTimeImmutable('first day of +2 month'))->format('Y-m');
+
+        // Vérifier si un livre a déjà été proposé pour ce mois
+        $existingReadingMonth = null;
+        foreach ($readingMonths as $rm) {
+            if ($rm->getMonth() === $targetMonth) {
+                $existingReadingMonth = $rm;
+                break;
+            }
+        }
+
+        // Créer un ClubReadingMonth "virtuel" si le mois n'existe pas encore
+        if (!$existingReadingMonth) {
+            $rmNext = new ClubReadingMonth();
+            $rmNext->setMonth($targetMonth);
+            $rmNext->setClub($club);
+            $readingMonths[] = $rmNext;
+            $existingReadingMonth = $rmNext;
+        }
+
+        // Déterminer si le bouton peut être actif
+        $canPropose = $existingReadingMonth->getBook() === null;
+
+        // Re-trier après ajout
+        usort($readingMonths, fn($a, $b) => strtotime($b->getMonth()) - strtotime($a->getMonth()));
 
         return $this->render('club/propositions.html.twig', [
             'club' => $club,
-            'readingMonths' => $readingMonths
+            'readingMonths' => $readingMonths,
+            'targetMonth' => $targetMonth,
+            'canPropose' => $canPropose,
         ]);
+    }
+
+    #[Route('/club/{clubId}/proposer-livre/{month}', name: 'club_proposer_livre')]
+    public function proposerLivre(
+        Request $request,
+        int $clubId,
+        string $month,
+        EntityManagerInterface $em,
+        BookRepository $bookRepo,
+        ClubRepository $clubRepo
+    ): Response {
+        // --- Récupération du club ---
+        $club = $clubRepo->find($clubId);
+        if (!$club) {
+            throw $this->createNotFoundException('Club non trouvé');
+        }
+
+        // -------------------------------
+        // AJOUTER ICI LA VÉRIFICATION DU MOIS
+        // -------------------------------
+        $expectedMonth = (new \DateTimeImmutable('first day of +2 month'))->format('Y-m');
+
+        if ($month !== $expectedMonth) {
+            $this->addFlash('error', 'Vous ne pouvez proposer un livre que pour le mois prévu.');
+            return $this->redirectToRoute('club_propositions', ['id' => $clubId]);
+        }
+
+        $readingMonth = $club->getReadingMonths()->filter(fn($rm) => $rm->getMonth() === $month)->first();
+        if ($readingMonth && $readingMonth->getBook() !== null) {
+            $this->addFlash('error', 'Un livre a déjà été proposé pour ce mois.');
+            return $this->redirectToRoute('club_propositions', ['id' => $clubId]);
+        }
+
+        // --- Gestion POST (proposition de livre) ---
+        if ($request->isMethod('POST')) {
+            $bookId = $request->request->get('bookId');
+
+            if (!$bookId) {
+                $this->addFlash('error', 'Aucun livre sélectionné.');
+                return $this->redirectToRoute('club_propositions', ['id' => $clubId]);
+            }
+
+            $book = $bookRepo->find($bookId);
+            if (!$book) {
+                $this->addFlash('error', 'Livre introuvable.');
+                return $this->redirectToRoute('club_propositions', ['id' => $clubId]);
+            }
+
+            // --- Créer ou mettre à jour le mois ---
+            if (!$readingMonth) {
+                $readingMonth = new ClubReadingMonth();
+                $readingMonth->setClub($club);
+                $readingMonth->setMonth($month);
+                $em->persist($readingMonth);
+            }
+
+            // Assigner le livre
+            $readingMonth->setBook($book);
+            $em->flush();
+
+            $this->addFlash('success', 'Livre proposé avec succès !');
+            return $this->redirectToRoute('club_propositions', ['id' => $clubId]);
+        }
+
+        // --- Gestion AJAX pour la modal ---
+        if ($request->isXmlHttpRequest()) {
+            $books = $bookRepo->findBy([], ['title' => 'ASC'], 10);
+            return $this->render('club/proposition_modal.html.twig', [
+                'club' => $club,
+                'month' => $month,
+                'books' => $books,
+            ]);
+        }
+
+        // --- Affichage normal ---
+        return $this->render('club/propositions.html.twig', [
+            'club' => $club,
+            'readingMonths' => $club->getReadingMonths()->toArray(),
+            'nextMonth' => $month,
+        ]);
+    }
+
+    #[Route('/clubs/{clubId}/recherche-livre', name: 'club_recherche_livre', methods: ['GET'])]
+    public function rechercheLivre(Request $request, BookRepository $bookRepo, int $clubId): JsonResponse
+    {
+        $query = $request->query->get('q', '');
+        if (strlen($query) < 2) {
+            return new JsonResponse([]);
+        }
+
+        $books = $bookRepo->createQueryBuilder('b')
+            ->where('LOWER(b.title) LIKE :q OR LOWER(b.author) LIKE :q')
+            ->setParameter('q', '%'.strtolower($query).'%')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+
+        $data = array_map(fn($b) => [
+            'id' => $b->getId(),
+            'title' => $b->getTitle(),
+            'author' => $b->getAuthor()->getName(),
+            'cover' => $b->getCover()
+        ], $books);
+
+        return new JsonResponse($data);
     }
 }

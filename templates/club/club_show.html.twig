@@ -101,7 +101,7 @@
     <section class="recent-books-carousel">
         <div class="recent-books-header">
             <h2>Dernières propositions de lecture</h2>
-            <a href="#" class="btn btn-primary btn-sm">Voir toutes les propositions</a>
+            <a href="{{ path('club_propositions', {'id': club.id}) }}" class="btn btn-primary btn-sm">Voir toutes les propositions</a>
         </div>
 
         {% if recentBooks is empty %}

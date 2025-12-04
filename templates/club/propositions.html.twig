@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Propositions de livres – {{ club.name }}{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/club/propositions.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="propositions-container">
+
+    {# Récupérer le mois cible pour lequel on peut proposer un livre #}
+    {% set nextMonthReading = readingMonths|filter(rm => rm.month == targetMonth)|first %}
+    {% set nextMonthBookChosen = nextMonthReading ? nextMonthReading.book is not null : false %}
+
+    <h1>
+        Toutes les propositions
+        <button 
+            id="openProposerModal" 
+            class="btn btn-primary" 
+            data-url="{{ path('club_proposer_livre', {'clubId': club.id, 'month': targetMonth}) }}" 
+            data-club-id="{{ club.id }}"
+            {% if not canPropose %}disabled style="opacity:0.5; cursor:not-allowed;"{% endif %}
+        >
+            Proposer un livre pour le mois de {{ targetMonth|date("F Y") }}
+        </button>
+    </h1>
+
+    <div class="propositions-container">
+        {% for rm in readingMonths %}
+            {% set monthDate = rm.month ~ "-01" %}
+            {% set dateObj = monthDate|date("Y-m-d") %}
+
+            <div class="month-block">
+                <div class="month-header">
+                    <h2>{{ dateObj|date("F Y") }}</h2>
+                    <span class="toggle-arrow">▼</span>
+                </div>
+
+                <div class="month-content">
+                    <div class="books-grid">
+                        {# Affiche le livre sélectionné pour le mois #}
+                        {% if rm.book %}
+                            <div class="book-card selected">
+                                <img src="{{ rm.book.cover|replace({'http://':'https://'}) }}" alt="{{ rm.book.title }}">
+                                <p class="book-title">{{ rm.book.title }}</p>
+                                <p class="book-author">{{ rm.book.author.name }}</p>
+                            </div>
+                        {% endif %}
+
+                        {# Affiche tous les livres proposés #}
+                        {% for book in rm.proposedBooks %}
+                            {% if not someCondition %}
+                                <div class="book-card {{ rm.book and book.id == rm.book.id ? 'selected' : '' }}">
+                                    <img src="{{ book.cover }}" alt="{{ book.title }}">
+                                    <p class="book-title">{{ book.title }}</p>
+                                    <p class="book-author">{{ book.author.name }}</p>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p>Aucune proposition n'a encore été faite pour ce club.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Conteneur modal -->
+<div id="modalContainer"></div>
+
+<script src="{{ asset('js/readingPropositions.js') }}"></script>
+{% endblock %}
