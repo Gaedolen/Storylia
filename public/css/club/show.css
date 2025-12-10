@@ -111,12 +111,13 @@
 }
 
 /* Bouton voter */
-.btn-vote {
+.vote-btn {
     padding: 8px 14px;
     background-color: #C97C5D;
     color: white;
     border-radius: 25px;
     text-decoration: none;
+    border: none;
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
@@ -126,9 +127,50 @@
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.btn-vote:hover {
+.vote-btn:hover {
     background-color: #B46749;
     transform: translateY(-2px);
+}
+
+.vote-btn:hover:not(:disabled) {
+    background-color: #B46749;
+    transform: translateY(-2px);
+}
+
+/* Bouton disabled */
+.vote-btn:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Tooltip */
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip-container .tooltip-text {
+    visibility: hidden;
+    width: 220px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 4px;
+    padding: 5px;
+    position: absolute;
+    z-index: 10;
+    bottom: 125%; /* au-dessus du bouton */
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.9rem;
+}
+
+.tooltip-container:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
 }
 
 /* -- Bloc livre du mois -- */
@@ -317,6 +359,7 @@
     color: white;
     border-radius: 25px;
     text-decoration: none;
+    border: none;
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
@@ -444,4 +487,155 @@
 
 .carousel-inner {
     overflow: visible;
+}
+
+/* Modal */
+#voteModal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+}
+
+/* Contenu */
+#voteModal .modal-content {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 25px;
+    max-width: 900px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Fermeture */
+#voteModal .close-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Bouton centré en bas */
+.vote-btn-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+/* Grille de livres */
+.books-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 cartes par ligne */
+    gap: 20px;
+}
+
+/* Carte livre */
+.book-card {
+    display: flex;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    overflow: hidden;
+    padding: 10px;
+}
+
+/* Checkbox en haut à droite */
+.book-card input[type="radio"] {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    transform: scale(1.3);
+}
+
+/* Couverture */
+.book-cover-wrapper {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.book-cover {
+    width: 120px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+/* Checkbox en haut à droite */
+.book-checkbox {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.book-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    margin-left: 15px;
+}
+
+.book-title {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+
+.book-author,
+.book-proposer,
+.vote-count {
+    font-size: 0.9em;
+    margin-bottom: 3px;
+    color: #555;
+}
+
+/* Couronne en haut à gauche */
+.crown {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    font-size: 1.5em;
+}
+
+#voteModal .btn-primary {
+    padding: 8px 14px;
+    background-color: #C97C5D;
+    color: white;
+    border-radius: 25px;
+    text-decoration: none;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow:
+        0 6px 10px rgba(0, 0, 0, 0.3),
+        inset 0 4px 6px rgba(0, 0, 0, 0.2);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+#voteModal .btn-primary:hover {
+    background-color: #B46749;
+    transform: translateY(-2px);
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {opacity: 0; transform: scale(0.95);}
+    to {opacity: 1; transform: scale(1);}
 }

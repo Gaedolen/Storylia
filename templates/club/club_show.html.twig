@@ -36,7 +36,7 @@
                         <a href="{{ path('app_livre_detail', {id: bookOfNextMonth.id}) }}"><img src={{ bookOfNextMonth.cover }} alt="{{ bookOfNextMonth.title }}"><a>
                         <div class="book-info">
                             <a href="{{ path('app_livre_detail', {id: bookOfNextMonth.id}) }}"><p class="book-title">{{ bookOfNextMonth.title }}</p></a>
-                            <a href="#"><p class="book-author">{{ bookOfNextMonth.author.name }}</p></a>
+                            <a href="#"><p class="book-author">{{ bookOfNextMonth.author is not null ? bookOfNextMonth.author.name : 'Auteur inconnu' }}</p></a>
                         </div>
                     </div>
                 </a>
@@ -44,7 +44,26 @@
                 <p>Aucun livre prévu pour ce mois.</p>
             {% endif %}
 
-            <a href="#{#{{ path('club_vote_next_book', {'id': club.id}) }}#}" class="btn-vote">Voter pour le prochain livre</a>
+            {# Bouton voter #}
+            {% if userCanVote %}
+                <button id="vote-btn" class="vote-btn">
+                    Voter pour le prochain livre
+                </button>
+            {% else %}
+                <div class="tooltip-container">
+                    <button class="vote-btn" disabled>
+                        Voter pour le prochain livre
+                    </button>
+                    <span class="tooltip-text">
+                        {% if not userHasProposed %}
+                            Vous devez d'abord proposer un livre
+                        {% elseif userHasVoted %}
+                            Vous avez déjà voté ce mois
+                        {% endif %}
+                    </span>
+                </div>
+            {% endif %}
+
         </div>
 
     </section>
@@ -86,13 +105,19 @@
             <div class="reviews-list">
                 {% for review in lastReviews %}
                     <div class="review-bubble">
-                        <p class="review-meta"><strong>{{ review.user.pseudo }}</strong> ({{ review.createdAt|date('d/m/Y') }})</p>
+                        <p class="review-meta">
+                            <strong>{{ review.user.pseudo }}</strong> ({{ review.createdAt|date('d/m/Y') }})
+                        </p>
                         <p class="review-comment">{{ review.comment }}</p>
                     </div>
+                {% else %}
+                    <p>Aucun avis pour le moment.</p>
                 {% endfor %}
             </div>
             <div class="review-footer">
-                <a href="#{#{{ path('club_leave_review', {'id': club.id}) }}#}" class="btn-leave-review">Laisser mon avis</a>
+                <button class="btn-leave-review" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                    Laisser un avis
+                </button>
             </div>
         </div>
 
@@ -104,16 +129,17 @@
             <a href="{{ path('club_propositions', {'id': club.id}) }}" class="btn btn-primary btn-sm">Voir toutes les propositions</a>
         </div>
 
-        {% if recentBooks is empty %}
+        {% if recentBookProposals is empty %}
             <p>Aucun livre proposé pour le moment.</p>
         {% else %}
             <div class="carousel-container">
                 <div id="recentBooksCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
                     <div class="carousel-inner">
-                        {% for chunk in recentBooks|batch(5) %}
+                        {% for chunk in recentBookProposals|batch(5) %}
                             <div class="carousel-item {% if loop.first %}active{% endif %}">
                                 <div class="d-flex justify-content-center gap-3">
-                                    {% for book in chunk %}
+                                    {% for proposal in chunk %}
+                                        {% set book = proposal.book %}
                                         <a href="{{ path('app_livre_detail', {id: book.id}) }}" class="carousel-card-link">
                                             <div class="card carousel-card">
                                                 <img src="{{ book.cover }}" class="card-img-top" alt="{{ book.title }}">
@@ -141,5 +167,158 @@
             </div>
         {% endif %}
     </section>
+
+    {# Modal de vote #}
+    {% if clubReadingMonth is not null %}
+        <div id="voteModal" class="vote-modal" style="display:none;">
+            <div class="modal-content">
+                <span class="close-modal">×</span>
+                <h2>Votez pour le livre du mois de {{ nextNextMonthName }}</h2>
+
+                <form action="{{ path('club_vote', { clubId: club.id }) }}" method="post">
+                    <div class="books-grid">
+                        {% for proposal in clubReadingMonth.bookProposals %}
+                            {% set book = proposal.book %}
+                            <div class="book-card">
+                                <div class="book-cover-wrapper">
+                                    <label for="proposal-{{ proposal.id }}">
+                                        <img src="{{ asset(book.cover) }}" alt="{{ book.title }}" class="book-cover">
+                                    </label>
+
+                                    <input 
+                                        type="radio" 
+                                        id="proposal-{{ proposal.id }}" 
+                                        name="vote[bookProposal]"  {# correspond au tableau attendu côté controller #}
+                                        value="{{ proposal.id }}"
+                                    >
+                                    {% if proposal.id in leadingProposals %}
+                                        <div class="crown">👑</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="book-info">
+                                    <div class="book-title">{{ book.title }}</div>
+                                    <div class="book-author">{{ book.author.name }}</div>
+                                    <div class="book-proposer">Proposé par {{ proposal.proposer.pseudo }}</div>
+                                    <div class="vote-count">{{ proposal.votes|length }} vote{{ proposal.votes|length > 1 ? 's' : '' }}</div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <p>Aucun livre proposé pour le moment.</p>
+                        {% endfor %}
+                    </div>
+
+                    <div class="vote-btn-container">
+                        <button type="submit" class="btn btn-primary">Voter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Modal laisser un avis -->
+    <div class="modal fade" id="reviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Laisser un avis</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form id="reviewForm" data-month="{{ clubReadingMonth.id }}">
+
+                        <label for="comment" class="form-label">Votre avis (max 1000 caractères)</label>
+                        <textarea
+                            id="comment"
+                            name="comment"
+                            class="form-control"
+                            maxlength="1000"
+                            rows="6"
+                            required
+                        ></textarea>
+
+                        <div class="text-end mt-1">
+                            <small><span id="charCount">0</span>/1000 caractères</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary mt-3">Valider</button>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // Modal de vote (custom)
+        (() => {
+            const voteBtn = document.getElementById('vote-btn');
+            const voteModal = document.getElementById('voteModal');
+            if (!voteBtn || !voteModal) return;
+
+            const closeBtn = voteModal.querySelector('.close-modal');
+
+            voteBtn.addEventListener('click', () => voteModal.style.display = 'flex');
+            if (closeBtn) closeBtn.addEventListener('click', () => voteModal.style.display = 'none');
+            window.addEventListener('click', (e) => { if (e.target === voteModal) voteModal.style.display = 'none'; });
+            window.addEventListener('keydown', (e) => { if (e.key === 'Escape') voteModal.style.display = 'none'; });
+        })();
+
+        // Modal laisser un avis
+        const reviewForm = document.getElementById('reviewForm');
+        const textarea = document.getElementById('comment');
+        const charCount = document.getElementById('charCount');
+
+        if (!reviewForm || !textarea || !charCount) return;
+
+        // Compteur dynamique
+        textarea.addEventListener('input', () => {
+            charCount.textContent = textarea.value.length;
+        });
+
+        // URL générée par Symfony
+        const reviewUrl = "{{ path('club_review_add') }}";
+
+        // Soumission AJAX
+        reviewForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const monthId = reviewForm.dataset.month;
+            if (!monthId) {
+                console.error("data-month manquant sur le formulaire");
+                return;
+            }
+
+            const data = {
+                comment: textarea.value,
+                readingMonthId: monthId,
+                rating: 5 // facultatif
+            };
+
+            try {
+                const response = await fetch(reviewUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    location.reload();
+                } else {
+                    console.error("Erreur lors de l'envoi de l'avis:", result.error || response.statusText);
+                }
+            } catch (err) {
+                console.error("Erreur réseau :", err);
+            }
+        });
+    });
+    </script>
 
 {% endblock %}

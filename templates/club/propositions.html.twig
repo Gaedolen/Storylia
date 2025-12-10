@@ -15,16 +15,19 @@
 
     <h1>
         Toutes les propositions
-        <button 
-            id="openProposerModal" 
-            class="btn btn-primary" 
-            data-url="{{ path('club_proposer_livre', {'clubId': club.id, 'month': targetMonth}) }}" 
-            data-club-id="{{ club.id }}"
-            {% if not canPropose %}disabled style="opacity:0.5; cursor:not-allowed;"{% endif %}
-        >
-            Proposer un livre pour le mois de {{ targetMonthName }}
-        </button>
+        <div class="vote-btn-wrapper" style="position: relative; display: inline-block;">
+            {% set userHasProposed = nextMonthReading.bookProposals|filter(p => p.proposer == app.user)|length > 0 %}
 
+            <button 
+                id="openProposerModal" 
+                class="btn btn-primary"
+                data-url="{{ path('club_proposer_livre', {'clubId': club.id, 'month': targetMonth}) }}"
+                data-club-id="{{ club.id }}"
+                {% if userHasProposed %}disabled style="opacity:0.5; cursor:not-allowed;" title="Vous avez déjà proposé un livre pour ce mois"{% endif %}
+            >
+                Proposer un livre pour le mois de {{ targetMonthName }}
+            </button>
+        </div>
     </h1>
 
     <div class="propositions-container">
@@ -46,19 +49,19 @@
                         {% if rm.book %}
                             <a href="{{ path('app_livre_detail', {'id': rm.book.id}) }}">
                                 <div class="book-card selected">
-                                    <img src="{{ rm.book.cover|replace({'http://':'https://'}) }}" alt="{{ rm.book.title }}">
+                                    <img src="{{ rm.book.cover|default('images/default_cover.jpg') }}" alt="{{ rm.book.title }}">
                                     <p class="book-title">{{ rm.book.title }}</p>
                                     <p class="book-author">{{ rm.book.author.name }}</p>
                                 </div>
                             </a>
                         {% endif %}
 
-
-                        {# Affiche tous les livres proposés #}
-                        {% for book in rm.proposedBooks %}
-                            <a href="{{ path('book_show', {'id': book.id}) }}">
+                        {# Affiche tous les livres proposés via BookProposal #}
+                        {% for proposal in rm.bookProposals %}
+                            {% set book = proposal.book %}
+                            <a href="{{ path('app_livre_detail', {'id': book.id}) }}">
                                 <div class="book-card {{ rm.book and book.id == rm.book.id ? 'selected' : '' }}">
-                                    <img src="{{ book.cover }}" alt="{{ book.title }}">
+                                    <img src="{{ book.cover|default('images/default_cover.jpg') }}" alt="{{ book.title }}">
                                     <p class="book-title">{{ book.title }}</p>
                                     <p class="book-author">{{ book.author.name }}</p>
                                 </div>

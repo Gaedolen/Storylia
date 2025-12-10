@@ -10,7 +10,8 @@ h1 {
 }
 
 .btn-primary {
-        display: inline-block;
+    display: inline-block;
+    border: none;
     width: auto;
     padding: 8px 14px;
     background-color: #C97C5D;

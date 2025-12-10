@@ -75,10 +75,17 @@ class Book
     #[ORM\OneToMany(mappedBy: 'book', targetEntity: Review::class, cascade: ['remove'])]
     private Collection $reviews;
 
+    /**
+     * @var Collection<int, Vote>
+     */
+    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'book')]
+    private Collection $votes;
+
     // Constructeur
     public function __construct()
     {
         $this->reviews = new ArrayCollection();
+        $this->votes = new ArrayCollection();
     }
 
     // Getters & Setters
@@ -290,5 +297,13 @@ class Book
         }
 
         return $count > 0 ? round($total / $count, 1) : null;
+    }
+
+    /**
+     * @return Collection<int, Vote>
+     */
+    public function getVotes(): Collection
+    {
+        return $this->votes;
     }
 }

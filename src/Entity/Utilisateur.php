@@ -99,6 +99,12 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: ReadingHistory::class)]
     private Collection $readingHistory;
 
+    /**
+     * @var Collection<int, Vote>
+     */
+    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'utilisateur')]
+    private Collection $votes;
+
     public function __construct()
     {
         $this->clubsCrees = new ArrayCollection();
@@ -108,6 +114,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         $this->signalementsFaits = new ArrayCollection();
         $this->signalementsRecus = new ArrayCollection();
         $this->readingHistory = new ArrayCollection();
+        $this->votes = new ArrayCollection();
     }
 
     // Setters et Getters
@@ -467,5 +474,35 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     public function getSalt(): ?string
     {
         return null;
+    }
+
+    /**
+     * @return Collection<int, Vote>
+     */
+    public function getVotes(): Collection
+    {
+        return $this->votes;
+    }
+
+    public function addVote(Vote $vote): static
+    {
+        if (!$this->votes->contains($vote)) {
+            $this->votes->add($vote);
+            $vote->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVote(Vote $vote): static
+    {
+        if ($this->votes->removeElement($vote)) {
+            // set the owning side to null (unless already changed)
+            if ($vote->getUtilisateur() === $this) {
+                $vote->setUtilisateur(null);
+            }
+        }
+
+        return $this;
     }
 }

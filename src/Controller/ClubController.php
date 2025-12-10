@@ -4,15 +4,20 @@ namespace App\Controller;
 
 use App\Entity\Club;
 use App\Entity\Book;
-use App\Entity\User;
+use App\Entity\BookProposal;
+use App\Entity\Utilisateur;
 use App\Entity\ClubReadingMonth;
 use App\Entity\ReadingMonthBook;
+use App\Entity\Vote;
+use App\Entity\ClubReview;
+use App\Form\VoteType;
 use App\Form\ClubType;
 use Symfony\Component\Form\FormError;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\BookRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\ClubReadingMonthRepository;
+use App\Repository\BookProposalRepository;
 use App\Repository\ClubReviewRepository;
 use App\Repository\ClubRepository;
 use App\Repository\UtilisateurRepository;
@@ -20,9 +25,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use DateTime;
 use DateInterval;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\SecurityBundle\Security;
 
 #[Route('/clubs')]
 class ClubController extends AbstractController
@@ -125,31 +132,111 @@ class ClubController extends AbstractController
     }
 
     #[Route('/clubs/{id}', name: 'club_show', methods: ['GET'])]
-        public function show(
-        Club $club,
+    public function show(
+        Club $club, Utilisateur $utilisateur,
         ClubReadingMonthRepository $clubReadingMonthRepository,
         ClubReviewRepository $clubReviewRepository,
-        BookRepository $bookRepository
+        BookProposalRepository $bookProposalRepository
     ): Response {
-        // Récupérer le mois en cours et le mois prochain pour ce club
-        $bookOfMonthReading = $clubReadingMonthRepository->findCurrentMonthByClub($club);
-        $bookOfNextMonthReading = $clubReadingMonthRepository->findNextMonthByClub($club);
 
-        $bookOfMonth = $bookOfMonthReading?->getBook();        // Livre du mois courant
-        $bookOfNextMonth = $bookOfNextMonthReading?->getBook(); // Livre du mois prochain
-
-        $currentMonthName = $bookOfMonthReading ? date('F', strtotime($bookOfMonthReading->getMonth() . '-01')) : '';
-        $nextMonthName = $bookOfNextMonthReading ? date('F', strtotime($bookOfNextMonthReading->getMonth() . '-01')) : '';
-
-        // Récupérer les derniers avis pour ce club (limité à 5)
-        $lastReviews = $clubReviewRepository->findBy(
-            ['readingMonth' => $bookOfMonthReading],
-            ['createdAt' => 'DESC'],
-            3
+        $formatter = new \IntlDateFormatter(
+            'fr_FR',
+            \IntlDateFormatter::FULL,
+            \IntlDateFormatter::NONE,
+            null,
+            null,
+            'LLLL' // nom complet du mois
         );
 
-        // Récupérer les 20 derniers livres proposés
-        $recentBooks = $clubReadingMonthRepository->findRecentBooks($club);
+        // Mois courant
+        $bookOfMonthReading = $clubReadingMonthRepository->findCurrentMonthByClub($club);
+        $bookOfMonth = $bookOfMonthReading?->getBook();
+        $currentMonthName = $bookOfMonthReading
+            ? ucfirst($formatter->format(new DateTime($bookOfMonthReading->getMonth() . '-01')))
+            : '';
+
+        // Mois prochain
+        $bookOfNextMonthReading = $clubReadingMonthRepository->findNextMonthByClub($club);
+        $bookOfNextMonth = $bookOfNextMonthReading?->getBook();
+        $nextMonthName = $bookOfNextMonthReading
+            ? ucfirst($formatter->format(new DateTime($bookOfNextMonthReading->getMonth() . '-01')))
+            : '';
+
+        // Mois +2
+        $bookOfNextNextMonthReading = $clubReadingMonthRepository->findOneBy([
+            'club' => $club,
+            'month' => (new \DateTimeImmutable('first day of +2 month'))->format('Y-m'),
+        ]);
+        $nextNextMonthName = $bookOfNextNextMonthReading
+            ? ucfirst($formatter->format(new DateTime($bookOfNextNextMonthReading->getMonth() . '-01')))
+            : '';
+
+        // --- Avis ---
+        $lastReviews = $clubReviewRepository->findLastReviewsByClub($club, 3);
+
+        // --- Récupération du mois des propositions (+2 mois) ---
+        $clubReadingMonth = $clubReadingMonthRepository->findOneBy([
+            'club' => $club,
+            'month' => (new \DateTimeImmutable('first day of +2 month'))->format('Y-m'),
+        ]);
+
+        // --- Livres récemment proposés ---
+        $recentBookProposals = $bookProposalRepository->findRecentBooksByClub($club->getId());
+
+        // Condition de vote
+        $user = $this->getUser();
+        $userHasProposed = false;
+        $userHasVoted = false;
+        $userCanVote = false;
+
+        // --- Déterminer le livre en tête des votes (+2 mois) ---
+        $leadingProposals = [];
+        $maxVotes = -1;
+
+        if ($clubReadingMonth instanceof ClubReadingMonth) {
+            foreach ($clubReadingMonth->getBookProposals() as $proposal) {
+                $voteCount = count($proposal->getVotes());
+
+                if ($voteCount > $maxVotes) {
+                    // Nouveau max → on réinitialise
+                    $maxVotes = $voteCount;
+                    $leadingProposals = [$proposal->getId()];
+                } elseif ($voteCount === $maxVotes) {
+                    // Égalité → on ajoute
+                    $leadingProposals[] = $proposal->getId();
+                }
+            }
+        }
+
+        /** @var Utilisateur $user */
+        if ($user instanceof Utilisateur && $clubReadingMonth instanceof ClubReadingMonth) {
+
+            // --- Vérifier si l’utilisateur a proposé un livre ---
+            foreach ($clubReadingMonth->getBookProposals() as $proposal) {
+                $proposer = $proposal->getProposer(); // Utilisateur qui a proposé
+                if ($proposer instanceof Utilisateur && $proposer === $user) {
+                    $userHasProposed = true;
+                    break;
+                }
+            }
+
+            // --- Vérifier si l’utilisateur a déjà voté ---
+            foreach ($clubReadingMonth->getVotes() as $vote) {
+                $voter = $vote->getUtilisateur();
+                if (!$voter instanceof Utilisateur) {
+                    continue; // Ignore si pas d’utilisateur
+                }
+
+                if ($voter->getId() === $user->getId()) {
+                    $userHasVoted = true;
+                    break;
+                }
+            }
+
+            // --- Peut-il voter ? ---
+            $userCanVote = $userHasProposed && !$userHasVoted;
+        }
+
 
         return $this->render('club/club_show.html.twig', [
             'club' => $club,
@@ -157,8 +244,14 @@ class ClubController extends AbstractController
             'bookOfNextMonth' => $bookOfNextMonth,
             'currentMonthName' => $currentMonthName,
             'nextMonthName' => $nextMonthName,
+            'nextNextMonthName' => $nextNextMonthName,
             'lastReviews' => $lastReviews,
-            'recentBooks' => $recentBooks,
+            'recentBookProposals' => $recentBookProposals,
+            'clubReadingMonth' => $clubReadingMonth,
+            'userHasProposed' => $userHasProposed,
+            'userHasVoted' => $userHasVoted,
+            'userCanVote' => $userCanVote,
+            'leadingProposals' => $leadingProposals
         ]);
     }
 
@@ -249,17 +342,17 @@ class ClubController extends AbstractController
     }
 
     #[Route('/club/{id}/propositions', name: 'club_propositions')]
-    public function propositions(Club $club): Response
+    public function propositions(Club $club, EntityManagerInterface $em, Utilisateur $user): Response
     {
         $readingMonths = $club->getReadingMonths()->toArray();
 
         // Trier du plus récent au plus ancien
         usort($readingMonths, fn($a, $b) => strtotime($b->getMonth()) - strtotime($a->getMonth()));
 
-        // Mois cible
+        // Mois cible : mois +2
         $targetMonth = (new \DateTimeImmutable('first day of +2 month'))->format('Y-m');
 
-        // --- Nom du mois cible en français ---
+        // Nom du mois cible en français
         $dt = new \DateTimeImmutable($targetMonth . '-01');
         $fmt = new \IntlDateFormatter(
             'fr_FR',
@@ -271,7 +364,7 @@ class ClubController extends AbstractController
         );
         $targetMonthName = ucfirst($fmt->format($dt));
 
-        // Vérifier si un livre a déjà été proposé pour ce mois
+        // Récupérer le readingMonth correspondant au mois cible
         $existingReadingMonth = null;
         foreach ($readingMonths as $rm) {
             if ($rm->getMonth() === $targetMonth) {
@@ -284,14 +377,26 @@ class ClubController extends AbstractController
             $rmNext = new ClubReadingMonth();
             $rmNext->setMonth($targetMonth);
             $rmNext->setClub($club);
+            $em->persist($rmNext);
+            $em->flush();
             $readingMonths[] = $rmNext;
             $existingReadingMonth = $rmNext;
         }
 
-        // Déterminer si le bouton peut être actif
-        $canPropose = $existingReadingMonth->getBook() === null;
+        // --- Vérifier si l’utilisateur a proposé un livre ---
+        $userHasProposed = false;
+        foreach ($existingReadingMonth->getBookProposals() as $proposal) {
+            $proposer = $proposal->getProposer(); // Utilisateur qui a proposé le livre
+            if ($proposer instanceof Utilisateur && $proposer === $user) {
+                $userHasProposed = true;
+                break;
+            }
+        }
 
-        // --- Ajouter le nom français pour chaque month (lecture) ---
+        // Déterminer si le bouton général peut être actif
+        $canPropose = !$userHasProposed;
+
+        // Ajouter nom français pour chaque mois
         foreach ($readingMonths as $rm) {
             $dtMonth = new \DateTimeImmutable($rm->getMonth() . '-01');
             $fmtMonth = new \IntlDateFormatter(
@@ -311,87 +416,74 @@ class ClubController extends AbstractController
             'targetMonth' => $targetMonth,
             'targetMonthName' => $targetMonthName,
             'canPropose' => $canPropose,
+            'userHasProposed' => $userHasProposed, // <- pour Twig
         ]);
     }
 
     #[Route('/club/{clubId}/proposer-livre/{month}', name: 'club_proposer_livre')]
-    public function proposerLivre(
-        Request $request,
-        int $clubId,
-        string $month,
-        EntityManagerInterface $em,
-        BookRepository $bookRepo,
-        ClubRepository $clubRepo
-    ): Response {
-        // --- Récupération du club ---
+    public function proposerLivre(Request $request, int $clubId, string $month, EntityManagerInterface $em, BookRepository $bookRepo, ClubRepository $clubRepo): Response {
+
+        /** @var Utilisateur $user */
+        $user = $this->getUser();
+
+
         $club = $clubRepo->find($clubId);
-        if (!$club) {
-            throw $this->createNotFoundException('Club non trouvé');
-        }
-
-        // -------------------------------
-        // AJOUTER ICI LA VÉRIFICATION DU MOIS
-        // -------------------------------
-        $expectedMonth = (new \DateTimeImmutable('first day of +2 month'))->format('Y-m');
-
-        if ($month !== $expectedMonth) {
-            $this->addFlash('error', 'Vous ne pouvez proposer un livre que pour le mois prévu.');
-            return $this->redirectToRoute('club_propositions', ['id' => $clubId]);
-        }
+        if (!$club) throw $this->createNotFoundException('Club non trouvé');
 
         $readingMonth = $club->getReadingMonths()->filter(fn($rm) => $rm->getMonth() === $month)->first();
-        if ($readingMonth && $readingMonth->getBook() !== null) {
-            $this->addFlash('error', 'Un livre a déjà été proposé pour ce mois.');
-            return $this->redirectToRoute('club_propositions', ['id' => $clubId]);
+        if (!$readingMonth) {
+            $readingMonth = new ClubReadingMonth();
+            $readingMonth->setMonth($month);
+            $readingMonth->setClub($club);
+            $em->persist($readingMonth);
         }
 
-        // --- Gestion POST (proposition de livre) ---
-        if ($request->isMethod('POST')) {
-            $bookId = $request->request->get('bookId');
+        // Vérifier si l'utilisateur a déjà proposé ce mois
+        $existingProposal = $readingMonth->getBookProposals()
+            ->filter(fn($p) => $p->getProposer()->getId() === $user->getId())
+            ->first();
 
-            if (!$bookId) {
-                $this->addFlash('error', 'Aucun livre sélectionné.');
+        $canPropose = !$readingMonth->getBookProposals()
+            ->exists(fn($key, $p) => $p->getProposer()->getId() === $user->getId());
+
+
+        if ($request->isMethod('POST')) {
+            if (!$canPropose) {
+                $this->addFlash('error', 'Vous avez déjà proposé un livre ce mois.');
                 return $this->redirectToRoute('club_propositions', ['id' => $clubId]);
             }
 
+            $bookId = $request->request->get('bookId');
             $book = $bookRepo->find($bookId);
             if (!$book) {
                 $this->addFlash('error', 'Livre introuvable.');
                 return $this->redirectToRoute('club_propositions', ['id' => $clubId]);
             }
 
-            // --- Créer ou mettre à jour le mois ---
-            if (!$readingMonth) {
-                $readingMonth = new ClubReadingMonth();
-                $readingMonth->setClub($club);
-                $readingMonth->setMonth($month);
-                $em->persist($readingMonth);
-            }
+            $proposal = new BookProposal();
+            $proposal->setBook($book)
+                    ->setProposer($user)
+                    ->setReadingMonth($readingMonth);
 
-            // Assigner le livre
-            $readingMonth->setBook($book);
+            $em->persist($proposal);
             $em->flush();
 
             $this->addFlash('success', 'Livre proposé avec succès !');
             return $this->redirectToRoute('club_propositions', ['id' => $clubId]);
         }
 
-        // --- Gestion AJAX pour la modal ---
+        // AJAX modal
         if ($request->isXmlHttpRequest()) {
             $books = $bookRepo->findBy([], ['title' => 'ASC'], 10);
             return $this->render('club/proposition_modal.html.twig', [
                 'club' => $club,
                 'month' => $month,
                 'books' => $books,
+                'canPropose' => $canPropose
             ]);
         }
 
-        // --- Affichage normal ---
-        return $this->render('club/propositions.html.twig', [
-            'club' => $club,
-            'readingMonths' => $club->getReadingMonths()->toArray(),
-            'nextMonth' => $month,
-        ]);
+        return $this->redirectToRoute('club_propositions', ['id' => $clubId]);
     }
 
     #[Route('/clubs/{clubId}/recherche-livre', name: 'club_recherche_livre', methods: ['GET'])]
@@ -417,5 +509,124 @@ class ClubController extends AbstractController
         ], $books);
 
         return new JsonResponse($data);
+    }
+
+    #[Route('/club/{clubId}/vote', name: 'club_vote', methods: ['POST'])]
+    public function vote(int $clubId, Request $request, EntityManagerInterface $em): Response 
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            $this->addFlash('error', 'Vous devez être connecté pour voter.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        // Récupérer le club
+        $club = $em->getRepository(Club::class)->find($clubId);
+        if (!$club) {
+            throw $this->createNotFoundException("Club introuvable.");
+        }
+
+        // Mois +2
+        $month = (new \DateTimeImmutable('first day of +2 months'))->format('Y-m');
+        $clubReadingMonth = $em->getRepository(ClubReadingMonth::class)
+            ->findOneBy(['club' => $club, 'month' => $month]);
+
+        if (!$clubReadingMonth) {
+            $this->addFlash('error', 'Le mois de lecture n’a pas encore été créé.');
+            return $this->redirectToRoute('club_show', ['id' => $clubId]);
+        }
+
+        // Déjà voté ?
+        $existingVote = $em->getRepository(Vote::class)
+            ->findOneBy(['utilisateur' => $user, 'clubReadingMonth' => $clubReadingMonth]);
+        if ($existingVote) {
+            $this->addFlash('warning', 'Vous avez déjà voté pour ce mois.');
+            return $this->redirectToRoute('club_show', ['id' => $clubId]);
+        }
+
+        // A proposé un livre ?
+        $userProposed = false;
+        foreach ($clubReadingMonth->getBookProposals() as $proposal) {
+            if ($proposal->getProposer() === $user) {
+                $userProposed = true;
+                break;
+            }
+        }
+        if (!$userProposed) {
+            $this->addFlash('warning', 'Vous devez proposer un livre avant de voter.');
+            return $this->redirectToRoute('club_show', ['id' => $clubId]);
+        }
+
+        // Récupérer l'ID de la proposition sélectionnée
+        $voteData = $request->request->all('vote');
+        $bookProposalId = $voteData['bookProposal'] ?? null;
+
+        if ($bookProposalId) {
+            $proposal = $em->getRepository(BookProposal::class)->find($bookProposalId);
+            if ($proposal) {
+                $vote = new Vote();
+                $vote->setUtilisateur($user);
+                $vote->setClubReadingMonth($clubReadingMonth);
+                $vote->setBookProposal($proposal);
+                $em->persist($vote);
+                $em->flush();
+
+                $this->addFlash('success', 'Votre vote a été enregistré !');
+            }
+        }
+
+        // Calculer le livre en tête des votes pour ce mois
+        $proposals = $clubReadingMonth->getBookProposals();
+        $leadingProposalId = null;
+        $maxVotes = -1;
+
+        foreach ($proposals as $proposal) {
+            $votesCount = count($proposal->getVotes()); // Assure-toi que getVotes() existe
+            if ($votesCount > $maxVotes) {
+                $maxVotes = $votesCount;
+                $leadingProposalId = $proposal->getId();
+            }
+        }
+
+        // Rediriger vers le show du club en passant leadingProposalId
+        return $this->redirectToRoute('club_show', [
+            'id' => $clubId,
+            'leadingProposalId' => $leadingProposalId
+        ]);
+    }
+
+    #[Route('/club/review/add', name: 'club_review_add', methods: ['POST'])]
+    public function addReview(
+        Request $request,
+        EntityManagerInterface $em,
+        Security $security,
+        ClubReadingMonthRepository $monthRepo
+    ): JsonResponse {
+        // Assurez-vous que l'utilisateur est connecté
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        $user = $security->getUser();
+
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['comment'], $data['readingMonthId'])) {
+            return new JsonResponse(['error' => 'Invalid data'], 400);
+        }
+
+        $month = $monthRepo->find($data['readingMonthId']);
+        if (!$month) {
+            return new JsonResponse(['error' => 'Month not found'], 404);
+        }
+
+        $review = new ClubReview();
+        $review->setComment($data['comment']);
+        $review->setRating($data['rating'] ?? null); // facultatif
+        $review->setUser($user);
+        $review->setReadingMonth($month);
+
+        $em->persist($review);
+        $em->flush();
+
+        return new JsonResponse(['success' => true], 201);
     }
 }

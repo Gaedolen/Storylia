@@ -63,11 +63,11 @@ class ClubReviewRepository extends ServiceEntityRepository
      * @param int $limit
      * @return ClubReview[]
      */
-    public function findLastReviewsForClub(Club $club, int $limit = 3): array
+    public function findLastReviewsByClub(Club $club, int $limit = 3)
     {
         return $this->createQueryBuilder('r')
-            ->join('r.readingMonth', 'rm')
-            ->andWhere('rm.club = :club')
+            ->join('r.readingMonth', 'm')
+            ->andWhere('m.club = :club')
             ->setParameter('club', $club)
             ->orderBy('r.createdAt', 'DESC')
             ->setMaxResults($limit)

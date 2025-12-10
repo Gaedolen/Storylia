@@ -28,8 +28,11 @@ class ClubReadingMonth
     private ?Club $club = null;
 
     #[ORM\ManyToOne(targetEntity: Book::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Book $book = null;
+
+    #[ORM\OneToMany(mappedBy: "readingMonth", targetEntity: BookProposal::class, cascade: ["persist", "remove"])]
+    private $bookProposals;
 
     #[ORM\OneToMany(mappedBy: 'readingMonth', targetEntity: ClubReview::class, cascade: ['remove'])]
     private Collection $reviews;
@@ -37,16 +40,19 @@ class ClubReadingMonth
     #[ORM\OneToMany(mappedBy: 'readingMonth', targetEntity: ClubMessage::class, cascade: ['remove'])]
     private Collection $messages;
 
-    #[ORM\ManyToMany(targetEntity: Book::class)]
-    #[ORM\JoinTable(name: "club_reading_month_proposals")]
-    private Collection $proposedBooks;
+    /**
+     * @var Collection<int, Vote>
+     */
+    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'clubReadingMonth')]
+    private Collection $votes;
 
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->reviews = new ArrayCollection();
         $this->messages = new ArrayCollection();
-        $this->proposedBooks = new ArrayCollection();
+        $this->votes = new ArrayCollection();
+        $this->bookProposals = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -151,24 +157,37 @@ class ClubReadingMonth
     }
 
     /**
-     * @return Collection<int, Book>
+     * @return Collection<int, Vote>
      */
-    public function getProposedBooks(): Collection
+    public function getVotes(): Collection
     {
-        return $this->proposedBooks;
+        return $this->votes;
     }
 
-    public function addProposedBook(Book $book): static
+    public function addVote(Vote $vote): static
     {
-        if (!$this->proposedBooks->contains($book)) {
-            $this->proposedBooks->add($book);
+        if (!$this->votes->contains(element: $vote)) {
+            $this->votes->add($vote);
+            $vote->setClubReadingMonth($this);
         }
+
         return $this;
     }
 
-    public function removeProposedBook(Book $book): static
+    public function removeVote(Vote $vote): static
     {
-        $this->proposedBooks->removeElement($book);
+        if ($this->votes->removeElement($vote)) {
+            // set the owning side to null (unless already changed)
+            if ($vote->getClubReadingMonth() === $this) {
+                $vote->setClubReadingMonth(null);
+            }
+        }
+
         return $this;
+    }
+
+    public function getBookProposals(): Collection
+    {
+        return $this->bookProposals;
     }
 }
