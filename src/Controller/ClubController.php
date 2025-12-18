@@ -133,7 +133,7 @@ class ClubController extends AbstractController
 
     #[Route('/clubs/{id}', name: 'club_show', methods: ['GET'])]
     public function show(
-        Club $club, Utilisateur $utilisateur,
+        Club $club,
         ClubReadingMonthRepository $clubReadingMonthRepository,
         ClubReviewRepository $clubReviewRepository,
         BookProposalRepository $bookProposalRepository
@@ -173,6 +173,18 @@ class ClubController extends AbstractController
 
         // --- Avis ---
         $lastReviews = $clubReviewRepository->findLastReviewsByClub($club, 3);
+
+        // Bloque le btn d'avis si l'utilisateur en a déjà laissé un
+        $userHasReviewedMonth = false;
+        $user = $this->getUser();
+
+        if ($bookOfMonthReading instanceof ClubReadingMonth && $user instanceof Utilisateur) {
+            $monthId = $bookOfMonthReading->getId(); // Ici, getId() n'est jamais sur un null
+            $userId = $user->getId();
+
+            $existingReview = $clubReviewRepository->findByUserAndMonth($userId, $monthId);
+            $userHasReviewedMonth = ($existingReview !== null);
+        }
 
         // --- Récupération du mois des propositions (+2 mois) ---
         $clubReadingMonth = $clubReadingMonthRepository->findOneBy([
@@ -243,11 +255,13 @@ class ClubController extends AbstractController
             'bookOfMonth' => $bookOfMonth,
             'bookOfNextMonth' => $bookOfNextMonth,
             'currentMonthName' => $currentMonthName,
+            'bookOfMonthReading' => $bookOfMonthReading,
             'nextMonthName' => $nextMonthName,
             'nextNextMonthName' => $nextNextMonthName,
             'lastReviews' => $lastReviews,
-            'recentBookProposals' => $recentBookProposals,
             'clubReadingMonth' => $clubReadingMonth,
+            'userHasReviewedMonth' => $userHasReviewedMonth,
+            'recentBookProposals' => $recentBookProposals,
             'userHasProposed' => $userHasProposed,
             'userHasVoted' => $userHasVoted,
             'userCanVote' => $userCanVote,
@@ -596,15 +610,8 @@ class ClubController extends AbstractController
     }
 
     #[Route('/club/review/add', name: 'club_review_add', methods: ['POST'])]
-    public function addReview(
-        Request $request,
-        EntityManagerInterface $em,
-        Security $security,
-        ClubReadingMonthRepository $monthRepo
-    ): JsonResponse {
-        // Assurez-vous que l'utilisateur est connecté
+    public function addReview(Request $request, EntityManagerInterface $em, Security $security, ClubReadingMonthRepository $monthRepo): JsonResponse {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $user = $security->getUser();
 
         $data = json_decode($request->getContent(), true);
@@ -620,7 +627,7 @@ class ClubController extends AbstractController
 
         $review = new ClubReview();
         $review->setComment($data['comment']);
-        $review->setRating($data['rating'] ?? null); // facultatif
+        $review->setRating($data['rating'] ?? null);
         $review->setUser($user);
         $review->setReadingMonth($month);
 
@@ -628,5 +635,49 @@ class ClubController extends AbstractController
         $em->flush();
 
         return new JsonResponse(['success' => true], 201);
+    }
+
+    #[Route('/clubs/{id}/reviews', name: 'club_all_reviews', methods: ['GET'])]
+    public function allReviews(
+        Club $club,
+        ClubReadingMonthRepository $clubReadingMonthRepository,
+        ClubReviewRepository $clubReviewRepository
+    ): Response {
+
+        $formatter = new \IntlDateFormatter(
+            'fr_FR',
+            \IntlDateFormatter::FULL,
+            \IntlDateFormatter::NONE,
+            null,
+            null,
+            'LLLL'
+        );
+
+        // Mois courant
+        $readingMonth = $clubReadingMonthRepository->findCurrentMonthByClub($club);
+
+        if (!$readingMonth) {
+            throw $this->createNotFoundException("Aucun livre prévu pour ce mois.");
+        }
+
+        $book = $readingMonth->getBook();
+
+        $currentMonthName = ucfirst(
+            $formatter->format(new DateTime($readingMonth->getMonth() . '-01'))
+        );
+
+        // Tous les avis du mois courant
+        $reviews = $clubReviewRepository->findBy(
+            ['readingMonth' => $readingMonth],
+            ['createdAt' => 'DESC']
+        );
+
+        return $this->render('club/all_reviews.html.twig', [
+            'club'            => $club,
+            'book'            => $book,
+            'readingMonth'    => $readingMonth,
+            'currentMonthName'=> $currentMonthName,
+            'reviews'         => $reviews,
+        ]);
     }
 }

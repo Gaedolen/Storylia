@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\ClubReview;
+use App\Entity\Utilisateur;
+use App\Entity\ClubReadingMonth;
 use App\Entity\Club;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -73,5 +75,18 @@ class ClubReviewRepository extends ServiceEntityRepository
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
+    }
+
+    public function hasUserReviewedMonth(Utilisateur $user, ClubReadingMonth $month): bool
+    {
+        return (bool) $this->createQueryBuilder('r')
+            ->select('1')
+            ->where('r.user = :user')
+            ->andWhere('r.readingMonth = :month')
+            ->setParameter('user', $user)
+            ->setParameter('month', $month)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

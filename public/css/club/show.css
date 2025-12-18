@@ -183,16 +183,19 @@
     max-width: 1800px;
     margin: 0 auto;
     box-sizing: border-box;
+    align-items: stretch;
 }
 
 /* -------- Bloc livre du mois -------- */
 .book-presentation {
-    flex: 0.5;
+    width: 700px;
     background-color: #E8CBAE; 
     color: #3B2F2F;
     padding: 20px;
     border-radius: 12px;
     margin: 0;
+    flex-shrink: 0;    /* ne pas réduire */
+    height: auto; 
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
@@ -269,15 +272,25 @@
 }
 
 /* -------- Bloc avis -------- */
+.club-reviews-wrapper {
+    display: flex;
+    align-items: center;
+}
+
 .club-reviews {
     flex: 1; /* largeur fixe */
     background-color: #F5E9D7;
-    padding: 1.5rem;
-    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    margin: 0;
+    margin-top: 10px;       /* espace en haut pour “enfoncer” le bloc */
+    margin-bottom: 10px;    /* espace en bas */
+    max-height: calc(100% - 20px); /* pour respecter les marges */
+    overflow-y: auto;
+    width: 1100px;
 }
 
 .reviews-header {
@@ -373,6 +386,15 @@
     background-color: #B46749;
     transform: translateY(-2px);
 }
+
+.btn-leave-review:disabled {
+    background-color: #cccccc; /* gris clair */
+    color: #666666;            /* texte plus foncé */
+    cursor: not-allowed;
+    opacity: 0.7;              /* léger effet transparent */
+}
+
+/* Carrousel propositions */
 
 .recent-books-carousel {
     max-width: 1800px;

@@ -96,28 +96,35 @@
         </div>
 
         <!-- Bloc avis -->
-        <div class="club-reviews">
-            <div class="reviews-header">
-                <h3>Avis laissés par les membres :</h3>
-                <a href="#{#{{ path('club_all_reviews', {'id': club.id}) }}#}" class="btn-view-all">Voir tous les avis</a>
-            </div>
+        <div class="club-reviews-wrapper">
+            <div class="club-reviews">
+                <div class="reviews-header">
+                    <h3>Avis laissés par les membres :</h3>
+                    <a href="{{ path('club_all_reviews', {'id': club.id}) }}" class="btn-view-all">
+                        Voir tous les avis
+                    </a>
+                </div>
 
-            <div class="reviews-list">
-                {% for review in lastReviews %}
-                    <div class="review-bubble">
-                        <p class="review-meta">
-                            <strong>{{ review.user.pseudo }}</strong> ({{ review.createdAt|date('d/m/Y') }})
-                        </p>
-                        <p class="review-comment">{{ review.comment }}</p>
-                    </div>
-                {% else %}
-                    <p>Aucun avis pour le moment.</p>
-                {% endfor %}
-            </div>
-            <div class="review-footer">
-                <button class="btn-leave-review" data-bs-toggle="modal" data-bs-target="#reviewModal">
-                    Laisser un avis
-                </button>
+                <div class="reviews-list">
+                    {% for review in lastReviews %}
+                        <div class="review-bubble">
+                            <p class="review-meta">
+                                <strong>{{ review.user.pseudo }}</strong> ({{ review.createdAt|date('d/m/Y') }})
+                            </p>
+                            <p class="review-comment">{{ review.comment }}</p>
+                        </div>
+                    {% else %}
+                        <p>Aucun avis pour le moment.</p>
+                    {% endfor %}
+                </div>
+                <div class="review-footer">
+                    <button class="btn-leave-review"
+                            data-bs-toggle="modal"
+                            data-bs-target="#reviewModal"
+                            {% if userHasReviewedMonth %} disabled {% endif %}>
+                        Laisser un avis
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -220,34 +227,20 @@
     <div class="modal fade" id="reviewModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-
                 <div class="modal-header">
                     <h5 class="modal-title">Laisser un avis</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-
                 <div class="modal-body">
-                    <form id="reviewForm" data-month="{{ clubReadingMonth.id }}">
-
+                    <form id="reviewForm" data-month="{{ bookOfMonthReading.id }}">
                         <label for="comment" class="form-label">Votre avis (max 1000 caractères)</label>
-                        <textarea
-                            id="comment"
-                            name="comment"
-                            class="form-control"
-                            maxlength="1000"
-                            rows="6"
-                            required
-                        ></textarea>
-
+                        <textarea id="comment" name="comment" class="form-control" maxlength="1000" rows="6" required></textarea>
                         <div class="text-end mt-1">
                             <small><span id="charCount">0</span>/1000 caractères</small>
                         </div>
-
                         <button type="submit" class="btn btn-primary mt-3">Valider</button>
-
                     </form>
                 </div>
-
             </div>
         </div>
     </div>
@@ -273,31 +266,23 @@
         const reviewForm = document.getElementById('reviewForm');
         const textarea = document.getElementById('comment');
         const charCount = document.getElementById('charCount');
-
         if (!reviewForm || !textarea || !charCount) return;
 
-        // Compteur dynamique
         textarea.addEventListener('input', () => {
             charCount.textContent = textarea.value.length;
         });
 
-        // URL générée par Symfony
         const reviewUrl = "{{ path('club_review_add') }}";
 
-        // Soumission AJAX
         reviewForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-
             const monthId = reviewForm.dataset.month;
-            if (!monthId) {
-                console.error("data-month manquant sur le formulaire");
-                return;
-            }
+            if (!monthId) return console.error("data-month manquant");
 
             const data = {
                 comment: textarea.value,
                 readingMonthId: monthId,
-                rating: 5 // facultatif
+                rating: 5
             };
 
             try {
@@ -308,11 +293,10 @@
                 });
 
                 const result = await response.json();
-
                 if (response.ok && result.success) {
-                    location.reload();
+                    location.reload(); // Recharge pour désactiver le bouton
                 } else {
-                    console.error("Erreur lors de l'envoi de l'avis:", result.error || response.statusText);
+                    console.error("Erreur:", result.error || response.statusText);
                 }
             } catch (err) {
                 console.error("Erreur réseau :", err);

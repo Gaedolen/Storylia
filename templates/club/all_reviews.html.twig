@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Avis du livre{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('css/club/all_reviews.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="book-review-page">
+
+    {# Bloc Livre #}
+    <div class="book-info-container">
+        <div class="book-left">
+            <img src={{  book.cover }} alt="{{ book.title }}" class="book-cover">
+            <div class="book-meta">
+                <h2>{{ book.title }}</h2>
+                <p><strong>Auteur :</strong> {{ book.author.name }}</p>
+                {% if book.genres is not empty %}
+                    <p><strong>Genres :</strong> {{ book.genres|join(', ') }}</p>
+                {% endif %}
+                <p><strong>Date de publication :</strong> {{ book.publicationDate ? book.publicationDate|date('d/m/Y') : 'N/A' }}</p>
+                <p><strong>Pages :</strong> {{ book.pages }}</p>
+                <p><strong>Éditeurs :</strong> 
+                    {% if book.publishers is not empty %}
+                        {{ book.publishers|join(', ') }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </p>
+                <p><strong>Livre du mois de {{ currentMonthName }}</strong></p>
+            </div>
+        </div>
+        <div class="book-right">
+            <h3>Résumé</h3>
+            <p>{{ book.summary }}</p>
+        </div>
+    </div>
+
+    {# Bloc Avis #}
+    <div class="reviews-container">
+        <h3>Avis des membres</h3>
+        {% if reviews is empty %}
+            <p>Aucun avis pour ce livre.</p>
+        {% else %}
+            <div class="review-list">
+                {% for review in reviews %}
+                    <div class="review-card">
+                        <div class="review-header">
+                            <span class="review-user">{{ review.user.pseudo }}</span>
+                            <span class="review-date">{{ review.createdAt|date('d/m/Y H:i') }}</span>
+                        </div>
+                        <div class="review-comment">
+                            <p>{{ review.comment }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
