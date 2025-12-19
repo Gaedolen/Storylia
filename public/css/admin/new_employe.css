@@ -1,0 +1,104 @@
+/* Container général */
+.form-container {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 30px 35px;
+    background-color: #fdeece;
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15), 0 8px 20px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    color: #3B2F2F;
+}
+
+/* Titre */
+.form-container h1 {
+    text-align: center;
+    font-size: 2rem;
+    color: #714B2F;
+    margin-bottom: 25px;
+}
+
+/* Champs du formulaire */
+.form-container .form-group,
+.form-container .form-row {
+    margin-bottom: 20px;
+}
+
+.form-container label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #714B2F;
+}
+
+.form-container input,
+.form-container select,
+.form-container textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #C0A080;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #3B2F2F;
+    background-color: #FFF9F0;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.form-container input:focus,
+.form-container select:focus,
+.form-container textarea:focus {
+    outline: none;
+    border-color: #A67856;
+    box-shadow: 0 0 6px rgba(166, 120, 86, 0.4);
+}
+
+/* Messages d'erreur */
+.error-message {
+    color: #C97C5D;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    font-weight: 500;
+}
+
+/* Bouton soumettre */
+.btn-container {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.btn-submit {
+    background-color: #5F7F5F;
+    color: #FAF3E0;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.25s ease, transform 0.2s ease;
+}
+
+.btn-submit:hover {
+    background-color: #4f6a4f;
+    transform: translateY(-2px);
+}
+
+/* Flash messages Symfony */
+.alert {
+    border-radius: 8px;
+    padding: 12px 18px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .form-container {
+        padding: 25px 20px;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 12px 0;
+    }
+}

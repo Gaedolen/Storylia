@@ -16,6 +16,18 @@ class UtilisateurRepository extends ServiceEntityRepository
         parent::__construct($registry, Utilisateur::class);
     }
 
+    // src/Repository/UtilisateurRepository.php
+
+    public function findEmployes(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->join('u.role', 'r')
+            ->where('r.label = :role')
+            ->setParameter('role', 'EMPLOYE')
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Utilisateur[] Returns an array of Utilisateur objects
 //     */

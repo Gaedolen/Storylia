@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des employés{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/admin/employes.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Gestion des employés</h1>
+
+        <div class="table-wrapper">
+            <table class="table-employes">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Date de naissance (Âge)</th>
+                        <th>Email</th>
+                        <th>Gérer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employe in employes %}
+                        {% set naissance = employe.birthDate %}
+                        {% set today = "now"|date("Y-m-d") %}
+                        {% set age = (date(today).diff(naissance)).y %}
+                        <tr>
+                            <td>{{ employe.familyName|e }}</td>
+                            <td>{{ employe.firstName|e }}</td>
+                            <td>{{ naissance|date('d/m/Y') }} ({{ age }} ans)</td>
+                            <td>{{ employe.email|e }}</td>
+                            <td>
+                                <form method="post" action="{{ path('admin_supprimer_employe', {'id': employe.id}) }}" class="form-delete">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete-employe-' ~ employe.id) }}">
+                                    <button type="submit" class="btn-delete">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" style="text-align:center;">Aucun employé trouvé.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="actions">
+            <a href="{{ path('admin_dashboard') }}" class="back-btn">⬅ Retour au dashboard</a>
+            <a href="{{ path('admin_creer_employe') }}" class="btn-add">Ajouter un employé</a>
+        </div>
+    </div>
+
+    <!-- Modal de confirmation -->
+    <div class="modal-confirm">
+        <div class="modal-content">
+            <p>Voulez-vous vraiment supprimer cet employé ? Cette action est irréversible.</p>
+            <div class="modal-buttons">
+                <button class="modal-confirm-yes">Oui</button>
+                <button class="modal-confirm-no">Non</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ asset('js/employes_gestion.js') }}"></script>
+{% endblock %}

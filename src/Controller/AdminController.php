@@ -5,16 +5,22 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Service\BookApiService;
 use App\Service\BookCreationService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use App\Form\EmployeType;
+use App\Entity\Role;
+use App\Entity\Utilisateur;
+use App\Entity\Report;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Book;
 use App\Entity\Author;
-
-
+use App\Repository\UtilisateurRepository;
 
 #[IsGranted('ROLE_ADMIN')]
 #[Route('/admin')]
@@ -190,5 +196,84 @@ class AdminController extends AbstractController
 
         $this->addFlash('success', "$count livre(s) mis à jour.");
         return $this->redirectToRoute('admin_dashboard');
+    }
+
+    #[Route('/employes', name: 'admin_employes')]
+    #[IsGranted('ROLE_ADMIN')]
+    public function employes(UtilisateurRepository $userRepository): Response
+    {
+        $employes = $userRepository->findEmployes();
+
+        return $this->render('admin/employes.html.twig', [
+            'employes' => $employes
+        ]);
+    }
+
+    #[Route('/employes/creer', name: 'admin_creer_employe')]
+    #[IsGranted('ROLE_ADMIN')]
+    public function creerEmploye(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $hasher): Response
+    {
+        $employe = new Utilisateur();
+        $form = $this->createForm(EmployeType::class, $employe);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Vérifier ou créer le rôle EMPLOYE
+            $role = $em->getRepository(Role::class)->findOneBy(['label' => 'EMPLOYE']);
+            if (!$role) {
+                $role = new Role();
+                $role->setLabel('EMPLOYE');
+                $em->persist($role);
+            }
+
+            $employe->setRole($role);
+            $employe->setIsVerified(true);
+
+            // Récupérer le mot de passe depuis le formulaire (non mappé)
+            $plainPassword = $form->get('password')->getData();
+            if (!$plainPassword) {
+                $this->addFlash('error', 'Le mot de passe est obligatoire.');
+                return $this->render('admin/nouveau_employe.html.twig', [
+                    'form' => $form->createView(),
+                ]);
+            }
+
+            // Hashage sécurisé
+            $hashedPassword = $hasher->hashPassword($employe, $plainPassword);
+            $employe->setPassword($hashedPassword);
+
+            $em->persist($employe);
+            $em->flush();
+
+            $this->addFlash('success', 'Employé créé avec succès !');
+
+            return $this->redirectToRoute('admin_employes');
+        }
+
+        return $this->render('admin/new_employe.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/employe/supprimer/{id}', name: 'admin_supprimer_employe', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function supprimerEmploye(int $id, Request $request, UtilisateurRepository $userRepository, EntityManagerInterface $em, CsrfTokenManagerInterface $csrfTokenManager): RedirectResponse
+    {
+        $user = $userRepository->find($id);
+
+        if (!$user || $user->getRole()->getLabel() !== 'EMPLOYE') {
+            throw $this->createNotFoundException('Employé non trouvé');
+        }
+
+        $submittedToken = $request->request->get('_token');
+        if (!$csrfTokenManager->isTokenValid(new \Symfony\Component\Security\Csrf\CsrfToken('delete-employe-' . $id, $submittedToken))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $em->remove($user);
+        $em->flush();
+
+        $this->addFlash('success', 'Employé supprimé avec succès.');
+        return $this->redirectToRoute('admin_employes');
     }
 }

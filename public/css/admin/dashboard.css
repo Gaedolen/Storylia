@@ -1,0 +1,119 @@
+body {
+    background-color: #FAF3E0;
+    color: #3B2F2F;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* Conteneur principal */
+.admin-dashboard {
+    max-width: 1100px;
+    margin: 60px auto;
+    padding: 40px;
+    background-color: #FAF3E0;
+}
+
+/* Titre */
+.admin-dashboard h1 {
+    font-size: 2.4rem;
+    color: #714B2F;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Intro */
+.admin-intro {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #6B6B6B;
+    margin-bottom: 50px;
+}
+
+/* Zone des actions */
+.admin-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+/* Boutons génériques */
+.admin-actions a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    padding: 25px 20px;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    text-decoration: none;
+
+    background-color: #E8CBAE;
+    color: #3B2F2F;
+
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.25s ease;
+}
+
+/* Hover commun */
+.admin-actions a:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Variantes par action */
+.btn-import {
+    border-left: 6px solid #C97C5D;
+}
+
+.btn-ajout {
+    border-left: 6px solid #5F7F5F;
+}
+
+.btn-employe {
+    border-left: 6px solid #A67856;
+}
+
+.btn-utilisateur {
+    border-left: 6px solid #714B2F;
+}
+
+/* Hover accentué */
+.btn-import:hover,
+.btn-ajout:hover,
+.btn-employe:hover,
+.btn-utilisateur:hover {
+    background-color: #C97C5D;
+    color: #FAF3E0;
+}
+
+/* Flash messages */
+.alert {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+    font-size: 0.95rem;
+}
+
+.alert-success {
+    background-color: #5F7F5F;
+    color: #FAF3E0;
+}
+
+.alert-error,
+.alert-danger {
+    background-color: #C97C5D;
+    color: #FAF3E0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-dashboard {
+        padding: 25px 20px;
+    }
+
+    .admin-dashboard h1 {
+        font-size: 2rem;
+    }
+}

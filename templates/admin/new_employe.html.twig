@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter un employé{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/admin/new_employe.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="form-container">
+        <h1>Créer un nouvel employé</h1>
+
+        {{ form_start(form) }}
+            {{ form_row(form.pseudo) }}
+            {{ form_row(form.familyName) }}
+            {{ form_row(form.firstName) }}
+            {{ form_row(form.email) }}
+            {{ form_row(form.password) }}
+            <div class="form-group">
+                {{ form_label(form.birthDate) }}
+                {{ form_widget(form.birthDate) }}
+
+                {% set filteredErrors = [] %} <!-- Gestion du message d'erreur -->
+                    {% if form.birthDate.vars.errors|filter(e => e.message == "L'employé doit avoir au moins 18 ans.")|length > 0 %}
+                        <div class="error-message">
+                            L'employé doit avoir au moins 18 ans.
+                        </div>
+                    {% endif %}
+            </div>
+
+            <div class="btn-container">
+                <button type="submit" class="btn-submit">Créer l'employé</button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

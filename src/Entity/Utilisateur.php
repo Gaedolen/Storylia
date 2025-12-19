@@ -71,6 +71,9 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $bio = null;
 
+    #[ORM\Column]
+    private bool $isVerified = false;
+
     #[ORM\ManyToOne(targetEntity: Role::class, inversedBy: 'utilisateurs')]
     private ?Role $role = null;
 
@@ -261,6 +264,18 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     public function setBio(?string $bio): self
     {
         $this->bio = $bio;
+        return $this;
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
+
         return $this;
     }
 

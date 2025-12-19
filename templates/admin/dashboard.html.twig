@@ -2,33 +2,55 @@
 
 {% block title %}Dashboard Admin{% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/admin/dashboard.css') }}">
+{% endblock %}
+
 {% block body %}
-    <h1>Bienvenue sur le tableau de bord administrateur</h1>
+    <div class="admin-dashboard">
 
-    <p>Depuis cette page, vous pourrez :</p>
-    <ul>
-        <li>Ajouter ou supprimer des livres via l’API</li>
-        <li>Gérer les utilisateurs</li>
-        <li>Superviser la base de données</li>
-    </ul>
+        <h1>Tableau de bord administrateur</h1>
 
-    <a href="{{ path('import_books') }}" class="btn btn-success">
-        Importer des livres
-    </a>
+        <p class="admin-intro">
+            Depuis cette page, vous pouvez gérer les fonctionnalités principales de la plateforme.
+        </p>
 
-    <a href="{{ path('update_books') }}" class="btn btn-primary">
-        Mettre à jour les livres existants
-    </a>
+        <div class="admin-actions">
 
-    {% for label, messages in app.flashes %}
-        {% for message in messages %}
-            <div class="alert alert-{{ label }} mt-3" role="alert">
-                {{ message }}
-            </div>
+            {# Import livres #}
+            <a href="{{ path('import_books') }}" class="btn-import">
+                📚Importer des livres
+            </a>
+
+            {# Mise à jour livres #}
+            <a href="{{ path('update_books') }}" class="btn-ajout">
+                Mettre à jour les livres
+            </a>
+
+            {# Gestion des employés #}
+            <a href="{{ path('admin_employes') }}" class="btn-employe">
+                Gérer les employés
+            </a>
+
+            {# Gestion des utilisateur #}
+            <a href="#" class="btn-utilisateur">
+                Gérer les utilisateurs
+            </a>
+
+        </div>
+
+        {# Flash messages #}
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }} mt-3" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
 
-    <div id="import-result" style="margin-top: 20px;"></div>
+        <div id="import-result" style="margin-top: 20px;"></div>
+
+    </div>
 
     <script src="{{ asset('js/dashboardAdmin.js') }}"></script>
 {% endblock %}
