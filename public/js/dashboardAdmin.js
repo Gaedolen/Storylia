@@ -2,26 +2,39 @@ document.addEventListener('DOMContentLoaded', function() {
     const importBtn = document.getElementById('import-books-btn');
     const resultDiv = document.getElementById('import-result');
 
-    if(!importBtn) return;
+    if (!importBtn) return;
 
-    importBtn.addEventListener('clicj', function() {
-        resultDiv.innerHTML = 'Importation en cours...';
+    importBtn.addEventListener('click', function() {
+        resultDiv.innerHTML = '<p>Importation en cours...</p>';
 
-        // Appel de la route import_books
-        fetch(importBtn.dataset.url)
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) { // Afficher le nb de livres importés + le nb de livres existants (s'il y a)
-                    resultDiv.innerHTML = `
+        // Vérifier que l'URL est définie
+        const url = importBtn.dataset.url;
+        if (!url) {
+            resultDiv.innerHTML = '<p style="color:red;">Erreur : URL d’importation non définie</p>';
+            return;
+        }
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                resultDiv.innerHTML = `
                     <p>Livres importés : ${data.imported_count}</p>
                     <p>Livres déjà existants : ${data.already_exists_count}</p>
-                    `;
-                } else {
-                    resultDiv.innerHTML = `<p style="color:red;">Erreur : ${data.message}</p>`;
-                }
-            })
-            .catch(err => {
-                resultDiv.innerHTML = `<p style="color:red;">Erreur : ${err}</p>`;
-            });
+                `;
+            } else {
+                resultDiv.innerHTML = `<p style="color:red;">Erreur : ${data.message}</p>`;
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            resultDiv.innerHTML = `<p style="color:red;">Erreur : ${err}</p>`;
+        });
     });
 });

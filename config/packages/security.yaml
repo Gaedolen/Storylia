@@ -19,6 +19,7 @@ security:
             custom_authenticators:
                  - App\Security\LoginFormAuthenticator
             entry_point: App\Security\LoginFormAuthenticator
+            user_checker: App\Security\UserChecker
 
             form_login:
                 login_path: app_login

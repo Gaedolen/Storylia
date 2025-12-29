@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Employé{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/employe/dashboard.css') }}">
+{% endblock %}
+
+{% block body %}
+    <h1>Dashboard Employé</h1>
+
+    <h2>Avis et livres</h2>
+    <a href="#"><button>Modération des avis signalés</button></a>
+    <a href="#"><button>Gestion des livres signalés</button></a>
+
+    <h2>Utilisateurs et clubs</h2>
+    <a href="#"><button>Utilisateurs problématiques</button></a>
+    <a href="#"><button>Clubs problématiques</button></a>
+
+    <h2>Messagerie</h2>
+    <a href="#"><button>Messagerie Employés / Admin</button></a>
+{% endblock %}

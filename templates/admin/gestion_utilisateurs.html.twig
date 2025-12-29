@@ -1,0 +1,94 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des utilisateurs{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('css/admin/gestion_utilisateurs.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="admin-dashboard">
+        <h1 class="page-title">Gestion des utilisateurs</h1>
+
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>Pseudo</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.pseudo }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {% if user.isSuspendu() %}
+                                <span class="status suspended">Suspendu</span>
+                                {% if user.suspendReason %}
+                                    <span class="tooltip" title="{{ user.suspendReason }}">&#x1F6C8;</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="status active">Actif</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user.isSuspendu() %}
+                                <button class="btn unsuspend-btn"
+                                        data-user-id="{{ user.id }}"
+                                        data-csrf="{{ user.suspendToken|default('') }}">
+                                    Réactiver
+                                </button>
+                            {% else %}
+                                <button class="btn suspend-btn"
+                                        data-user-id="{{ user.id }}"
+                                        data-pseudo="{{ user.pseudo }}"
+                                        data-csrf="{{ user.suspendToken|default('') }}">
+                                    Suspendre
+                                </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="no-users">Aucun utilisateur trouvé.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {# Modal pour suspendre #}
+        <div id="suspendModal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Suspendre l'utilisateur <span id="modalPseudo"></span></h2>
+                <form id="suspendForm">
+                    <input type="hidden" name="_token" id="csrfToken">
+                    <div class="form-group">
+                        <label>Raison :</label>
+                        <select id="reasonSelect">
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Comportement inapproprié">Comportement inapproprié</option>
+                            <option value="Violation des règles">Violation des règles</option>
+                            <option value="autres">Autres</option>
+                        </select>
+                    </div>
+                    <div class="form-group hidden" id="otherReasonDiv">
+                        <label>Autre raison :</label>
+                        <input type="text" id="otherReason">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" id="cancelModal" class="btn cancel-btn">Annuler</button>
+                        <button type="submit" class="btn suspend-confirm-btn">Suspendre</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/gestion_utilisateurs.js') }}"></script>
+{% endblock %}

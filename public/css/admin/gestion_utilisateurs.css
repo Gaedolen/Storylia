@@ -1,0 +1,148 @@
+/* === Général === */
+body {
+    font-family: 'Comfortaa', sans-serif;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.admin-dashboard {
+    max-width: 1200px; /* Limite la largeur */
+    margin: 50px auto; /* Centre horizontalement et espace en haut */
+    padding: 30px;
+    background-color: #f5f5f5; /* léger fond pour détacher du body */
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+
+/* === Tableau utilisateurs === */
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.users-table th,
+.users-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.users-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+.status.active {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.status.suspended {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.tooltip {
+    cursor: help;
+    margin-left: 0.25rem;
+}
+
+/* === Boutons === */
+.btn {
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.suspend-btn {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.suspend-btn:hover {
+    background-color: #c82333;
+}
+
+.unsuspend-btn {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.unsuspend-btn:hover {
+    background-color: #218838;
+}
+
+.no-users {
+    text-align: center;
+    color: #777;
+    padding: 1rem;
+}
+
+/* === Modal === */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    width: 380px;
+    max-width: 90%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.modal-content h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.cancel-btn {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+.cancel-btn:hover {
+    background-color: #5a6268;
+}
+
+.suspend-confirm-btn {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.suspend-confirm-btn:hover {
+    background-color: #c82333;
+}

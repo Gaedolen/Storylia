@@ -74,6 +74,9 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $isVerified = false;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $suspendReason = null;
+
     #[ORM\ManyToOne(targetEntity: Role::class, inversedBy: 'utilisateurs')]
     private ?Role $role = null;
 
@@ -108,6 +111,12 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'utilisateur')]
     private Collection $votes;
 
+    /**
+     * @var Collection<int, Book>
+     */
+    #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Book::class)]
+    private Collection $books;
+
     public function __construct()
     {
         $this->clubsCrees = new ArrayCollection();
@@ -118,6 +127,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         $this->signalementsRecus = new ArrayCollection();
         $this->readingHistory = new ArrayCollection();
         $this->votes = new ArrayCollection();
+        $this->books = new ArrayCollection();
     }
 
     // Setters et Getters
@@ -278,6 +288,17 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getSuspendReason(): ?string
+    {
+        return $this->suspendReason;
+    }
+
+    public function setSuspendReason(?string $reason): self
+    {
+        $this->suspendReason = $reason;
+    return $this;
+}
 
     public function getRole(): ?Role
     {
@@ -519,5 +540,10 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    public function getBooks(): Collection
+    {
+        return $this->books;
     }
 }

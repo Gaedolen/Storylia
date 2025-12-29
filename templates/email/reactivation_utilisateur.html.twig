@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Compte réactivé</title>
+        <style>
+            body { font-family: 'Comfortaa', sans-serif; background-color: #f4f4f4; margin:0; padding:0; }
+            .container { max-width: 600px; margin: 40px auto; background:#fff; padding: 30px; border-radius:8px; }
+            h1 { color: #28a745; }
+            p { color: #333; line-height:1.5; }
+            a.btn { display:inline-block; padding:10px 20px; background:#28a745; color:#fff; text-decoration:none; border-radius:5px; margin-top:15px; }
+            a.btn:hover { background:#218838; }
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <h1>Votre compte est réactivé</h1>
+            <p>Bonjour {{ user.pseudo }},</p>
+            <p>Votre compte sur Storylia a été réactivé. Vous pouvez désormais vous connecter et profiter de toutes les fonctionnalités.</p>
+            <a href="{{ url('app_login') }}" class="btn">Se connecter</a>
+        </div>
+    </body>
+
+</html>

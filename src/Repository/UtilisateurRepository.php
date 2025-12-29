@@ -16,14 +16,12 @@ class UtilisateurRepository extends ServiceEntityRepository
         parent::__construct($registry, Utilisateur::class);
     }
 
-    // src/Repository/UtilisateurRepository.php
-
-    public function findEmployes(): array
+    public function findByRoleLibelle(string $label): array
     {
         return $this->createQueryBuilder('u')
             ->join('u.role', 'r')
-            ->where('r.label = :role')
-            ->setParameter('role', 'EMPLOYE')
+            ->where('r.label = :label')
+            ->setParameter('label', $label)
             ->getQuery()
             ->getResult();
     }

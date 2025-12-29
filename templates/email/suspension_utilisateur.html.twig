@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Compte suspendu</title>
+        <style>
+            body { font-family: 'Comfortaa', sans-serif; background-color: #f4f4f4; margin:0; padding:0; }
+            .container { max-width: 600px; margin: 40px auto; background:#fff; padding: 30px; border-radius:8px; }
+            h1 { color: #dc3545; }
+            p { color: #333; line-height:1.5; }
+            .reason { background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin: 10px 0; }
+            a.btn { display:inline-block; padding:10px 20px; background:#dc3545; color:#fff; text-decoration:none; border-radius:5px; margin-top:15px; }
+            a.btn:hover { background:#c82333; }
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <h1>Votre compte a été suspendu</h1>
+            <p>Bonjour {{ user.pseudo }},</p>
+            <p>Votre compte sur Storylia a été suspendu pour la raison suivante :</p>
+            {% if reason %}
+                <div class="reason">{{ reason }}</div>
+            {% else %}
+                <p>Raison non précisée.</p>
+            {% endif %}
+            <p>Si vous pensez qu’il s’agit d’une erreur, vous pouvez contacter l’équipe Storylia.</p>
+            <a href="mailto:storylia@gmail.com" class="btn">Contacter le support</a>
+        </div>
+    </body>
+
+</html>

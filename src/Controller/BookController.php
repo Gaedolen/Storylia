@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Book;
+use App\Entity\Utilisateur;
 use App\Entity\Bookshelf;
 use App\Entity\Author;
 use DateTime;
@@ -132,6 +133,15 @@ class BookController extends AbstractController
 
     #[Route('/creation', name: 'livres_creation', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $em, HttpClientInterface $client): JsonResponse {
+    /** @var Utilisateur $user */
+    $user = $this->getUser();
+        if (!$user instanceof Utilisateur) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Utilisateur non connecté.'
+            ], 401);
+        }
+
         $data = json_decode($request->getContent(), true);
 
         $bookTitle = trim($data['title'] ?? '');
@@ -203,6 +213,8 @@ class BookController extends AbstractController
         $book->setPublishers(!empty($bookInfo['publisher']) ? [$bookInfo['publisher']] : []);
         $book->setGenres($bookInfo['categories'] ?? []);
         $book->setSubjects($bookInfo['categories'] ?? []);
+
+        $book->setUtilisateur($this->getUser());
 
         $em->persist($book);
         $em->flush();

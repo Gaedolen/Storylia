@@ -1,119 +1,111 @@
+/* === Général === */
 body {
+    font-family: 'Comfortaa', sans-serif;
     background-color: #FAF3E0;
-    color: #3B2F2F;
-    font-family: "Segoe UI", sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
-/* Conteneur principal */
 .admin-dashboard {
-    max-width: 1100px;
-    margin: 60px auto;
-    padding: 40px;
-    background-color: #FAF3E0;
+    max-width: 1300px;
+    margin: 50px auto;
+    padding: 30px;
 }
 
-/* Titre */
+/* === Titres === */
 .admin-dashboard h1 {
-    font-size: 2.4rem;
+    font-size: 2rem;
     color: #714B2F;
-    margin-bottom: 15px;
-    text-align: center;
+    margin-bottom: 0.5rem;
 }
 
-/* Intro */
 .admin-intro {
-    text-align: center;
-    font-size: 1.1rem;
     color: #6B6B6B;
-    margin-bottom: 50px;
+    margin-bottom: 2rem;
 }
 
-/* Zone des actions */
-.admin-actions {
+/* === Résumé général === */
+.dashboard-summary {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
     margin-bottom: 40px;
 }
 
-/* Boutons génériques */
-.admin-actions a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-
-    padding: 25px 20px;
+.summary-card {
+    background-color: #E8CBAE;
     border-radius: 12px;
-    font-size: 1.05rem;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.summary-card:hover {
+    transform: translateY(-3px);
+}
+
+.summary-title {
+    font-weight: bold;
+    color: #5F7F5F;
+    margin-bottom: 10px;
+}
+
+.summary-value {
+    font-size: 1.8rem;
+    color: #3B2F2F;
+    font-weight: 600;
+}
+
+/* === Sections === */
+.dashboard-section {
+    margin-bottom: 40px;
+}
+
+.dashboard-section h2 {
+    color: #714B2F;
+    margin-bottom: 15px;
+}
+
+/* === Boutons === */
+.admin-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.admin-actions a {
+    flex: 1 1 200px;
+    text-align: center;
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
     font-weight: 600;
     text-decoration: none;
-
-    background-color: #E8CBAE;
-    color: #3B2F2F;
-
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
-    transition: all 0.25s ease;
+    border-radius: 10px;
+    color: #FAF3E0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
 }
 
-/* Hover commun */
 .admin-actions a:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.15);
 }
 
-/* Variantes par action */
-.btn-import {
-    border-left: 6px solid #C97C5D;
-}
+.btn-import { background-color: #C97C5D; }
+.btn-ajout { background-color: #714B2F; }
+.btn-employe { background-color: #5F7F5F; }
+.btn-utilisateur { background-color: #A67856; }
+.btn-livres { background-color: #C97C5D; }
 
-.btn-ajout {
-    border-left: 6px solid #5F7F5F;
-}
-
-.btn-employe {
-    border-left: 6px solid #A67856;
-}
-
-.btn-utilisateur {
-    border-left: 6px solid #714B2F;
-}
-
-/* Hover accentué */
-.btn-import:hover,
-.btn-ajout:hover,
-.btn-employe:hover,
-.btn-utilisateur:hover {
-    background-color: #C97C5D;
-    color: #FAF3E0;
-}
-
-/* Flash messages */
+/* === Flash messages === */
 .alert {
-    padding: 15px 20px;
+    padding: 0.8rem 1rem;
     border-radius: 8px;
-    margin-top: 20px;
-    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
 }
 
-.alert-success {
-    background-color: #5F7F5F;
-    color: #FAF3E0;
-}
-
+.alert-success { background-color: #DFF0D8; color: #3B2F2F; }
 .alert-error,
-.alert-danger {
-    background-color: #C97C5D;
-    color: #FAF3E0;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .admin-dashboard {
-        padding: 25px 20px;
-    }
-
-    .admin-dashboard h1 {
-        font-size: 2rem;
-    }
-}
+.alert-danger { background-color: #F8D7DA; color: #3B2F2F; }

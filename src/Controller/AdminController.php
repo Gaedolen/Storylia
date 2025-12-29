@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Service\BookApiService;
 use App\Service\BookCreationService;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -21,16 +23,53 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Book;
 use App\Entity\Author;
 use App\Repository\UtilisateurRepository;
+use App\Repository\BookRepository;
+use App\Repository\ClubRepository;
 
 #[IsGranted('ROLE_ADMIN')]
 #[Route('/admin')]
 class AdminController extends AbstractController
 {
     #[Route('/dashboard', name: 'admin_dashboard')]
-    public function index(): Response
-    {
+    public function index(BookRepository $bookRepository, ClubRepository $clubRepository, UtilisateurRepository $userRepository): Response {
+        // Livres totaux
+        $totalBooks = $bookRepository->count([]);
+
+        // Clubs créés
+        $totalClubs = $clubRepository->count([]);
+
+        // Utilisateurs "classiques" (pas admin ni employés)
+        $totalUsers = $userRepository->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->join('u.role', 'r')
+            ->where('r.label = :label')
+            ->setParameter('label', 'ROLE_USER')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // Participants aux clubs (chaque utilisateur compte 1 seule fois)
+        $allUsersInClubs = $clubRepository->createQueryBuilder('c')
+            ->select('m.id')
+            ->join('c.membres', 'm')
+            ->getQuery()
+            ->getScalarResult();
+
+        $userIds = array_unique(array_column($allUsersInClubs, 'id'));
+        $totalParticipants = count($userIds);
+
+        // Livres créés par les utilisateurs
+        $totalUserBooks = $bookRepository->createQueryBuilder('b')
+            ->select('COUNT(b.id)')
+            ->where('b.utilisateur IS NOT NULL')
+            ->getQuery()
+            ->getSingleScalarResult();
+
         return $this->render('admin/dashboard.html.twig', [
-            'controller_name' => 'AdminController',
+            'totalBooks' => $totalBooks,
+            'totalClubs' => $totalClubs,
+            'totalUsers' => $totalUsers,
+            'totalParticipants' => $totalParticipants,
+            'totalUserBooks' => $totalUserBooks,
         ]);
     }
 
@@ -202,7 +241,7 @@ class AdminController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function employes(UtilisateurRepository $userRepository): Response
     {
-        $employes = $userRepository->findEmployes();
+        $employes = $userRepository->findByRoleLibelle('EMPLOYE');
 
         return $this->render('admin/employes.html.twig', [
             'employes' => $employes
@@ -275,5 +314,113 @@ class AdminController extends AbstractController
 
         $this->addFlash('success', 'Employé supprimé avec succès.');
         return $this->redirectToRoute('admin_employes');
+    }
+
+    #[Route('/utilisateurs', name: 'admin_gestion_utilisateurs')]
+    public function gestionUtilisateurs(EntityManagerInterface $em, UtilisateurRepository $userRepository): Response {
+        $users = $userRepository->findByRoleLibelle('USER');
+
+        $reports = $em->getRepository(Report::class)->findAll();
+
+        $reportsByUser = [];
+        foreach ($reports as $report) {
+            $reportedBy = $report->getAuthor();
+            $reportedUser = $report->getReported();
+
+            if (!$reportedBy || !$reportedUser) continue;
+            if ($reportedBy->getRole()->getLabel() !== 'EMPLOYE') continue;
+
+            $userId = $reportedUser->getId();
+            $reportsByUser[$userId][] = $report;
+        }
+
+        return $this->render('admin/gestion_utilisateurs.html.twig', [
+            'users' => $users,
+            'reportsByUser' => $reportsByUser,
+        ]);
+    }
+
+    #[Route('/utilisateur/suspendre/{id}', name: 'admin_suspendre_utilisateur', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function suspendreUtilisateur(int $id, Request $request, UtilisateurRepository $userRepository, EntityManagerInterface $em, MailerInterface $mailer): JsonResponse
+    {
+        $user = $userRepository->find($id);
+        if (!$user) {
+            return $this->json(['success' => false, 'error' => 'Utilisateur non trouvé'], 404);
+        }
+
+        $data = json_decode($request->getContent(), true) ?? [];
+        $csrfToken = $data['_token'] ?? null;
+
+        if (!$csrfToken || !$this->isCsrfTokenValid('suspend_user_' . $user->getId(), $csrfToken)) {
+            return $this->json(['success' => false, 'error' => 'Token CSRF invalide'], 400);
+        }
+
+        $reason = $data['reason'] ?? '';
+        if ($reason === 'autres') $reason = $data['otherReason'] ?? '';
+
+        $user->setStatus(Utilisateur::STATUS_SUSPENDU);
+        $user->setSuspendReason($reason);
+        $em->flush();
+
+        if ($user->getEmail()) {
+            $email = (new TemplatedEmail())
+                ->from('storylia@gmail.com')
+                ->to($user->getEmail())
+                ->subject('Votre compte a été suspendu')
+                ->htmlTemplate('emails/suspension_utilisateur.html.twig')
+                ->context(['user' => $user, 'reason' => $reason]);
+            $mailer->send($email);
+        }
+
+        $unsuspendToken = $this->container->get('security.csrf.token_manager')
+            ->getToken('unsuspend_user_' . $user->getId())
+            ->getValue();
+
+        return $this->json([
+            'success' => true,
+            'userId' => $user->getId(),
+            'unsuspendToken' => $unsuspendToken
+        ]);
+    }
+
+    #[Route('/utilisateur/unsuspendre/{id}', name: 'admin_unsuspendre_utilisateur', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function unsuspendUser(int $id, Request $request, UtilisateurRepository $userRepository, EntityManagerInterface $em, MailerInterface $mailer, CsrfTokenManagerInterface $csrfTokenManager
+    ): JsonResponse
+    {
+        $user = $userRepository->find($id);
+        if (!$user) {
+            return $this->json(['success' => false, 'error' => 'Utilisateur non trouvé'], 404);
+        }
+
+        $data = json_decode($request->getContent(), true) ?? [];
+        $csrfToken = $data['_token'] ?? null;
+
+        if (!$csrfToken || !$this->isCsrfTokenValid('unsuspend_user_' . $user->getId(), $csrfToken)) {
+            return $this->json(['success' => false, 'error' => 'Token CSRF invalide'], 400);
+        }
+
+        $user->setStatus(Utilisateur::STATUS_ACTIF);
+        $user->setSuspendReason(null);
+        $em->flush();
+
+        if ($user->getEmail()) {
+            $email = (new TemplatedEmail())
+                ->from('storylia@gmail.com')
+                ->to($user->getEmail())
+                ->subject('Votre compte a été réactivé')
+                ->htmlTemplate('emails/reactivation_utilisateur.html.twig')
+                ->context(['user' => $user]);
+            $mailer->send($email);
+        }
+
+        $suspendToken = $csrfTokenManager->getToken('suspend_user_' . $user->getId())->getValue();
+
+        return $this->json([
+            'success' => true,
+            'userId' => $user->getId(),
+            'suspendToken' => $suspendToken
+        ]);
     }
 }

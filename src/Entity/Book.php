@@ -81,6 +81,10 @@ class Book
     #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'book')]
     private Collection $votes;
 
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'books')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Utilisateur $utilisateur = null;
+
     // Constructeur
     public function __construct()
     {
@@ -305,5 +309,16 @@ class Book
     public function getVotes(): Collection
     {
         return $this->votes;
+    }
+
+    public function getUtilisateur(): ?Utilisateur
+    {
+        return $this->utilisateur;
+    }
+
+    public function setUtilisateur(?Utilisateur $utilisateur): self
+    {
+        $this->utilisateur = $utilisateur;
+        return $this;
     }
 }
