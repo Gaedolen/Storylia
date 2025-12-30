@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use App\Repository\ReviewRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -34,6 +36,15 @@ class Review
     #[ORM\ManyToOne(targetEntity: Author::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?Author $author = null;
+
+    #[ORM\OneToMany(mappedBy: 'review', targetEntity: Report::class, orphanRemoval: true)]
+    private Collection $reports;
+
+    public function __construct()
+    {
+        $this->date = new \DateTime();
+        $this->reports = new ArrayCollection();
+    }
 
     // Getters et setters
 
@@ -107,6 +118,30 @@ class Review
     public function setAuthor(?Author $author): static
     {
         $this->author = $author;
+        return $this;
+    }
+
+    public function getReports(): Collection
+    {
+        return $this->reports;
+    }
+
+    public function addReport(Report $report): static
+    {
+        if (!$this->reports->contains($report)) {
+            $this->reports->add($report);
+            $report->setReview($this);
+        }
+        return $this;
+    }
+
+    public function removeReport(Report $report): static
+    {
+        if ($this->reports->removeElement($report)) {
+            if ($report->getReview() === $this) {
+                $report->setReview(null);
+            }
+        }
         return $this;
     }
 }

@@ -1,0 +1,85 @@
+/* === Général === */
+body {
+    font-family: 'Comfortaa', sans-serif;
+    background-color: #FAF3E0;
+    margin: 0;
+    padding: 0;
+}
+
+.employe-dashboard {
+    max-width: 1300px;
+    margin: 50px auto;
+    padding: 30px;
+}
+
+/* === Titres === */
+.employe-dashboard h1 {
+    font-size: 2rem;
+    color: #714B2F;
+    margin-bottom: 0.5rem;
+}
+
+.employe-intro {
+    color: #6B6B6B;
+    margin-bottom: 2.5rem;
+}
+
+/* === Sections === */
+.dashboard-section {
+    margin-bottom: 40px;
+}
+
+.dashboard-section h2 {
+    color: #714B2F;
+    margin-bottom: 15px;
+}
+
+/* === Actions === */
+.employe-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.employe-actions a {
+    flex: 1 1 240px;
+    text-align: center;
+    padding: 1.2rem 1.5rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 12px;
+    color: #FAF3E0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.employe-actions a:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+}
+
+/* === Couleurs boutons === */
+.btn-moderation {
+    background-color: #C97C5D;
+}
+
+.btn-livres {
+    background-color: #5F7F5F;
+}
+
+.btn-livres-site{
+    background-color: #6B6B6B;
+}
+
+.btn-utilisateur {
+    background-color: #A67856;
+}
+
+.btn-club {
+    background-color: #714B2F;
+}
+
+.btn-message {
+    background-color: #3B2F2F;
+}

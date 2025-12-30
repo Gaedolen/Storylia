@@ -32,8 +32,20 @@ class Report
     private ?Utilisateur $author = null;
 
     #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'signalementsRecus')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Utilisateur $reported = null;
+
+    #[ORM\ManyToOne(targetEntity: Review::class, inversedBy: 'reports')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    private ?Review $review = null;
+
+    #[ORM\ManyToOne(targetEntity: Club::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Club $reportedClub = null;
+
+    #[ORM\ManyToOne(targetEntity: Book::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Book $reportedBook = null;
 
     public function __construct()
     {
@@ -120,6 +132,39 @@ class Report
     public function setReported(?Utilisateur $reported): static
     {
         $this->reported = $reported;
+        return $this;
+    }
+
+    public function getReview(): ?Review
+    {
+        return $this->review;
+    }
+
+    public function setReview(?Review $review): static
+    {
+        $this->review = $review;
+        return $this;
+    }
+
+    public function getReportedClub(): ?Club
+    {
+        return $this->reportedClub;
+    }
+
+    public function setReportedClub(?Club $club): static
+    {
+        $this->reportedClub = $club;
+        return $this;
+    }
+
+    public function getReportedBook(): ?Book
+    {
+        return $this->reportedBook;
+    }
+
+    public function setReportedBook(?Book $book): static
+    {
+        $this->reportedBook = $book;
         return $this;
     }
 }

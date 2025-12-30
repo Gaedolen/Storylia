@@ -7,16 +7,36 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Dashboard Employé</h1>
+    <div class="employe-dashboard">
 
-    <h2>Avis et livres</h2>
-    <a href="#"><button>Modération des avis signalés</button></a>
-    <a href="#"><button>Gestion des livres signalés</button></a>
+        <h1>Dashboard Employé</h1>
+        <p class="employe-intro">
+            Espace de gestion et de modération réservé aux employés.
+        </p>
 
-    <h2>Utilisateurs et clubs</h2>
-    <a href="#"><button>Utilisateurs problématiques</button></a>
-    <a href="#"><button>Clubs problématiques</button></a>
+        <div class="dashboard-section">
+            <h2>Avis et livres</h2>
+            <div class="employe-actions">
+                <a href="{{ path('employe_avis_signales') }}" class="btn-moderation">Modération des avis signalés</a>
+                <a href="#" class="btn-livres">Gestion des livres signalés</a>
+                <a href="{{ path('app_recherche_livre') }}" class="btn-livres-site">Gestion des livres du site</a>
+            </div>
+        </div>
 
-    <h2>Messagerie</h2>
-    <a href="#"><button>Messagerie Employés / Admin</button></a>
+        <div class="dashboard-section">
+            <h2>Utilisateurs et clubs</h2>
+            <div class="employe-actions">
+                <a href="#" class="btn-utilisateur">Utilisateurs problématiques</a>
+                <a href="#" class="btn-club">Clubs problématiques</a>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <h2>Messagerie</h2>
+            <div class="employe-actions">
+                <a href="#" class="btn-message">Messagerie Employés / Admin</a>
+            </div>
+        </div>
+
+    </div>
 {% endblock %}

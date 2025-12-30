@@ -16,6 +16,17 @@ class ReviewRepository extends ServiceEntityRepository
         parent::__construct($registry, Review::class);
     }
 
+    public function findSignaled(): array
+    {
+        return $this->createQueryBuilder('r')
+            ->innerJoin('r.reports', 'rep')
+            ->where('rep.status = :status')
+            ->setParameter('status', \App\Entity\Report::STATUS_EN_COURS)
+            ->orderBy('rep.date', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Review[] Returns an array of Review objects
     //     */

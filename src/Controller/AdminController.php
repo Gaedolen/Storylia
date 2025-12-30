@@ -258,11 +258,12 @@ class AdminController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Vérifier ou créer le rôle EMPLOYE
-            $role = $em->getRepository(Role::class)->findOneBy(['label' => 'EMPLOYE']);
+            $role = $em->getRepository(Role::class)->findOneBy(['label' => 'ROLE_EMPLOYE']);
             if (!$role) {
                 $role = new Role();
-                $role->setLabel('EMPLOYE');
+                $role->setLabel('ROLE_EMPLOYE'); // <-- bien mettre ROLE_ devant
                 $em->persist($role);
+                $em->flush(); // pour être sûr que l'id est généré
             }
 
             $employe->setRole($role);

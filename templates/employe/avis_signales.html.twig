@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Avis signalés{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/employe/avis_signales.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="employe-dashboard">
+
+    <h1>Avis signalés</h1>
+    <p class="admin-intro">Liste des avis signalés par les utilisateurs.</p>
+
+    {% if avis is empty %}
+        <p>Aucun avis signalé</p>
+    {% else %}
+        <div class="dashboard-section">
+            {% for review in avis %}
+                <div class="summary-card">
+
+                    <p><strong>Livre :</strong> {{ review.book.title }}</p>
+                    <p><strong>Auteur :</strong> {{ review.utilisateur.pseudo }}</p>
+                    <p><strong>Note :</strong> {{ review.rating }}/5</p>
+                    <p><strong>Commentaire :</strong><br>{{ review.comment }}</p>
+
+                    <div class="admin-actions">
+                        <a href="#" class="btn-ajout">Valider</a>
+                        <a href="#" class="btn-import">Supprimer</a>
+                        <a href="#" class="btn-utilisateur">Voir signalements</a>
+                    </div>
+
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
