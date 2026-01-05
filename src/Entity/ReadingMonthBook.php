@@ -10,7 +10,7 @@ class ReadingMonthBook
     #[ORM\Id, ORM\GeneratedValue, ORM\Column(type:"integer")]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: ClubReadingMonth::class, inversedBy: "proposedBooks")]
+    #[ORM\ManyToOne(targetEntity: ClubReadingMonth::class, inversedBy: "bookProposals")]
     #[ORM\JoinColumn(nullable: false)]
     private ?ClubReadingMonth $readingMonth = null;
 

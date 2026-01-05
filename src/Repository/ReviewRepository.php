@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Review;
+use App\Entity\Book;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -23,6 +24,18 @@ class ReviewRepository extends ServiceEntityRepository
             ->where('rep.status = :status')
             ->setParameter('status', \App\Entity\Report::STATUS_EN_COURS)
             ->orderBy('rep.date', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByBookPaginated(Book $book, int $limit, int $offset): array
+    {
+        return $this->createQueryBuilder('r')
+            ->where('r.book = :book')
+            ->setParameter('book', $book)
+            ->orderBy('r.date', 'DESC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
             ->getQuery()
             ->getResult();
     }

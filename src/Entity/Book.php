@@ -9,12 +9,13 @@ use App\Entity\Club;
 use App\Entity\Review;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\UniqueConstraint;
 
 #[ORM\Entity]
 #[ORM\Table(
     name: "book",
     uniqueConstraints: [
-        new ORM\UniqueConstraint(name: "unique_title", columns: ["title"])
+        new UniqueConstraint(name: "unique_title", columns: ["title"])
     ]
 )]
 
@@ -75,12 +76,6 @@ class Book
     #[ORM\OneToMany(mappedBy: 'book', targetEntity: Review::class, cascade: ['remove'])]
     private Collection $reviews;
 
-    /**
-     * @var Collection<int, Vote>
-     */
-    #[ORM\OneToMany(targetEntity: Vote::class, mappedBy: 'book')]
-    private Collection $votes;
-
     #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'books')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Utilisateur $utilisateur = null;
@@ -89,7 +84,6 @@ class Book
     public function __construct()
     {
         $this->reviews = new ArrayCollection();
-        $this->votes = new ArrayCollection();
     }
 
     // Getters & Setters
@@ -232,17 +226,6 @@ class Book
         return $this;
     }
 
-    public function isVoted(): bool
-    {
-        return $this->voted;
-    }
-
-    public function setVoted(bool $voted): static
-    {
-        $this->voted = $voted;
-        return $this;
-    }
-
     public function getClub(): ?Club
     {
         return $this->club;
@@ -303,13 +286,6 @@ class Book
         return $count > 0 ? round($total / $count, 1) : null;
     }
 
-    /**
-     * @return Collection<int, Vote>
-     */
-    public function getVotes(): Collection
-    {
-        return $this->votes;
-    }
 
     public function getUtilisateur(): ?Utilisateur
     {

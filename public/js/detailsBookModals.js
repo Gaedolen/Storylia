@@ -430,65 +430,122 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Modal de note
+    // ==========================
+    // MODAL DE NOTE
+    // ==========================
     const leaveBtn = document.getElementById('leave-rating-btn');
-    const rateUrl = leaveBtn.dataset.rateUrl;
     const modal = document.getElementById('rating-modal');
-    const stars = document.querySelectorAll('#rating-stars .star');
-    const ratingValue = document.getElementById('rating-value');
-    const submitBtn = document.getElementById('submit-rating-btn');
-    let selectedRating = 0;
 
-    leaveBtn?.addEventListener('click', () => openModal(modal));
+    if (leaveBtn && modal) {
 
-    document.getElementById('close-rating-btn')
-        ?.addEventListener('click', () => closeModal(modal));
+        const rateUrl = leaveBtn.dataset.rateUrl;
+        const stars = modal.querySelectorAll('#rating-stars .star');
+        const ratingValue = modal.querySelector('#rating-value');
+        const submitBtn = modal.querySelector('#submit-rating-btn');
+        let selectedRating = 0;
 
-    setupCloseOutside(modal);
+        leaveBtn.addEventListener('click', () => openModal(modal));
 
-    // Hover / Click étoiles
-    stars.forEach(star => {
-        star.addEventListener('mouseover', () => highlightStars(star.dataset.value));
-        star.addEventListener('mouseout', () => highlightStars(selectedRating));
-        star.addEventListener('click', () => {
-            selectedRating = star.dataset.value;
-            ratingValue.textContent = selectedRating;
-            highlightStars(selectedRating);
+        modal.querySelector('#close-rating-btn')
+            ?.addEventListener('click', () => closeModal(modal));
+
+        setupCloseOutside(modal);
+
+        // Hover / Click étoiles
+        stars.forEach(star => {
+            star.addEventListener('mouseover', () => highlightStars(star.dataset.value));
+            star.addEventListener('mouseout', () => highlightStars(selectedRating));
+            star.addEventListener('click', () => {
+                selectedRating = star.dataset.value;
+                ratingValue.textContent = selectedRating;
+                highlightStars(selectedRating);
+            });
         });
-    });
 
-    function highlightStars(val) {
-        stars.forEach(s => {
-            s.textContent = s.dataset.value <= val ? '★' : '☆';
+        function highlightStars(val) {
+            stars.forEach(s => {
+                s.textContent = s.dataset.value <= val ? '★' : '☆';
+            });
+        }
+
+        // Envoi
+        submitBtn?.addEventListener('click', () => {
+            if (selectedRating == 0) {
+                alert("Veuillez sélectionner une note.");
+                return;
+            }
+
+            fetch(rateUrl, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                body: JSON.stringify({ rating: selectedRating })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    leaveBtn.textContent = "Note laissée ✓";
+                    leaveBtn.disabled = true;
+                    closeModal(modal);
+                } else {
+                    alert(data.message);
+                }
+            });
         });
     }
 
-    // Envoi de la note
-    submitBtn.addEventListener('click', () => {
-        if (selectedRating == 0) {
-            alert("Veuillez sélectionner une note.");
-            return;
-        }
+    // ==========================
+    // MODAL SIGNALER AVIS
+    // ==========================
+    const reportModal = document.getElementById('report-modal');
+    const form = document.getElementById('report-form');
+    const reviewIdInput = document.getElementById('report-review-id');
 
-        fetch(rateUrl, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': csrfToken,
-            },
-            body: JSON.stringify({ rating: selectedRating })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                leaveBtn.textContent = "Note laissée ✓";
-                leaveBtn.disabled = true;
-                closeModal(modal);
+    if (reportModal && form && reviewIdInput) {
+
+        document.querySelectorAll('.review-report-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                reviewIdInput.value = btn.dataset.reviewId;
+                reportModal.style.display = 'flex';
+            });
+        });
+
+        reportModal.querySelector('.close')
+            ?.addEventListener('click', () => {
+                reportModal.style.display = 'none';
+                form.reset();
+            });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const payload = {
+                reviewId: reviewIdInput.value,
+                reason: document.getElementById('report-reason').value,
+                message: document.getElementById('report-message').value
+            };
+
+            const response = await fetch('/report/review', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert('Signalement envoyé');
+                reportModal.style.display = 'none';
+                form.reset();
             } else {
-                alert(data.message);
+                alert(result.message || 'Erreur lors du signalement');
             }
-        })
-        .catch(err => console.error(err));
-    });
+        });
+    }
 });

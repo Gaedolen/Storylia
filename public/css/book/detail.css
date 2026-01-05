@@ -235,15 +235,142 @@ body {
     box-shadow: 0 3px 8px rgba(0,0,0,0.1);
 }
 
-.review {
-    border-bottom: 1px solid #e0c69e;
-    padding: 10px 0;
+/* === Bulle d'avis === */
+.review-bubble {
+    display: flex;
+    background-color: #E8CBAE;
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    position: relative;
 }
 
-.review:last-child {
-    border-bottom: none;
+/* Queue de la bulle */
+.review-bubble::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -12px;
+    left: 50px;
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top: 12px solid #E8CBAE;
 }
 
+/* Colonne utilisateur */
+.review-user {
+    width: 110px;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+.review-user img {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #d7b08a;
+    margin-bottom: 6px;
+}
+
+.review-username {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #714B2F;
+}
+
+/* Séparateur */
+.review-separator {
+    width: 1px;
+    margin: 0 20px;
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(0,0,0,0.25),
+        transparent
+    );
+}
+
+/* -- Contenu des avis -- */
+.review-content {
+    flex: 1;
+}
+
+/* Header */
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.review-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.review-date {
+    font-size: 0.85rem;
+    color: #6B6B6B;
+}
+
+/* Badge catégorie */
+.review-category-badge {
+    background-color: #c97c5d;
+    color: white;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+/* Bouton signaler */
+.review-report-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    opacity: 0.6;
+    transition: 0.2s ease;
+}
+
+.review-report-btn:hover {
+    opacity: 1;
+    transform: scale(1.15);
+}
+
+.report-icon {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: #8b0000;
+    stroke-width: 2;
+}
+
+.reported-badge {
+    background-color: #ffcc00;
+    color: #4b2e05;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.8rem;
+    margin-left: 5px;
+}
+
+/* Texte */
+.review-text p {
+    margin: 0;
+    color: #3B2F2F;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+/* Pagination */
 .pagination {
     text-align: center;
     margin-top: 20px;
@@ -1010,12 +1137,12 @@ body {
 
 /* Styles pour les <a> qui remplacent les boutons si non connecté */
 a.btn-main {
-    display: inline-block;       /* comme un bouton */
-    text-decoration: none;       /* supprime le souligné */
-    text-align: center;          /* texte centré */
-    padding: 10px 15px;          /* même padding que tes boutons */
-    border-radius: 10px;         /* coins arrondis */
-    color: #fff;                 /* texte blanc */
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+    padding: 10px 15px;
+    border-radius: 10px;
+    color: #fff;
     cursor: pointer;
     transition: 0.2s ease;
 }
@@ -1024,7 +1151,7 @@ a.btn-main:hover {
     transform: scale(1.05);
 }
 
-/* === Liste des sujets affichés sous forme de badges === */
+/* Liste des sujets affichés sous forme de badges */
 .book-subjects {
     margin-top: 15px;
 }
@@ -1037,4 +1164,39 @@ a.btn-main:hover {
     margin: 3px;
     border-radius: 8px;
     font-size: 0.9rem;
+}
+
+/* Modal de report avis */
+#report-modal textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #c6a874;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+#report-modal .char-count {
+    text-align: right;
+    font-size: 0.85rem;
+    color: #4b2e05;
+    margin-top: 5px;
+}
+
+#report-form label {
+    font-weight: 600;
+    margin-top: 6px;
+}
+
+#report-form select,
+#report-form textarea {
+    width: 100%;
+    display: block;
+}
+
+#report-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }

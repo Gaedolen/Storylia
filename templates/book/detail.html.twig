@@ -234,51 +234,74 @@
 
             {% for review in reviews %}
                 <div class="review-bubble">
-                    <!-- Profil utilisateur -->
+
+                    <!-- COLONNE UTILISATEUR -->
                     <div class="review-user">
-                        <img 
-                            src="{{ review.utilisateur.avatar ?? asset('images/default-avatar.png') }}"
-                            alt="Avatar {{ review.utilisateur.pseudo }}"
+                        <img
+                            src="{{ asset('uploads/profiles/' ~ review.utilisateur.profilePicture) }}"
+                            alt="Photo {{ review.utilisateur.pseudo }}"
                         >
                         <span class="review-username">
                             {{ review.utilisateur.pseudo }}
                         </span>
                     </div>
 
-                    <!-- Séparateur -->
+                    <!-- SÉPARATEUR -->
                     <div class="review-separator"></div>
 
-                    <!-- Contenu de l’avis -->
+                    <!-- CONTENU AVIS -->
                     <div class="review-content">
-                        <!-- Header -->
+
+                        <!-- HEADER -->
                         <div class="review-header">
-                            <div class="review-meta">
+
+                            <div class="review-header-left">
                                 <span class="review-date">
                                     {{ review.date|date('d/m/Y') }}
                                 </span>
-                                <span class="review-category">
-                                    {{ review.category.name ?? 'Non classé' }}
+
+                                {% set shelf = bookshelvesByUser[review.utilisateur.id] ?? null %}
+                                <span class="review-category-badge">
+                                    {% if shelf and shelf.readingStatus %}
+                                        {{ prettyStatuses[shelf.readingStatus.label]
+                                            ?? shelf.readingStatus.label|replace({'_': ' '})|capitalize
+                                        }}
+                                    {% else %}
+                                        Non classé
+                                    {% endif %}
                                 </span>
                             </div>
 
-                            <!-- Bouton signaler -->
-                            <a
-                                href="{{ path('review_report', { id: review.id }) }}"
-                                class="review-report-btn"
-                                title="Signaler un problème"
-                            >
-                                🚫
-                            </a>
+                            <!-- BOUTON SIGNALER -->
+                            {% if review.reports|length > 0 %}
+                                <span class="reported-badge" title="Cet avis a déjà été signalé">⚠️ Signalé</span>
+                            {% else %}
+                                {% if app.user and app.user.id != review.utilisateur.id %}
+                                    <button
+                                        type="button"
+                                        class="review-report-btn"
+                                        data-modal="report-modal"
+                                        data-review-id="{{ review.id }}"
+                                        title="Signaler cet avis"
+                                    >
+                                        <svg class="report-icon" viewBox="0 0 24 24">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <rect x="6" y="11" width="12" height="2"/>
+                                        </svg>
+                                    </button>
+                                {% endif %}
+                            {% endif %}
+
                         </div>
 
-                        <!-- Texte de l’avis -->
+                        <!-- TEXTE -->
                         <div class="review-text">
                             <p>{{ review.comment }}</p>
-                            <span class="review-rating">
-                                Note : {{ review.rating }}/5
-                            </span>
                         </div>
+
                     </div>
+                </div>
+
                 </div>
             {% else %}
                 <p>Aucun avis pour le moment.</p>
@@ -291,6 +314,42 @@
                     {% endfor %}
                 </div>
             {% endif %}
+        </div>
+    </div>
+
+    {# Modal de report avis #}
+    <div id="report-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+
+            <h3>Signaler un avis</h3>
+
+            <form id="report-form">
+                <input type="hidden" name="review_id" id="report-review-id">
+
+                <label>Motif</label>
+                <select name="reason" id="report-reason" required>
+                    <option value="">-- Choisir un motif --</option>
+                    <option value="contenu_inapproprie">Contenu inapproprié</option>
+                    <option value="spoiler">Orthographe</option>
+                    <option value="harcelement">Harcèlement / attaque</option>
+                    <option value="autre">Autre</option>
+                </select>
+
+                <label>Message</label>
+                <textarea
+                    name="message"
+                    id="report-message"
+                    maxlength="300"
+                    required
+                    placeholder="Explique brièvement le problème..."></textarea>
+
+                <div class="char-count" id="report-char-count">0 / 300</div>
+
+                <input type="hidden" name="_token" value="{{ csrf_token('report_review') }}">
+
+                <button type="submit" class="btn-main">Valider</button>
+            </form>
         </div>
     </div>
 
@@ -356,6 +415,23 @@
 
     <script>
         const csrfToken = '{{ csrf_token("review_rating") }}';
+    </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const textarea = document.getElementById('report-message');
+            const counter = document.getElementById('report-char-count');
+
+            if (!textarea || !counter) return;
+
+            // Initialiser compteur
+            counter.textContent = `${textarea.value.length} / ${textarea.maxLength}`;
+
+            // Mettre à jour au fur et à mesure
+            textarea.addEventListener('input', () => {
+                counter.textContent = `${textarea.value.length} / ${textarea.maxLength}`;
+            });
+        });
     </script>
 
 {% endblock %}

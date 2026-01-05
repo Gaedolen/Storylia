@@ -241,12 +241,21 @@ class BookController extends AbstractController
         $totalReviews = count($book->getReviews());
         $totalPages = ceil($totalReviews / $reviewsPerPage);
 
-        $reviews = $reviewRepo->findBy(
-            ['book' => $book],
-            ['date' => 'DESC'],
+        $reviews = $reviewRepo->findByBookPaginated(
+            $book,
             $reviewsPerPage,
             ($page - 1) * $reviewsPerPage
         );
+
+        $bookshelvesByUser = [];
+
+        if ($reviews) {
+            $entries = $bookshelfRepo->findBy(['book' => $book]);
+
+            foreach ($entries as $entry) {
+                $bookshelvesByUser[$entry->getUtilisateur()->getId()] = $entry;
+            }
+        }
 
         // Tous les statuts de lecture
         $readingStatuses = $readingStatusRepository->findAll();
@@ -299,9 +308,24 @@ class BookController extends AbstractController
             ]);
         }
 
+        // Afficher les catégories de manière plus esthétique
+        $prettyStatuses = [
+            'en_train_de_lire' => 'En train de lire',
+            'coup_de_coeur'    => 'Coup de cœur',
+            'adore'            => 'J’adore',
+            'apprecie'         => 'Apprécié',
+            'mitige'           => 'Mitigé',
+            'pas_aime'         => 'Pas aimé',
+            'lu_aussi'         => 'Lu',
+            'pal'              => 'Pile à lire',
+            'envies'           => 'Mes envies',
+        ];
+
+
         return $this->render('book/detail.html.twig', [
             'book' => $book,
             'reviews' => $reviews,
+            'bookshelvesByUser' => $bookshelvesByUser,
             'currentPage' => $page,
             'totalPages' => $totalPages,
             'isInLibrary' => $isInLibrary,
