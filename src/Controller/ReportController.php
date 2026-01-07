@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Report;
+use App\Entity\Book;
 use App\Entity\Review;
 use App\Repository\ReviewRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -68,6 +69,40 @@ class ReportController extends AbstractController
         $report->setReview($review);
         $report->setReason($data['reason']);
         $report->setMessage($data['message']);
+
+        $em->persist($report);
+        $em->flush();
+
+        return new JsonResponse(['success' => true]);
+    }
+
+    #[Route('/book', name: 'book', methods: ['POST'])]
+    public function reportBook(Request $request, EntityManagerInterface $em, CsrfTokenManagerInterface $csrfTokenManager): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) return new JsonResponse(['success' => false], 401);
+
+        $csrfToken = $request->headers->get('X-CSRF-TOKEN');
+        if (!$csrfToken || !$csrfTokenManager->isTokenValid(new CsrfToken('report_book', $csrfToken))) {
+            return new JsonResponse(['success' => false, 'message' => 'CSRF invalide.'], 403);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        if (!$data || empty($data['book_id']) || empty($data['reason'])) {
+            return new JsonResponse(['success' => false, 'message' => 'Données invalides.'], 400);
+        }
+
+        $book = $em->getRepository(Book::class)->find($data['book_id']);
+        if (!$book) {
+            return new JsonResponse(['success' => false, 'message' => 'Livre introuvable.'], 404);
+        }
+
+        $report = new Report();
+        $report->setAuthor($user);
+        $report->setReportedBook($book);
+        $report->setReason($data['reason']);
+        $report->setMessage($data['message'] ?? '');
+        $report->setStatus('en_cours');
 
         $em->persist($report);
         $em->flush();

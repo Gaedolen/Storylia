@@ -548,4 +548,82 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // ==================================
+    // MODAL SIGNALER UN PB SUR LE LIVRE
+    // ==================================
+    const reportBookModal = document.getElementById('report-book-modal');
+    const reportBookForm = document.getElementById('report-book-form');
+
+    if (reportBookModal && reportBookForm) {
+
+        const textarea = reportBookForm.querySelector('#report-book-message');
+        const counter = reportBookForm.querySelector('#report-book-char-count');
+
+        // Ouvrir modal
+        document.querySelectorAll('[data-modal="report-book-modal"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                openModal(reportBookModal);
+
+                // Initialiser le compteur
+                if (textarea && counter) {
+                    counter.textContent = `${textarea.value.length} / ${textarea.maxLength}`;
+                    textarea.focus();
+                }
+            });
+        });
+
+        // Fermer modal
+        const closeBtn = reportBookModal.querySelector('.close');
+        if (closeBtn) closeBtn.addEventListener('click', () => {
+            closeModal(reportBookModal);
+            reportBookForm.reset();
+            if (counter) counter.textContent = `0 / ${textarea.maxLength}`;
+        });
+
+        // Compteur dynamique
+        if (textarea && counter) {
+            textarea.addEventListener('input', () => {
+                counter.textContent = `${textarea.value.length} / ${textarea.maxLength}`;
+            });
+        }
+
+        // Soumission du formulaire
+        reportBookForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const payload = {
+                book_id: reportBookForm.querySelector('input[name="book_id"]').value,
+                reason: reportBookForm.querySelector('#report-book-reason').value,
+                message: textarea.value
+            };
+
+            const csrfToken = reportBookForm.querySelector('input[name="_token"]').value;
+
+            try {
+                const response = await fetch('/report/book', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Signalement envoyé !');
+                    closeModal(reportBookModal);
+                    reportBookForm.reset();
+                    if (counter) counter.textContent = `0 / ${textarea.maxLength}`;
+                } else {
+                    alert(result.message || 'Erreur lors du signalement.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Erreur réseau, réessayez.');
+            }
+        });
+    }
 });

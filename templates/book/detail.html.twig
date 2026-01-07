@@ -145,12 +145,15 @@
 
         <!-- Boutons additionnels à droite -->
         <div class="book-actions-right">
+
+            {# Bouton modification couverture #}
             {% if app.user %}
                 <button class="btn-main" data-modal="edit-cover-modal">Modifier la couverture</button>
             {% else %}
                 <a href="{{ path('app_login') }}" class="btn-main">Modifier la couverture</a>
             {% endif %}
 
+            {# Modal modification couverture #}
             <div class="modal" id="edit-cover-modal">
                 <div class="modal-content">
                     <span class="close">&times;</span>
@@ -166,6 +169,7 @@
                 </div>
             </div>
 
+            {# Bouton ajout de thèmes #}
             {% if book.subjects|length < 10 %}
                 {% if app.user %}
                     {% if book.subjects|length < 10 %}
@@ -176,6 +180,7 @@
                 {% endif %}
             {% endif %}
 
+            {# Modal ajout de thèmes #}
             <div class="modal" id="add-subject-modal" data-available="{{ availableSlots }}">
                 <div class="modal-content">
                     <span class="close">&times;</span>
@@ -197,12 +202,14 @@
                 </div>
             </div>
 
+            {# Bouton modification résumé #}
             {% if app.user %}
                 <button class="btn-main" data-modal="edit-summary-modal">Modifier le résumé</button>
             {% else %}
                 <a href="{{ path('app_login') }}" class="btn-main">Modifier le résumé</a>
             {% endif %}
 
+            {# Modal modification résumé #}
             <div class="modal" id="edit-summary-modal">
                 <div class="modal-content">
                     <span class="close">&times;</span>
@@ -215,6 +222,50 @@
                         <textarea name="summary" rows="6" maxlength="1000" placeholder="Nouveau résumé">{{ book.summary }}</textarea>
                         <p id="char-count">0 / 1000</p>
                         <button type="submit" class="btn-main" style="margin-top:10px;">Valider</button>
+                    </form>
+                </div>
+            </div>
+
+            {# Bouton signaler un pb sur le livre #}
+            {% if app.user %}
+                <button class="btn-main" data-modal="report-book-modal">Signaler un problème</button>
+            {% else %}
+                <a href="{{ path('app_login') }}" class="btn-main">Signaler un problème</a>
+            {% endif %}
+
+            {# Modal signaler un pb sur le livre #}
+            <div class="modal" id="report-book-modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+
+                    <h3>Signaler un problème sur ce livre</h3>
+
+                    <form id="report-book-form">
+                        <input type="hidden" name="book_id" value="{{ book.id }}">
+
+                        <label for="report-book-reason">Motif</label>
+                        <select name="reason" id="report-book-reason" required>
+                            <option value="">-- Choisir un motif --</option>
+                            <option value="titre_incorrect">Titre incorrect</option>
+                            <option value="mauvais_auteur">Auteur incorrect</option>
+                            <option value="themes_incorrects">Thème(s) incorrect(s)</option>
+                            <option value="resume_inexact">Résumé inexact</option>
+                            <option value="autre">Autre</option>
+                        </select>
+
+                        <label for="report-book-message">Message</label>
+                        <textarea
+                            name="message"
+                            id="report-book-message"
+                            maxlength="300"
+                            placeholder="Explique brièvement le problème..."
+                            required
+                        ></textarea>
+                        <div class="char-count" id="report-book-char-count">0 / 300</div>
+
+                        <input type="hidden" name="_token" value="{{ csrf_token('report_book') }}">
+
+                        <button type="submit" class="btn-main">Envoyer le signalement</button>
                     </form>
                 </div>
             </div>

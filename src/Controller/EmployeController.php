@@ -4,15 +4,17 @@ namespace App\Controller;
 
 use App\Repository\ReviewRepository;
 use App\Entity\Report;
+use App\Entity\Book;
 use App\Repository\ReportRepository;
+use App\Form\BookType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Symfony\Component\Mime\Email;
 
 
 #[Route('/employe')]
@@ -111,18 +113,71 @@ class EmployeController extends AbstractController
         ]);
     }
 
-    #[Route('/test-mail', name: 'test_mail')]
-public function testMail(MailerInterface $mailer): Response
-{
-    $email = (new Email())
-        ->from('no-reply@storylia.test')
-        ->to('test@mailtrap.io')
-        ->subject('Test Mailtrap OK')
-        ->text('Si tu vois ce mail, Mailtrap fonctionne.');
+    #[Route('/livres-signales', name: 'employe_livres_signales')]
+    public function livresSignales(ReportRepository $reportRepository): Response
+    {
+        // On récupère uniquement les reports sur des livres en cours
+        $reports = $reportRepository->findBy([
+            'status' => 'en_cours'
+        ]);
 
-    $mailer->send($email);
+        return $this->render('employe/livres_signales.html.twig', [
+            'reports' => $reports
+        ]);
+    }
 
-    return new Response('Mail envoyé');
-}
+    #[Route('/livres-signales/valider/{id}', name: 'employe_livre_valider', methods: ['POST'])]
+    public function validerLivre(int $id, ReportRepository $reportRepository, EntityManagerInterface $em): Response
+    {
+        $report = $reportRepository->find($id);
 
+        if (!$report) {
+            return $this->json(['success' => false, 'message' => 'Report introuvable.']);
+        }
+
+        // Supprime le report
+        $em->remove($report);
+        $em->flush();
+
+        return $this->json(['success' => true]);
+    }
+
+    #[Route('/employe/livre/{id}/edit', name: 'employe_livre_edit')]
+    #[IsGranted('ROLE_EMPLOYE')]
+    public function edit(Book $book, Request $request, EntityManagerInterface $em): Response
+    {
+        $report = $em->getRepository(Report::class)->findOneBy(
+            ['reportedBook' => $book],
+            ['date' => 'DESC']
+        );
+
+        $form = $this->createForm(BookType::class, $book);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $file = $form->get('cover')->getData();
+
+            if ($file) {
+                $filename = uniqid().'.'.$file->guessExtension();
+                $file->move(
+                    $this->getParameter('covers_directory'),
+                    $filename
+                );
+                $book->setCover('uploads/covers/'.$filename);
+            }
+
+
+            $em->flush();
+
+            $this->addFlash('success', 'Livre modifié !');
+            return $this->redirectToRoute('employe_livres_signales');
+        }
+
+        return $this->render('employe/livre_edit.html.twig', [
+            'form' => $form->createView(),
+            'book' => $book,
+            'report' => $report,
+        ]);
+    }
 }
