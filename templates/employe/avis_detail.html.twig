@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détail du signalement{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/employe/avis_detail.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="employe-dashboard">
+
+    <h1>Détail du signalement</h1>
+
+    <!-- Bloc Avis -->
+    <div class="card review-card">
+        <h2>Avis</h2>
+        <p><strong>Auteur :</strong> {{ review.utilisateur.pseudo }}</p>
+        <p><strong>Note :</strong> {{ review.rating }}/5</p>
+        <p><strong>Commentaire :</strong><br>{{ review.comment }}</p>
+
+        {% set report = review.reports|first %}
+        {% if report %}
+            <div class="report-section">
+                <h3>Signalement</h3>
+                <p><strong>Signalé par :</strong> {{ report.author.pseudo }}</p>
+                <p><strong>Date :</strong> {{ report.date|date('d/m/Y H:i') }}</p>
+                <p><strong>Raison :</strong> {{ report.reason }}</p>
+                <p><strong>Commentaire :</strong> {{ report.message }}</p>
+                <p><strong>Statut :</strong> 
+                    <span class="badge-status {{ report.status }}">{{ report.status|capitalize }}</span>
+                </p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Bloc Livre -->
+    <div class="card book-card">
+        <h2>Livre concerné</h2>
+        <div class="book-content">
+            <img src="{{ review.book.cover }}" alt="{{ review.book.title }}">
+            <div class="book-info">
+                <p><strong>Titre :</strong> {{ review.book.title }}</p>
+                <p><strong>Auteur :</strong> {{ review.book.author.name }}</p>
+                <p><strong>Genre(s) :</strong> 
+                    {% for genre in review.book.genres %}
+                        {{ genre }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </p>
+                <div class="summary">
+                    <h3>Résumé</h3>
+                    <p>{{ review.book.summary }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="{{ path('employe_avis_signales') }}" class="btn-retour">Retour</a>
+
+</div>
+{% endblock %}

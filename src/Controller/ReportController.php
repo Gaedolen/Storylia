@@ -66,7 +66,8 @@ class ReportController extends AbstractController
         $report->setAuthor($user);
         $report->setReported($review->getUtilisateur());
         $report->setReview($review);
-        $report->setMessage('[Motif : '.$data['reason'].'] '.$data['message']);
+        $report->setReason($data['reason']);
+        $report->setMessage($data['message']);
 
         $em->persist($report);
         $em->flush();

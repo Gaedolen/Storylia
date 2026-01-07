@@ -21,6 +21,9 @@ class Report
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $date = null;
 
+    #[ORM\Column(length: 50)]
+    private ?string $reason = null;
+
     #[ORM\Column(type: Types::TEXT)]
     private ?string $message = null;
 
@@ -49,8 +52,8 @@ class Report
 
     public function __construct()
     {
-        $this->date = new \DateTime();          // date du signalement à l’instant de création
-        $this->status = self::STATUS_EN_COURS;  // statut par défaut
+        $this->date = new \DateTime();
+        $this->status = self::STATUS_EN_COURS;
     }
 
     // Getters et setters
@@ -69,6 +72,17 @@ class Report
     {
         $this->date = $date;
 
+        return $this;
+    }
+
+    public function getReason(): ?string
+    {
+        return $this->reason;
+    }
+
+    public function setReason(string $reason): static
+    {
+        $this->reason = $reason;
         return $this;
     }
 

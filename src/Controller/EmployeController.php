@@ -4,11 +4,16 @@ namespace App\Controller;
 
 use App\Repository\ReviewRepository;
 use App\Entity\Report;
+use App\Repository\ReportRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mime\Email;
+
 
 #[Route('/employe')]
 #[IsGranted('ROLE_EMPLOYE')]
@@ -20,21 +25,104 @@ class EmployeController extends AbstractController
         return $this->render('employe/dashboard.html.twig');
     }
 
-    #[Route('/employe/avis-signales/{id}', name: 'employe_avis_detail')]
-    public function avisDetail(int $id, ReviewRepository $reviewRepository, EntityManagerInterface $em): Response
+    #[Route('/avis-signales', name: 'employe_avis_signales')]
+    public function avisSignales(ReviewRepository $reviewRepository): Response
+    {
+        $reviews = $reviewRepository->findByReportsEnCours();
+
+        return $this->render('employe/avis_signales.html.twig', [
+            'avis' => $reviews
+        ]);
+    }
+
+    #[Route('/avis-signales/{id}', name: 'employe_avis_detail')]
+    public function avisDetail(int $id, ReviewRepository $reviewRepository): Response
     {
         $review = $reviewRepository->find($id);
-
         if (!$review) {
             throw $this->createNotFoundException("Avis introuvable.");
         }
 
-        // On récupère les reports en cours pour cet avis
-        $reports = $review->getReports()->filter(fn($r) => $r->getStatus() === Report::STATUS_EN_COURS);
-
         return $this->render('employe/avis_detail.html.twig', [
-            'review' => $review,
-            'reports' => $reports
+            'review' => $review
         ]);
     }
+
+    #[Route('/avis-signales/valider/{id}', name: 'employe_avis_valider')]
+    public function validerAvis(int $id, ReviewRepository $reviewRepository, EntityManagerInterface $em, MailerInterface $mailer): Response
+    {
+        $review = $reviewRepository->find($id);
+        if (!$review) {
+            $this->addFlash('warning', 'Cet avis a déjà été traité.');
+            return $this->redirectToRoute('employe_avis_signales');
+        }
+
+        $user = $review->getUtilisateur();
+
+        // Supprime l'avis
+        $em->remove($review);
+        $em->flush();
+
+        $report = $review->getReports()->first();
+
+        // Envoi du mail
+        $email = (new TemplatedEmail())
+            ->from('no-reply@storylia.com')
+            ->to($user->getEmail())
+            ->subject('Votre avis a été modéré')
+            ->htmlTemplate('email/avis_supprime.html.twig')
+            ->context([
+                'user' => $user,
+                'review' => $review,
+                'report' => $report,
+            ]);
+
+        $mailer->send($email);
+
+        $this->addFlash('success', 'Avis validé et utilisateur notifié.');
+        return $this->redirectToRoute('employe_avis_signales');
+    }
+
+    #[Route('/avis-signales/supprimer-report/{id}', name: 'employe_report_supprimer')]
+    public function supprimerReport(int $id, EntityManagerInterface $em, ReportRepository $reportRepository): Response
+    {
+        $report = $reportRepository->find($id);
+        if (!$report) {
+            throw $this->createNotFoundException("Signalement introuvable.");
+        }
+
+        $em->remove($report);
+        $em->flush();
+
+        $this->addFlash('success', 'Signalement supprimé.');
+        return $this->redirectToRoute('employe_avis_signales');
+    }
+
+    #[Route('/avis-signales/detail/{id}', name: 'employe_avis_detail')]
+    public function voirSignalement(int $id, ReviewRepository $reviewRepository): Response
+    {
+        $review = $reviewRepository->find($id);
+        if (!$review) {
+            throw $this->createNotFoundException("Avis introuvable.");
+        }
+
+        return $this->render('employe/avis_detail.html.twig', [
+            'review' => $review
+        ]);
+    }
+
+    #[Route('/test-mail', name: 'test_mail')]
+public function testMail(MailerInterface $mailer): Response
+{
+    $email = (new Email())
+        ->from('no-reply@storylia.test')
+        ->to('test@mailtrap.io')
+        ->subject('Test Mailtrap OK')
+        ->text('Si tu vois ce mail, Mailtrap fonctionne.');
+
+    $mailer->send($email);
+
+    return new Response('Mail envoyé');
+}
+
 }

@@ -50,7 +50,7 @@ class ReviewController extends AbstractController
         $review->setUtilisateur($user);
         $review->setComment($comment);
         $review->setDate(new \DateTime());
-        $review->setRating(null); // facultatif
+        $review->setRating(null);
         $review->setAuthor($book->getAuthor());
 
         $this->em->persist($review);

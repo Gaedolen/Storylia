@@ -7,33 +7,51 @@
 {% endblock %}
 
 {% block body %}
-<div class="employe-dashboard">
+    <div class="employe-dashboard">
 
-    <h1>Avis signalés</h1>
-    <p class="admin-intro">Liste des avis signalés par les utilisateurs.</p>
+        <h1>Avis signalés</h1>
+        <p class="admin-intro">Liste des avis signalés par les utilisateurs.</p>
 
-    {% if avis is empty %}
-        <p>Aucun avis signalé</p>
-    {% else %}
-        <div class="dashboard-section">
-            {% for review in avis %}
-                <div class="summary-card">
+        {% if avis is empty %}
+            <p>Aucun avis signalé</p>
+        {% else %}
+            <table class="avis-table">
+                <thead>
+                    <tr>
+                        <th>Livre</th>
+                        <th>Auteur</th>
+                        <th>Note</th>
+                        <th>Commentaire</th>
+                        <th>Signalé par</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for review in avis %}
+                        {% set report = review.reports|first %}
+                        <tr>
+                            <td>{{ review.book.title }}</td>
+                            <td>{{ review.utilisateur.pseudo }}</td>
+                            <td>{{ review.rating }}/5</td>
+                            <td>{{ review.comment }}</td>
+                            <td>{% if report %}{{ report.author.pseudo }}{% else %}-{% endif %}</td>
+                            <td class="admin-actions">
+                                <a href="{{ path('employe_avis_valider', {'id': review.id}) }}" class="btn-valider" title="Supprime l'avis et envoie un mail d'avertissement">Supprimer l'avis</a>
 
-                    <p><strong>Livre :</strong> {{ review.book.title }}</p>
-                    <p><strong>Auteur :</strong> {{ review.utilisateur.pseudo }}</p>
-                    <p><strong>Note :</strong> {{ review.rating }}/5</p>
-                    <p><strong>Commentaire :</strong><br>{{ review.comment }}</p>
+                                {% if report %}
+                                    <a href="{{ path('employe_report_supprimer', {'id': report.id}) }}" class="btn-supprimer" title="Supprime seulement le signalement">Supprimer le signalement</a>
+                                {% else %}
+                                    <span class="btn-supprimer disabled" title="Aucun signalement">Supprimer le signalement</span>
+                                {% endif %}
 
-                    <div class="admin-actions">
-                        <a href="#" class="btn-ajout">Valider</a>
-                        <a href="#" class="btn-import">Supprimer</a>
-                        <a href="#" class="btn-utilisateur">Voir signalements</a>
-                    </div>
+                                <a href="{{ path('employe_avis_detail', {'id': review.id}) }}" class="btn-utilisateur">Voir signalement</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
 
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
 
-</div>
+    </div>
 {% endblock %}

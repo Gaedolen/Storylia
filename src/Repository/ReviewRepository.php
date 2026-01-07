@@ -40,6 +40,16 @@ class ReviewRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findByReportsEnCours(): array
+    {
+        return $this->createQueryBuilder('r')
+            ->join('r.reports', 'rep')
+            ->andWhere('rep.status = :status')
+            ->setParameter('status', \App\Entity\Report::STATUS_EN_COURS)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Review[] Returns an array of Review objects
     //     */

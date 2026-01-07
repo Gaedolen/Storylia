@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Avis modéré</title>
+        <style>
+            body {
+                font-family: 'Comfortaa', sans-serif;
+                background-color: #FAF3E0;
+                color: #3B2F2F;
+                padding: 20px;
+            }
+            .container {
+                background-color: #E8CBAE;
+                padding: 20px;
+                border-radius: 10px;
+                max-width: 600px;
+                margin: auto;
+            }
+            h1 {
+                color: #714B2F;
+            }
+            p {
+                font-size: 16px;
+                line-height: 1.5;
+                color: #3B2F2F;
+            }
+            .highlight {
+                color: #C97C5D;
+                font-weight: bold;
+            }
+            .footer {
+                margin-top: 20px;
+                font-size: 12px;
+                color: #6B6B6B;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Avis modéré</h1>
+
+            <p>Bonjour {{ user.pseudo }},</p>
+
+            <p>Votre avis sur le livre <span class="highlight">"{{ review.book.title }}"</span> a été supprimé par notre équipe de modération.</p>
+
+            {% if report %}
+                <p><strong>Raison :</strong> {{ report.reason|replace({'_':' '})|capitalize }}</p>
+                {% if report.reason == 'autre' %}
+                    <p><strong>Commentaire signalement :</strong><br>{{ report.message }}</p>
+                {% endif %}
+            {% endif %}
+
+            <p>Merci de bien vouloir réécrire votre avis en respectant les règles du site.</p>
+
+            <div class="footer">
+                © Storylia 2026 - Tous droits réservés
+            </div>
+        </div>
+    </body>
+</html>
