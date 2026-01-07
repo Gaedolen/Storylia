@@ -301,4 +301,44 @@ class ProfilController extends AbstractController
             'historique' => $historique,
         ]);
     }
+
+    #[Route('/utilisateur/{id}', name: 'app_utilisateur_public')]
+    public function profilPublic(Utilisateur $user, EntityManagerInterface $em): Response
+    {
+        /** @var Utilisateur $currentUser */
+        $currentUser = $this->getUser();
+        $isSelf = $currentUser && $currentUser->getId() === $user->getId();
+
+        // Coups de coeur
+        $coupsDeCoeur = $user->getBookshelves()->filter(fn($shelf) => $shelf->getReadingStatus()?->getLabel() === 'coup_de_coeur');
+
+        // Lecture en cours
+        $lectureEnCours = $user->getBookshelves()->filter(fn($shelf) => $shelf->getReadingStatus()?->getLabel() === 'en_train_de_lire')->first() ?: null;
+
+        // Historique
+        $lastRead = $em->getRepository(ReadingHistory::class)
+                    ->createQueryBuilder('rh')
+                    ->where('rh.utilisateur = :user')
+                    ->andWhere('rh.readingDate IS NOT NULL')
+                    ->orderBy('rh.readingDate', 'DESC')
+                    ->setParameter('user', $user)
+                    ->setMaxResults(20)
+                    ->getQuery()
+                    ->getResult();
+
+        // Clubs
+        $clubsCrees = $user->getClubsCrees();
+        $clubsMembre = $user->getClubsMembre();
+
+        return $this->render('profil/public_profil.html.twig', [
+            'utilisateur' => $user,
+            'currentUser' => $currentUser,
+            'isSelf' => $isSelf,
+            'coupsDeCoeur' => $coupsDeCoeur,
+            'lectureEnCours' => $lectureEnCours,
+            'lastRead' => $lastRead,
+            'clubsCrees' => $clubsCrees,
+            'clubsMembre' => $clubsMembre,
+        ]);
+    }
 }
