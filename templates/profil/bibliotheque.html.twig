@@ -1,26 +1,46 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ma bibliothèque{% endblock %}
+{% block title %}Bibliothèque de {{ utilisateur.pseudo }}{% endblock %}
 
 {% block stylesheets %}
-<link rel="stylesheet" href="{{ asset('css/profil/bibliotheque.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/profil/bibliotheque.css') }}">
 {% endblock %}
 
 {% block body %}
     <div class="bibliotheque-container">
 
-        {# --- Menu profil inchangé --- #}
+        {# --- Menu profil --- #}
         <nav class="profil-menu-horizontal">
             <div class="profil-user">
-                <img src="{{ asset('uploads/profiles/' ~ app.user.profilePicture) }}" alt="Photo de profil">
-                <span class="pseudo">{{ app.user.pseudo }}</span>
+                <img src="{{ asset('uploads/profiles/' ~ utilisateur.profilePicture) }}" alt="Photo de profil">
+                <span class="pseudo">{{ utilisateur.pseudo }}</span>
             </div>
 
             <ul class="profil-links">
-                <li><a href="{{ path('app_profil') }}" class="{{ app.request.get('_route') == 'app_profil' ? 'active' : '' }}">Profil</a></li>
-                <li><a href="{{ path('app_profil_bibliotheque') }}" class="{{ app.request.get('_route') == 'app_profil_bibliotheque' ? 'active' : '' }}">Bibliothèque</a></li>
-                <li><a href="{{ path('app_profil_clubs') }}" class="{{ app.request.get('_route') == 'app_profil_clubs' ? 'active' : '' }}">Clubs</a></li>
-                <li><a href="{{ path('app_profil_historique') }}" class="{{ app.request.get('_route') == 'app_profil_historique' ? 'active' : '' }}">Historique</a></li>
+                <li>
+                    <a href="{{ isSelf ? path('app_profil') : path('app_utilisateur_profil', {'id': utilisateur.id}) }}" 
+                    class="{{ app.request.get('_route') in ['app_profil','app_utilisateur_profil'] ? 'active' : '' }}">
+                        Profil
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ isSelf ? path('app_profil_bibliotheque') : path('app_utilisateur_bibliotheque', {'id': utilisateur.id}) }}" 
+                    class="{{ app.request.get('_route') in ['app_profil_bibliotheque','app_utilisateur_bibliotheque'] ? 'active' : '' }}">
+                        Bibliothèque
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ isSelf ? path('app_profil_clubs') : path('app_utilisateur_clubs', {'id': utilisateur.id}) }}" 
+                    class="{{ app.request.get('_route') in ['app_profil_clubs','app_utilisateur_clubs'] ? 'active' : '' }}">
+                        Clubs
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ isSelf ? path('app_profil_historique') : path('app_utilisateur_historique', {'id': utilisateur.id}) }}#}" 
+                    class="{{ app.request.get('_route') in ['app_profil_historique','app_utilisateur_historique'] ? 'active' : '' }}">
+                        Historique
+                    </a>
+                </li>
             </ul>
         </nav>
 
@@ -53,19 +73,21 @@
                                             <p><a href="#">{{ bookshelf.book.author.name }}</a></p>
                                         </div>
                                         <div class="buttons">
-                                            <button
-                                                class="bookshelf-move-btn"
-                                                data-book-id="{{ bookshelf.book.id }}"
-                                                data-current-status-key="{{ bookshelf.readingStatus ? bookshelf.readingStatus.label : 'envies' }}"
-                                                data-move-url="{{ path('livres_deplacer', {'id': bookshelf.id}) }}">
-                                                <i class="fas fa-arrows-alt"></i>
-                                            </button>
+                                            {% if isSelf %}
+                                                <button
+                                                    class="bookshelf-move-btn"
+                                                    data-book-id="{{ bookshelf.book.id }}"
+                                                    data-current-status-key="{{ bookshelf.readingStatus ? bookshelf.readingStatus.label : 'envies' }}"
+                                                    data-move-url="{{ path('livres_deplacer', {'id': bookshelf.id}) }}">
+                                                    <i class="fas fa-arrows-alt"></i>
+                                                </button>
 
-                                            <button 
-                                                class="bookshelf-remove-btn"
-                                                data-book-id="{{ bookshelf.id }}">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
+                                                <button 
+                                                    class="bookshelf-remove-btn"
+                                                    data-book-id="{{ bookshelf.id }}">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -77,11 +99,11 @@
         </div>
     </div>
 
-    {# Modal de suppression d'un livre en bibli #}
+    {# Modal de suppression #}
     <div id="confirm-remove-modal" class="modal">
         <div class="modal-content small-modal">
             <span class="close">&times;</span>
-            <p>Voulez-vous retirer ce livre de votre bibliothèque ?</p>
+            <p>Voulez-vous retirer ce livre de la bibliothèque ?</p>
 
             <div class="modal-buttons">
                 <button id="confirm-remove-cancel" class="btn-secondary">Non</button>
@@ -90,7 +112,7 @@
         </div>
     </div>
 
-    {# Modal de déplacement #}
+    {# Modal déplacement #}
     <div id="bookshelf-move-modal" class="modal">
         <div class="modal-content small-modal">
             <span class="close">&times;</span>

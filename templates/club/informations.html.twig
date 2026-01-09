@@ -12,10 +12,12 @@
         {# --- Créateur --- #}
         <div class="club-creator-section">
             <h3>Créateur du club</h3>
-            <div class="creator-card">
-                <img src="{{ asset('uploads/profiles/' ~ club.creator.profilePicture) }}" alt="{{ club.creator.pseudo }}" class="creator-photo">
-                <span class="creator-pseudo">{{ club.creator.pseudo }}</span>
-            </div>
+            <a href="{{ path('app_utilisateur_profil', {'id': club.creator.id}) }}" class="creator-card-link">
+                <div class="creator-card">
+                    <img src="{{ asset('uploads/profiles/' ~ club.creator.profilePicture) }}" alt="{{ club.creator.pseudo }}" class="creator-photo">
+                    <span class="creator-pseudo">{{ club.creator.pseudo }}</span>
+                </div>
+            </a>
         </div>
 
         {# --- Membres --- #}
@@ -23,10 +25,12 @@
             <h3>Membres ({{ club.membres|length }})</h3>
             <div class="members-grid">
                 {% for membre in club.membres %}
-                    <div class="member-card">
-                        <img src="{{ asset('uploads/profiles/' ~ membre.profilePicture) }}" alt="{{ membre.pseudo }}" class="member-photo">
-                        <span class="member-pseudo">{{ membre.pseudo }}</span>
-                    </div>
+                    <a href="{{ path('app_utilisateur_profil', {'id': membre.id}) }}" class="member-card-link">
+                        <div class="member-card">
+                            <img src="{{ asset('uploads/profiles/' ~ membre.profilePicture) }}" alt="{{ membre.pseudo }}" class="member-photo">
+                            <span class="member-pseudo">{{ membre.pseudo }}</span>
+                        </div>
+                    </a>
                 {% endfor %}
             </div>
         </div>
@@ -83,10 +87,6 @@
                             </span>
                         {% endfor %}
                     </div>
-                    <p><strong>Livres proposés :</strong> {{ club.books|length }}</p>
-                    <p><strong>Livres lus :</strong> 
-                        {{ club.readingMonths|filter(rm => rm.book.voted == true)|length }}
-                    </p>
                 </div>
             </div>
         </div>

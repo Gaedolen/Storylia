@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Report;
 use App\Entity\Book;
+use App\Entity\Utilisateur;
 use App\Entity\Review;
 use App\Repository\ReviewRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -108,5 +109,36 @@ class ReportController extends AbstractController
         $em->flush();
 
         return new JsonResponse(['success' => true]);
+    }
+
+    #[Route('/user/{id}', name: 'user', methods: ['POST'])]
+    public function reportUser(Utilisateur $utilisateur, Request $request, EntityManagerInterface $em, CsrfTokenManagerInterface $csrfTokenManager): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['success' => false, 'message' => 'Non authentifié.'], 401);
+        }
+
+        $csrfToken = $request->headers->get('X-CSRF-TOKEN');
+        if (!$csrfToken || !$csrfTokenManager->isTokenValid(new CsrfToken('report_user', $csrfToken))) {
+            return new JsonResponse(['success' => false, 'message' => 'CSRF invalide.'], 403);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        if (!$data || empty($data['reason']) || empty($data['message'])) {
+            return new JsonResponse(['success' => false, 'message' => 'Données invalides.'], 400);
+        }
+
+        $report = new Report();
+        $report->setAuthor($user);
+        $report->setReported($utilisateur);
+        $report->setReason($data['reason']);
+        $report->setMessage($data['message']);
+        $report->setStatus('en_cours');
+
+        $em->persist($report);
+        $em->flush();
+
+        return new JsonResponse(['success' => true, 'message' => 'Utilisateur signalé.']);
     }
 }

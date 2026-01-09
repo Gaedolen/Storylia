@@ -1,6 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mes clubs{% endblock %}
+{% block title %}
+    {{ isSelf ? 'Mes clubs' : 'Clubs de ' ~ utilisateur.pseudo }}
+{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('css/profil/clubs.css') }}">
@@ -10,20 +12,47 @@
 
     <div class="clubs-container">
 
-        {# Menu de navigation profil #}
+        {# ===== MENU PROFIL ===== #}
         <nav class="profil-menu-horizontal">
             <div class="profil-user">
-                <img src="{{ asset('uploads/profiles/' ~ app.user.profilePicture) }}" alt="Photo de profil">
-                <span class="pseudo">{{ app.user.pseudo }}</span>
+                <img
+                    src="{{ asset('uploads/profiles/' ~ utilisateur.profilePicture) }}"
+                    alt="Photo de profil"
+                >
+                <span class="pseudo">{{ utilisateur.pseudo }}</span>
             </div>
 
             <ul class="profil-links">
-                <li><a href="{{ path('app_profil') }}" class="{{ app.request.get('_route') == 'app_profil' ? 'active' : '' }}">Profil</a></li>
-                <li><a href="{{ path('app_profil_bibliotheque') }}" class="{{ app.request.get('_route') == 'app_profil_bibliotheque' ? 'active' : '' }}">Bibliothèque</a></li>
-                <li><a href="{{ path('app_profil_clubs') }}" class="{{ app.request.get('_route') == 'app_profil_clubs' ? 'active' : '' }}">Club</a></li>
-                <li><a href="{{ path('app_profil_historique') }}" class="{{ app.request.get('_route') == 'app_profil_historique' ? 'active' : '' }}">Historique</a></li>
+                <li>
+                    <a href="{{ isSelf ? path('app_profil') : path('app_utilisateur_profil', {'id': utilisateur.id}) }}"
+                    class="{{ app.request.get('_route') in ['app_profil','app_utilisateur_profil'] ? 'active' : '' }}">
+                        Profil
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ isSelf ? path('app_profil_bibliotheque') : path('app_utilisateur_bibliotheque', {'id': utilisateur.id}) }}"
+                    class="{{ app.request.get('_route') in ['app_profil_bibliotheque','app_utilisateur_bibliotheque'] ? 'active' : '' }}">
+                        Bibliothèque
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ isSelf ? path('app_profil_clubs') : path('app_utilisateur_clubs', {'id': utilisateur.id}) }}"
+                    class="{{ app.request.get('_route') in ['app_profil_clubs','app_utilisateur_clubs'] ? 'active' : '' }}">
+                        Clubs
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ isSelf ? path('app_profil_historique') : path('app_utilisateur_historique', {'id': utilisateur.id}) }}#}"
+                    class="{{ app.request.get('_route') in ['app_profil_historique','app_utilisateur_historique'] ? 'active' : '' }}">
+                        Historique
+                    </a>
+                </li>
             </ul>
         </nav>
+
     </div>
 
     <div class="listing-container">
@@ -58,13 +87,23 @@
         'manga': 'Manga'
     } %}
 
-    <div class="clubs-header">
-        <h2>Clubs que j'ai créés</h2>
-        <a href="{{ path('club_create') }}" class="btn-create-club">Créer un club</a>
-    </div>
+        {# ===== CLUBS CRÉÉS ===== #}
+        <div class="clubs-header">
+            <h2>
+                {{ isSelf ? 'Clubs que j’ai créés' : 'Clubs créés par ' ~ utilisateur.pseudo }}
+            </h2>
+
+            {% if isSelf %}
+                <a href="{{ path('club_create') }}" class="btn-create-club">
+                    Créer un club
+                </a>
+            {% endif %}
+        </div>
+
         <section class="clubs-list">
             {% for club in clubsCrees %}
                 <a href="{{ path('club_show', {'id': club.id}) }}" class="club-card">
+
                     <div class="club-card-left">
                         {% if club.photo %}
                             <img src="{{ asset('uploads/clubs/' ~ club.photo) }}" alt="{{ club.name }}">
@@ -73,8 +112,12 @@
                         {% endif %}
 
                         <div class="club-card-meta">
-                            <span class="club-participants">{{ club.membres|length }} participants</span>
-                            <span class="creation-date">Créé le {{ club.creationDate|date('d/m/Y') }}</span>
+                            <span class="club-participants">
+                                {{ club.membres|length }} participants
+                            </span>
+                            <span class="creation-date">
+                                Créé le {{ club.creationDate|date('d/m/Y') }}
+                            </span>
                         </div>
                     </div>
 
@@ -87,20 +130,30 @@
 
                         <div class="club-preferences">
                             {% for code in club.preferences %}
-                                <span class="pref-badge">{{ preferencesLabels[code] }}</span>
+                                <span class="pref-badge">
+                                    {{ preferencesLabels[code] }}
+                                </span>
                             {% endfor %}
                         </div>
                     </div>
+
                 </a>
             {% else %}
-                <p>Vous n'avez créé aucun club.</p>
+                <p class="empty">
+                    {{ isSelf ? 'Vous n’avez créé aucun club.' : 'Aucun club créé.' }}
+                </p>
             {% endfor %}
         </section>
 
-        <h2>Clubs dont je suis membre</h2>
+        {# ===== CLUBS MEMBRE ===== #}
+        <h2>
+            {{ isSelf ? 'Clubs dont je suis membre' : 'Clubs dont ' ~ utilisateur.pseudo ~ ' est membre' }}
+        </h2>
+
         <section class="clubs-list">
             {% for club in clubsMembre %}
                 <a href="{{ path('club_show', {'id': club.id}) }}" class="club-card">
+
                     <div class="club-card-left">
                         {% if club.photo %}
                             <img src="{{ asset('uploads/clubs/' ~ club.photo) }}" alt="{{ club.name }}">
@@ -109,8 +162,12 @@
                         {% endif %}
 
                         <div class="club-card-meta">
-                            <span class="club-participants">{{ club.membres|length }} participants</span>
-                            <span class="creation-date">Créé le {{ club.creationDate|date('d/m/Y') }}</span>
+                            <span class="club-participants">
+                                {{ club.membres|length }} participants
+                            </span>
+                            <span class="creation-date">
+                                Créé le {{ club.creationDate|date('d/m/Y') }}
+                            </span>
                         </div>
                     </div>
 
@@ -123,15 +180,21 @@
 
                         <div class="club-preferences">
                             {% for code in club.preferences %}
-                                <span class="pref-badge">{{ preferencesLabels[code] }}</span>
+                                <span class="pref-badge">
+                                    {{ preferencesLabels[code] }}
+                                </span>
                             {% endfor %}
                         </div>
                     </div>
+
                 </a>
             {% else %}
-                <p>Vous n'êtes membre d'aucun club.</p>
+                <p class="empty">
+                    {{ isSelf ? 'Vous n’êtes membre d’aucun club.' : 'Aucun club rejoint.' }}
+                </p>
             {% endfor %}
         </section>
+
     </div>
 
 {% endblock %}

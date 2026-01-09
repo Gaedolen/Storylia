@@ -1,39 +1,76 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mon historique de lecture{% endblock %}
+{% block title %}
+    {{ isSelf ? 'Mon historique de lecture' : 'Historique de lecture de ' ~ utilisateur.pseudo }}
+{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('css/profil/historique.css') }}">
 {% endblock %}
 
 {% block body %}
+
     <div class="historique-container">
 
-        {# Menu de navigation profil #}
+        {# ===== MENU PROFIL ===== #}
         <nav class="profil-menu-horizontal">
             <div class="profil-user">
-                <img src="{{ asset('uploads/profiles/' ~ app.user.profilePicture) }}" alt="Photo de profil">
-                <span class="pseudo">{{ app.user.pseudo }}</span>
+                <img
+                    src="{{ asset('uploads/profiles/' ~ utilisateur.profilePicture) }}"
+                    alt="Photo de profil"
+                >
+                <span class="pseudo">{{ utilisateur.pseudo }}</span>
             </div>
 
             <ul class="profil-links">
-                <li><a href="{{ path('app_profil') }}" class="{{ app.request.get('_route') == 'app_profil' ? 'active' : '' }}">Profil</a></li>
-                <li><a href="{{ path('app_profil_bibliotheque') }}" class="{{ app.request.get('_route') == 'app_profil_bibliotheque' ? 'active' : '' }}">Bibliothèque</a></li>
-                <li><a href="{{ path('app_profil_clubs') }}" class="{{ app.request.get('_route') == 'app_profil_clubs' ? 'active' : '' }}">Club</a></li>
-                <li><a href="{{ path('app_profil_historique') }}" class="{{ app.request.get('_route') == 'app_profil_historique' ? 'active' : '' }}">Historique</a></li>
+                <li>
+                    <a href="{{ isSelf ? path('app_profil') : path('app_utilisateur_profil', {'id': utilisateur.id}) }}"
+                    class="{{ app.request.get('_route') in ['app_profil','app_utilisateur_profil'] ? 'active' : '' }}">
+                        Profil
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ isSelf ? path('app_profil_bibliotheque') : path('app_utilisateur_bibliotheque', {'id': utilisateur.id}) }}"
+                    class="{{ app.request.get('_route') in ['app_profil_bibliotheque','app_utilisateur_bibliotheque'] ? 'active' : '' }}">
+                        Bibliothèque
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ isSelf ? path('app_profil_clubs') : path('app_utilisateur_clubs', {'id': utilisateur.id}) }}"
+                    class="{{ app.request.get('_route') in ['app_profil_clubs','app_utilisateur_clubs'] ? 'active' : '' }}">
+                        Clubs
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ isSelf ? path('app_profil_historique') : path('app_utilisateur_historique', {'id': utilisateur.id}) }}"
+                    class="{{ app.request.get('_route') in ['app_profil_historique','app_utilisateur_historique'] ? 'active' : '' }}">
+                        Historique
+                    </a>
+                </li>
             </ul>
         </nav>
 
-        {# Contenu principal #}
+        {# ===== CONTENU HISTORIQUE ===== #}
         <div class="grid-historique">
+
             {% if historique is not empty %}
+
                 {% for year, months in historique %}
                     <div class="year-card card">
+
                         <div class="year-header">
                             <h3>{{ year }}</h3>
                             <div class="toggle-year arrow">
-                                <svg class="arrow-icon" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                                <svg class="arrow-icon" width="26" height="26" viewBox="0 0 24 24">
+                                    <path d="M6 9l6 6 6-6"
+                                        stroke="currentColor"
+                                        stroke-width="2.2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        fill="none"/>
                                 </svg>
                             </div>
                         </div>
@@ -41,11 +78,17 @@
                         <div class="year-content">
                             {% for month, readings in months %}
                                 <div class="month-card">
+
                                     <div class="month-header">
                                         <h4>{{ month }}</h4>
                                         <div class="toggle-month arrow">
-                                            <svg class="arrow-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                                            <svg class="arrow-icon" width="22" height="22" viewBox="0 0 24 24">
+                                                <path d="M6 9l6 6 6-6"
+                                                    stroke="currentColor"
+                                                    stroke-width="2.2"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    fill="none"/>
                                             </svg>
                                         </div>
                                     </div>
@@ -54,9 +97,11 @@
                                         <div class="month-books">
                                             {% for reading in readings %}
                                                 <div class="book-card" data-book-id="{{ reading.book.id }}">
+
                                                     <div class="cover">
                                                         <a href="{{ path('app_livre_detail', {'id': reading.book.id}) }}">
-                                                            <img src="{{ reading.book.cover|replace({'http://':'https://'}) }}" alt="{{ reading.book.title }}">
+                                                            <img src="{{ reading.book.cover|replace({'http://':'https://'}) }}"
+                                                                alt="{{ reading.book.title }}">
                                                         </a>
                                                     </div>
 
@@ -68,14 +113,19 @@
                                                                 </a>
                                                             </h3>
 
-                                                            <p><a href="#">{{ reading.book.author.name }}</a></p>
+                                                            <p>
+                                                                <a href="#">
+                                                                    {{ reading.book.author.name }}
+                                                                </a>
+                                                            </p>
 
                                                             <p class="reading-date">
                                                                 <strong>Lu le :</strong>
-                                                                {{ reading.readingDate is defined and reading.readingDate ? reading.readingDate|date('d/m/Y') : 'Date inconnue' }}
+                                                                {{ reading.readingDate ? reading.readingDate|date('d/m/Y') : 'Date inconnue' }}
                                                             </p>
                                                         </div>
                                                     </div>
+
                                                 </div>
                                             {% endfor %}
                                         </div>
@@ -84,38 +134,42 @@
                                 </div>
                             {% endfor %}
                         </div>
+
                     </div>
                 {% endfor %}
+
             {% else %}
-                <p>Vous n'avez encore aucun historique de lecture.</p>
+                <p class="empty">
+                    {{ isSelf
+                        ? "Vous n'avez encore aucun historique de lecture."
+                        : utilisateur.pseudo ~ " n'a pas encore d'historique de lecture."
+                    }}
+                </p>
             {% endif %}
+
         </div>
     </div>
 
+    {# ===== JS TOGGLE ===== #}
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Toggle des années
+
             document.querySelectorAll(".year-header").forEach(header => {
                 header.addEventListener("click", (e) => {
-                // ignore si on clique sur un bouton interne
-                const isInteractive = e.target.closest('button, a, input, .ignore-toggle');
-                if (isInteractive) return;
-                const card = header.closest(".year-card");
-                if (!card) return;
-                card.classList.toggle("open");
+                    if (e.target.closest('button, a, input, .ignore-toggle')) return;
+                    const card = header.closest(".year-card");
+                    if (card) card.classList.toggle("open");
                 });
             });
 
-            // Toggle des mois
             document.querySelectorAll(".month-header").forEach(header => {
                 header.addEventListener("click", (e) => {
-                const isInteractive = e.target.closest('button, a, input, .ignore-toggle');
-                if (isInteractive) return;
-                const card = header.closest(".month-card");
-                if (!card) return;
-                card.classList.toggle("open");
+                    if (e.target.closest('button, a, input, .ignore-toggle')) return;
+                    const card = header.closest(".month-card");
+                    if (card) card.classList.toggle("open");
                 });
             });
+
         });
     </script>
 

@@ -95,11 +95,27 @@ h3 {
 }
 
 .preference-badge {
-    background-color: #C97C5D; /* couleur demandée */
+    background-color: #C97C5D;
     color: white;
     padding: 6px 12px;
     border-radius: 15px;
     font-size: 0.9rem;
     font-weight: 600;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Lien qui englobe toute la carte */
+.creator-card-link,
+.member-card-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+
+.creator-card-link:hover .creator-card,
+.member-card-link:hover .member-card {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    transition: all 0.2s ease-in-out;
 }

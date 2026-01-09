@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Club;
+use App\Entity\Utilisateur;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -69,6 +70,17 @@ class ClubRepository extends ServiceEntityRepository
 
         return $clubs;
     }
+
+    public function findByMembre(Utilisateur $utilisateur): array
+    {
+        return $this->createQueryBuilder('c')
+            ->innerJoin('c.membres', 'm')
+            ->where('m = :user')
+            ->setParameter('user', $utilisateur)
+            ->getQuery()
+            ->getResult();
+    }
+
 
     //    /**
     //     * @return Club[] Returns an array of Club objects

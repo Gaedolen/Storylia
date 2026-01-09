@@ -9,6 +9,8 @@ use App\Repository\ReadingStatusRepository;
 use App\Repository\UtilisateurRepository;
 use App\Form\ProfilType;
 use App\Repository\BookRepository;
+use App\Repository\ClubRepository;
+use App\Repository\ReadingHistoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -24,8 +26,11 @@ class ProfilController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
-        /** @var \App\Entity\Utilisateur $utilisateur */
+        /** @var Utilisateur $utilisateur */
         $utilisateur = $this->getUser();
+        $currentUser = $utilisateur;
+        $isSelf = true;
+
 
         // Mapping des préférences
         $preferenceLabels = [
@@ -93,11 +98,13 @@ class ProfilController extends AbstractController
 
 
         return $this->render('profil/profil.html.twig', [
-            'utilisateur' => $utilisateur,
             'coupsDeCoeur' => $coupsDeCoeur,
             'lectureEnCours' => $lectureEnCours,
-            'preferenceLabels' => $preferenceLabels,
             'lastRead' => $lastRead,
+            'preferenceLabels' => $preferenceLabels,
+            'utilisateur' => $utilisateur,
+            'currentUser' => $this->getUser(),
+            'isSelf' => $isSelf,
         ]);
     }
 
@@ -199,6 +206,8 @@ class ProfilController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_USER');
         /** @var Utilisateur $utilisateur */
         $utilisateur = $this->getUser();
+        $currentUser = $utilisateur;
+        $isSelf = true;
 
         // Récupère tous les livres liés à cet utilisateur dans Bookshelf
         $bookshelves = $utilisateur->getBookshelves();
@@ -233,8 +242,10 @@ class ProfilController extends AbstractController
 
         return $this->render('profil/bibliotheque.html.twig', [
             'categories' => $categories,
-            'utilisateur' => $utilisateur,
             'readingStatuses' => $readingStatuses,
+            'utilisateur' => $utilisateur,
+            'currentUser' => $this->getUser(),
+            'isSelf' => $isSelf,
         ]);
     }
 
@@ -244,6 +255,8 @@ class ProfilController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_USER');
         /** @var Utilisateur $utilisateur */
         $utilisateur = $this->getUser();
+        $currentUser = $utilisateur;
+        $isSelf = true;
 
         // Récupère les clubs créés par l'utilisateur
         $clubsCrees = $utilisateur->getClubsCrees();
@@ -254,6 +267,9 @@ class ProfilController extends AbstractController
         return $this->render('profil/clubs.html.twig',[
             'clubsCrees' => $clubsCrees,
             'clubsMembre' => $clubsMembre,
+            'utilisateur' => $utilisateur,
+            'currentUser' => $this->getUser(),
+            'isSelf' => $isSelf,
         ]);
     }
 
@@ -264,6 +280,8 @@ class ProfilController extends AbstractController
 
         /** @var Utilisateur $utilisateur */
         $utilisateur = $this->getUser();
+        $currentUser = $utilisateur;
+        $isSelf = true;
 
         $historique = []; // tableau regroupant les livres lus
 
@@ -299,46 +317,159 @@ class ProfilController extends AbstractController
         return $this->render('profil/historique.html.twig', [
             'utilisateur' => $utilisateur,
             'historique' => $historique,
+            'currentUser' => $this->getUser(),
+            'isSelf' => $isSelf,
         ]);
     }
 
-    #[Route('/utilisateur/{id}', name: 'app_utilisateur_public')]
-    public function profilPublic(Utilisateur $user, EntityManagerInterface $em): Response
+    #[Route('/utilisateur/{id}', name: 'app_utilisateur_profil')]
+    public function publicProfil(Utilisateur $utilisateur, EntityManagerInterface $em): Response 
     {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
         /** @var Utilisateur $currentUser */
         $currentUser = $this->getUser();
-        $isSelf = $currentUser && $currentUser->getId() === $user->getId();
+        $isSelf = ($currentUser === $utilisateur);
 
-        // Coups de coeur
-        $coupsDeCoeur = $user->getBookshelves()->filter(fn($shelf) => $shelf->getReadingStatus()?->getLabel() === 'coup_de_coeur');
+        // Mapping des préférences
+        $preferenceLabels = [
+            'scifi' => 'Science-Fiction',
+            'fantastique' => 'Fantastique',
+            'fantasy' => 'Fantasy',
+            'dystopie' => 'Dystopie',
+            'steampunk' => 'Steampunk',
+            'policier' => 'Policier',
+            'thriller' => 'Thriller',
+            'espionnage' => 'Espionnage',
+            'horreur' => 'Horreur',
+            'aventure' => 'Aventure',
+            'young_adult' => 'Young Adult',
+            'romance' => 'Romance',
+            'erotique' => 'Érotique',
+            'chicklit' => 'Chick-lit',
+            'essai' => 'Essai',
+            'biographie' => 'Biographie',
+            'philosophie' => 'Philosophie',
+            'historique' => 'Historique',
+            'science' => 'Science',
+            'sociologie' => 'Sociologie',
+            'poesie' => 'Poésie',
+            'theatre' => 'Théâtre',
+            'conte_legend' => 'Contes et légendes',
+            'mythologie' => 'Mythologie',
+            'graphic_novel' => 'Roman Graphique',
+            'bd' => 'Bande dessinée',
+            'manga' => 'Manga',
+        ];
+
+        // Coups de cœur
+        $coupsDeCoeur = $utilisateur->getBookshelves()
+            ->filter(fn($shelf) => $shelf->getReadingStatus()->getLabel() === 'coup_de_coeur');
 
         // Lecture en cours
-        $lectureEnCours = $user->getBookshelves()->filter(fn($shelf) => $shelf->getReadingStatus()?->getLabel() === 'en_train_de_lire')->first() ?: null;
+        $lectureEnCours = $utilisateur->getBookshelves()
+            ->filter(fn($shelf) => $shelf->getReadingStatus()->getLabel() === 'en_train_de_lire')
+            ->first() ?: null;
 
-        // Historique
+        // Dernières lectures
         $lastRead = $em->getRepository(ReadingHistory::class)
-                    ->createQueryBuilder('rh')
-                    ->where('rh.utilisateur = :user')
-                    ->andWhere('rh.readingDate IS NOT NULL')
-                    ->orderBy('rh.readingDate', 'DESC')
-                    ->setParameter('user', $user)
-                    ->setMaxResults(20)
-                    ->getQuery()
-                    ->getResult();
+            ->createQueryBuilder('rh')
+            ->where('rh.utilisateur = :user')
+            ->andWhere('rh.readingDate IS NOT NULL')
+            ->orderBy('rh.readingDate', 'DESC')
+            ->setParameter('user', $utilisateur)
+            ->setMaxResults(20)
+            ->getQuery()
+            ->getResult();
 
-        // Clubs
-        $clubsCrees = $user->getClubsCrees();
-        $clubsMembre = $user->getClubsMembre();
+        $uniqueLastRead = [];
+        foreach ($lastRead as $rh) {
+            $uniqueLastRead[$rh->getBook()->getId()] = $rh;
+        }
 
-        return $this->render('profil/public_profil.html.twig', [
-            'utilisateur' => $user,
+        $lastRead = array_slice(array_values($uniqueLastRead), 0, 20);
+
+        return $this->render('profil/profil.html.twig', [
+            'utilisateur' => $utilisateur,
             'currentUser' => $currentUser,
             'isSelf' => $isSelf,
             'coupsDeCoeur' => $coupsDeCoeur,
             'lectureEnCours' => $lectureEnCours,
             'lastRead' => $lastRead,
+            'preferenceLabels' => $preferenceLabels,
+        ]);
+    }
+
+    #[Route('/utilisateur/{id}/bibliotheque', name: 'app_utilisateur_bibliotheque')]
+    public function publicBibliotheque(Utilisateur $utilisateur, ReadingStatusRepository $readingStatusRepository): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+        $currentUser = $this->getUser();
+        $isSelf = ($currentUser === $utilisateur);
+
+        // Récupérer les livres et catégories comme pour la bibliothèque normale
+        $bookshelves = $utilisateur->getBookshelves();
+
+        $categories = [
+            'en_train_de_lire' => [],
+            'coup_de_coeur' => [],
+            'adore' => [],
+            'apprecie' => [],
+            'mitige' => [],
+            'pas_aime' => [],
+            'lu_aussi' => [],
+            'pal' => [],
+            'envies' => [],
+        ];
+
+        foreach($bookshelves as $bookshelf) {
+            $status = $bookshelf->getReadingStatus()?->getLabel();
+            if (!$status || !array_key_exists($status, $categories)) $status = 'envies';
+            $categories[$status][] = $bookshelf;
+        }
+
+        $readingStatuses = $readingStatusRepository->findAll();
+
+        return $this->render('profil/bibliotheque.html.twig', [
+            'utilisateur' => $utilisateur,
+            'categories' => $categories,
+            'readingStatuses' => $readingStatuses,
+            'currentUser' => $currentUser,
+            'isSelf' => $isSelf,
+        ]);
+    }
+
+    #[Route('/utilisateur/{id}/clubs', name: 'app_utilisateur_clubs')]
+    public function publicClubs(Utilisateur $utilisateur, ClubRepository $clubRepository): Response
+    {
+        $currentUser = $this->getUser();
+        $isSelf = ($currentUser === $utilisateur);
+
+        $clubsCrees = $clubRepository->findBy(['creator' => $utilisateur]);
+        $clubsMembre = $clubRepository->findByMembre($utilisateur);
+
+        return $this->render('profil/clubs.html.twig', [
+            'utilisateur' => $utilisateur,
             'clubsCrees' => $clubsCrees,
             'clubsMembre' => $clubsMembre,
+            'currentUser' => $currentUser,
+            'isSelf' => $isSelf,
+        ]);
+    }
+
+    #[Route('/utilisateur/{id}/historique', name: 'app_utilisateur_historique')]
+    public function utilisateurHistorique(Utilisateur $utilisateur, ReadingHistoryRepository $historiqueRepository): Response {
+        $currentUser = $this->getUser();
+        $isSelf = ($currentUser === $utilisateur);
+
+        /** @var Utilisateur $utilisateur */
+        $historique = $historiqueRepository->getHistoriqueParUtilisateur($utilisateur);
+
+        return $this->render('profil/historique.html.twig', [
+            'utilisateur' => $utilisateur,
+            'historique' => $historique,
+            'currentUser' => $currentUser,
+            'isSelf' => $isSelf,
         ]);
     }
 }

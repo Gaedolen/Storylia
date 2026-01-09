@@ -1,167 +1,190 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mon profil{% endblock %}
+{% block title %}Profil de {{ utilisateur.pseudo }}{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('css/profil/profil.css') }}">
 {% endblock %}
 
 {% block body %}
-    <div class="profil-container">
+<div class="profil-container">
 
-            {# Menu de navigation profil #}
-            <nav class="profil-menu-horizontal">
-                <div class="profil-user">
-                    <img src="{{ asset('uploads/profiles/' ~ app.user.profilePicture) }}" alt="Photo de profil">
-                    <span class="pseudo">{{ app.user.pseudo }}</span>
-                </div>
+    {# Menu de navigation profil #}
+    <nav class="profil-menu-horizontal">
+        <div class="profil-user">
+            <img src="{{ asset('uploads/profiles/' ~ utilisateur.profilePicture) }}" alt="Photo de profil">
+            <span class="pseudo">{{ utilisateur.pseudo }}</span>
+        </div>
 
-                <ul class="profil-links">
-                    <li><a href="{{ path('app_profil') }}" class="{{ app.request.get('_route') == 'app_profil' ? 'active' : '' }}">Profil</a></li>
-                    <li><a href="{{ path('app_profil_bibliotheque') }}" class="{{ app.request.get('_route') == 'app_profil_bibliotheque' ? 'active' : '' }}">Bibliothèque</a></li>
-                    <li><a href="{{ path('app_profil_clubs') }}" class="{{ app.request.get('_route') == 'app_profil_clubs' ? 'active' : '' }}">Club</a></li>
-                    <li><a href="{{ path('app_profil_historique') }}" class="{{ app.request.get('_route') == 'app_profil_historique' ? 'active' : '' }}">Historique</a></li>
-                </ul>
-            </nav>
+        <ul class="profil-links">
+            <li>
+                <a href="{{ isSelf ? path('app_profil') : path('app_utilisateur_profil', {'id': utilisateur.id}) }}" 
+                class="{{ app.request.get('_route') in ['app_profil','app_utilisateur_profil'] ? 'active' : '' }}">
+                    Profil
+                </a>
+            </li>
+            <li>
+                <a href="{{ isSelf ? path('app_profil_bibliotheque') : path('app_utilisateur_bibliotheque', {'id': utilisateur.id}) }}" 
+                class="{{ app.request.get('_route') in ['app_profil_bibliotheque','app_utilisateur_bibliotheque'] ? 'active' : '' }}">
+                    Bibliothèque
+                </a>
+            </li>
+            <li>
+                <a href="{{ isSelf ? path('app_profil_clubs') : path('app_utilisateur_clubs', {'id': utilisateur.id}) }}" 
+                class="{{ app.request.get('_route') in ['app_profil_clubs','app_utilisateur_clubs'] ? 'active' : '' }}">
+                    Clubs
+                </a>
+            </li>
+            <li>
+                <a href="{{ isSelf ? path('app_profil_historique') : path('app_utilisateur_historique', {'id': utilisateur.id}) }}#}" 
+                class="{{ app.request.get('_route') in ['app_profil_historique','app_utilisateur_historique'] ? 'active' : '' }}">
+                    Historique
+                </a>
+            </li>
+        </ul>
+    </nav>
 
-        <!-- CONTENU PRINCIPAL -->
-        <main class="profil-main">
-            <div class="grid-profil">
+    <!-- CONTENU PRINCIPAL -->
+    <main class="profil-main">
+        <div class="grid-profil">
 
-                <!-- Carte données personnelles -->
-                <div class="card personal-info">
-                    <div class="personal-info-header">
-                        <h3>Profil de {{ utilisateur.pseudo }}</h3>
+            <!-- Carte données personnelles -->
+            <div class="card personal-info">
+                <div class="personal-info-header">
+                    <h3>Profil de {{ utilisateur.pseudo }}</h3>
+
+                    {% if isSelf %}
                         <a href="{{ path('app_profil_edit') }}" class="btn-edit-profil">Modifier le profil</a>
-                    </div>
+                    {% endif %}
 
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <i class="fa-solid fa-user"></i>
-                            <span class="label">Pseudo</span>
-                            <span class="value">{{ utilisateur.pseudo }}</span>
-                        </div>
-
-                        <div class="info-item">
-                            <i class="fa-solid fa-calendar"></i>
-                            <span class="label">Année de naissance</span>
-                            <span class="value">{{ utilisateur.birthDate|date('Y') }}</span>
-                        </div>
-
-                            <a href="{{ path('app_profil_bibliotheque') }}" class="info-item link-card">
-                                <i class="fa-solid fa-book"></i>
-                                <span class="label">Livres dans la bibliothèque</span>
-                                <span class="value">
-                                    {{ utilisateur.bookshelves|filter(b => b.readingStatus != 'envies')|length }}
-                                </span>
-                            </a>
-                        
-                        <div class="info-item bio-box">
-                            <div class="bio-header">
-                                <i class="fa-solid fa-pen"></i>
-                                <span class="label">À propos de moi</span>
-                            </div>
-
-                            <div class="bio-content">
-                                {% if utilisateur.bio %}
-                                    <p class="bio-text">{{ utilisateur.bio }}</p>
-                                {% else %}
-                                    <p class="bio-text empty">Aucune description pour le moment.</p>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                    </div>
-
-                    {% if utilisateur.presentation %}
-                        <div class="presentation">
-                            <h4>À propos de moi</h4>
-                            <p>{{ utilisateur.presentation }}</p>
-                        </div>
+                    {% if currentUser and not isSelf %}
+                        <form action="{{ path('report_user', {'id': utilisateur.id}) }}" method="POST" class="mt-2">
+                            <input type="hidden" name="_token" value="{{ csrf_token('signal_user_' ~ utilisateur.id) }}">
+                            <button type="submit" class="btn btn-warning">Signaler</button>
+                        </form>
                     {% endif %}
                 </div>
 
-                <!-- Carte préférences et coups de coeur -->
-                <div class="card preferences">
-                    <div class="space-between">
-                        <h3>Préférences de lecture</h3>
-                        <div class="preferences-badges">
-                            {% for pref in utilisateur.preferences %}
-                                <span class="preference-badge">{{ preferenceLabels[pref]|default(pref) }}</span>
-                            {% endfor %}
-                        </div>
-                    </div
-                    
-                    <div class="space-between">
-                        <div id="coupsDeCoeurCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
-                            <h3>Mes coups de coeur</h3>
-                            <div class="carousel-wrapper">
-                                <div class="carousel-inner">
-                                    {% for chunk in coupsDeCoeur|batch(5) %}
-                                        <div class="carousel-item {% if loop.first %}active{% endif %}">
-                                            <div class="d-flex justify-content-center gap-3">
-                                                {% for livre in chunk %}
-                                                    <a href="{{ path('app_livre_detail', {id: livre.book.id}) }}" class="carousel-card-link">
-                                                        <div class="card carousel-card">
-                                                            <img src={{ livre.book.cover }} class="card-img-top" alt="{{ livre.book.title }}">
-                                                            <div class="card-body text-center">
-                                                                <h6 class="card-title">{{ livre.book.title }}</h6>
-                                                                <p class="card-text">{{ livre.book.author.name }}</p>
-                                                            </div>
-                                                        </div>
-                                                    </a>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            
+                <div class="info-grid">
+                    <div class="info-item">
+                        <i class="fa-solid fa-user"></i>
+                        <span class="label">Pseudo</span>
+                        <span class="value">{{ utilisateur.pseudo }}</span>
+                    </div>
 
-                            <!-- Flèches déplacées **à l’intérieur** du carousel -->
-                            <button class="carousel-control-prev" type="button" data-bs-target="#coupsDeCoeurCarousel" data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Précédent</span>
-                            </button>
-                            <button class="carousel-control-next" type="button" data-bs-target="#coupsDeCoeurCarousel" data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Suivant</span>
-                            </button>
+                    <div class="info-item">
+                        <i class="fa-solid fa-calendar"></i>
+                        <span class="label">Année de naissance</span>
+                        <span class="value">{{ utilisateur.birthDate|date('Y') }}</span>
+                    </div>
+
+                    <a href="{{ path('app_profil_bibliotheque') }}" class="info-item link-card">
+                        <i class="fa-solid fa-book"></i>
+                        <span class="label">Livres dans la bibliothèque</span>
+                        <span class="value">
+                            {{ utilisateur.bookshelves|filter(b => b.readingStatus != 'envies')|length }}
+                        </span>
+                    </a>
+
+                    <div class="info-item bio-box">
+                        <div class="bio-header">
+                            <i class="fa-solid fa-pen"></i>
+                            <span class="label">À propos de moi</span>
+                        </div>
+
+                        <div class="bio-content">
+                            {% if utilisateur.bio %}
+                                <p class="bio-text">{{ utilisateur.bio }}</p>
+                            {% else %}
+                                <p class="bio-text empty">Aucune description pour le moment.</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
 
-                <div class="reading-row">
-                    <!-- Lecture du moment -->
-                    <div class="card current-reading">
-                        <h3>Lecture du moment</h3>
+                {% if utilisateur.presentation %}
+                    <div class="presentation">
+                        <h4>À propos de moi</h4>
+                        <p>{{ utilisateur.presentation }}</p>
+                    </div>
+                {% endif %}
+            </div>
 
-                        {% if lectureEnCours %}
-                            <div class="lecture-container">
+            <!-- Carte préférences et coups de coeur -->
+            <div class="card preferences">
+                <div class="space-between">
+                    <h3>Préférences de lecture</h3>
+                    <div class="preferences-badges">
+                        {% for pref in utilisateur.preferences %}
+                            <span class="preference-badge">{{ preferenceLabels[pref]|default(pref) }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
 
-                                <!-- Couverture -->
-                                <div class="lecture-cover">
+                <div class="space-between">
+                    <div id="coupsDeCoeurCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+                        <h3>Mes coups de coeur</h3>
+                        <div class="carousel-wrapper">
+                            <div class="carousel-inner">
+                                {% for chunk in coupsDeCoeur|batch(5) %}
+                                    <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                        <div class="d-flex justify-content-center gap-3">
+                                            {% for livre in chunk %}
+                                                <a href="{{ path('app_livre_detail', {id: livre.book.id}) }}" class="carousel-card-link">
+                                                    <div class="card carousel-card">
+                                                        <img src="{{ livre.book.cover }}" class="card-img-top" alt="{{ livre.book.title }}">
+                                                        <div class="card-body text-center">
+                                                            <h6 class="card-title">{{ livre.book.title }}</h6>
+                                                            <p class="card-text">{{ livre.book.author.name }}</p>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Flèches carousel -->
+                        <button class="carousel-control-prev" type="button" data-bs-target="#coupsDeCoeurCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Précédent</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#coupsDeCoeurCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Suivant</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reading-row">
+                <!-- Lecture du moment -->
+                <div class="card current-reading">
+                    <h3>Lecture du moment</h3>
+
+                    {% if lectureEnCours %}
+                        <div class="lecture-container">
+                            <div class="lecture-cover">
+                                <a href="{{ path('app_livre_detail', {id: lectureEnCours.book.id}) }}">
+                                    <img src="{{ lectureEnCours.book.cover|default(asset('images/default_cover.jpg')) }}" 
+                                        alt="{{ lectureEnCours.book.title }}">
+                                </a>
+                            </div>
+
+                            <div class="lecture-info">
+                                <h4>
                                     <a href="{{ path('app_livre_detail', {id: lectureEnCours.book.id}) }}">
-                                        <img src="{{ lectureEnCours.book.cover|default(asset('images/default_cover.jpg')) }}" 
-                                            alt="{{ lectureEnCours.book.title }}">
+                                        {{ lectureEnCours.book.title }}
                                     </a>
-                                </div>
+                                </h4>
+                                <p>
+                                    <a href="#">{{ lectureEnCours.book.author.name|default('Auteur inconnu') }}</a>
+                                </p>
+                            </div>
 
-                                <!-- Infos livre -->
-                                <div class="lecture-info">
-                                    <h4>
-                                        <a href="{{ path('app_livre_detail', {id: lectureEnCours.book.id}) }}">
-                                            {{ lectureEnCours.book.title }}
-                                        </a>
-                                    </h4>
-                                    <p>
-                                        <a href="#">
-                                            {{ lectureEnCours.book.author.name|default('Auteur inconnu') }}
-                                        </a>
-                                    </p>
-                                </div>
-
-                                <!-- Cercle de progression -->
+                            {% if isSelf %}
                                 <div class="lecture-progress">
                                     {% set totalPages = lectureEnCours.book.pages ?? 0 %}
                                     {% set pagesRead = lectureEnCours.pagesRead ?? 0 %}
@@ -200,60 +223,59 @@
                                         </form>
                                     </div>
                                 </div>
-
-                            </div>
-                        {% else %}
-                            <div>Aucune lecture en cours</div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Carrousel dernières lectures -->
-                    <div class="card last-read">
-                        <h3>Dernières lectures</h3>
-                        <div id="lastReadCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
-                            <div class="carousel-wrapper">
-                                <div class="carousel-inner">
-                                    {% for book in lastRead|batch(5) %}
-                                        <div class="carousel-item {% if loop.first %}active{% endif %}">
-                                            <div class="d-flex justify-content-center gap-3">
-                                                {% for shelf in book %}
-                                                    <a href="{{ path('app_livre_detail', {id: shelf.book.id}) }}" class="carousel-card-link text-center">
-                                                        <div class="card carousel-card">
-                                                            <img src={{ shelf.book.cover }} class="card-img-top" alt="{{ shelf.book.title }}">
-                                                            <div class="card-body">
-                                                                <h6 class="card-title">{{ shelf.book.title }}</h6>
-                                                                <p class="card-text">{{ shelf.readingDate|date('d/m/Y') }}</p>
-                                                            </div>
-                                                        </div>
-                                                    </a>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-
-                            <!-- Flèches -->
-                            <button class="carousel-control-prev" type="button" data-bs-target="#lastReadCarousel" data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Précédent</span>
-                            </button>
-                            <button class="carousel-control-next" type="button" data-bs-target="#lastReadCarousel" data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Suivant</span>
-                            </button>
+                            {% endif %}
                         </div>
-                    </div>
+                    {% else %}
+                        <div>Aucune lecture en cours</div>
+                    {% endif %}
                 </div>
 
+                <!-- Carrousel dernières lectures -->
+                <div class="card last-read">
+                    <h3>Dernières lectures</h3>
+                    <div id="lastReadCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+                        <div class="carousel-wrapper">
+                            <div class="carousel-inner">
+                                {% for book in lastRead|batch(5) %}
+                                    <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                        <div class="d-flex justify-content-center gap-3">
+                                            {% for shelf in book %}
+                                                <a href="{{ path('app_livre_detail', {id: shelf.book.id}) }}" class="carousel-card-link text-center">
+                                                    <div class="card carousel-card">
+                                                        <img src="{{ shelf.book.cover }}" class="card-img-top" alt="{{ shelf.book.title }}">
+                                                        <div class="card-body">
+                                                            <h6 class="card-title">{{ shelf.book.title }}</h6>
+                                                            <p class="card-text">{{ shelf.readingDate|date('d/m/Y') }}</p>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Flèches -->
+                        <button class="carousel-control-prev" type="button" data-bs-target="#lastReadCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Précédent</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#lastReadCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Suivant</span>
+                        </button>
+                    </div>
+                </div>
             </div>
-        </main>
 
-    </div>
+        </div>
+    </main>
 
+</div>
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('js/profil.js') }}"></script>
- {% endblock %}
+{% endblock %}

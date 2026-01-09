@@ -22,6 +22,7 @@ use App\Repository\ClubReviewRepository;
 use App\Repository\ClubRepository;
 use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use DateTime;
 use DateInterval;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -327,8 +328,12 @@ class ClubController extends AbstractController
     }
 
     #[Route('/clubs/{id}/info', name: 'club_info', methods: ['GET'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function info(Club $club): Response
     {
+        /** @var \App\Entity\Utilisateur $user */
+        $user = $this->getUser(); // Utilisateur connecté garanti
+
         // Créateur
         $creator = $club->getCreator();
 
@@ -346,12 +351,34 @@ class ClubController extends AbstractController
             }
         }
 
+        $booksWithVoteStatus = [];
+
+        foreach ($club->getReadingMonths() as $month) {
+            foreach ($month->getBookProposals() as $proposal) {
+                $hasVoted = false;
+
+                foreach ($proposal->getVotes() as $vote) {
+                    if ($vote->getUtilisateur() === $user) {
+                        $hasVoted = true;
+                        break;
+                    }
+                }
+
+                $booksWithVoteStatus[] = [
+                    'proposal' => $proposal,
+                    'month' => $month,
+                    'hasVoted' => $hasVoted,
+                ];
+            }
+        }
+
         return $this->render('club/informations.html.twig', [
             'club' => $club,
             'creator' => $creator,
             'members' => $members,
             'totalBooksProposed' => $totalBooksProposed,
             'totalBooksRead' => $totalBooksRead,
+            'booksWithVoteStatus' => $booksWithVoteStatus,
         ]);
     }
 
