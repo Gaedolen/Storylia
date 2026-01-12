@@ -16,6 +16,17 @@ class ReportRepository extends ServiceEntityRepository
         parent::__construct($registry, Report::class);
     }
 
+    public function findEnCours(): array
+{
+    return $this->createQueryBuilder('r')
+        ->where('r.status = :status')
+        ->setParameter('status', Report::STATUS_EN_COURS)
+        ->orderBy('r.date', 'DESC')
+        ->getQuery()
+        ->getResult();
+}
+
+
     //    /**
     //     * @return Report[] Returns an array of Report objects
     //     */

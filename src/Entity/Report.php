@@ -12,6 +12,7 @@ class Report
     public const STATUS_EN_COURS = 'en_cours';
     public const STATUS_TRAITE = 'traite';
     public const STATUS_REFUSE = 'refuse';
+    public const STATUS_ADMIN = 'transmis_admin';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -105,7 +106,12 @@ class Report
 
     public function setStatus(string $status): static
     {
-        if (!in_array($status, [self::STATUS_EN_COURS, self::STATUS_TRAITE, self::STATUS_REFUSE])) {
+        if (!in_array($status, [
+            self::STATUS_EN_COURS,
+            self::STATUS_TRAITE,
+            self::STATUS_REFUSE,
+            self::STATUS_ADMIN
+        ])) {
             throw new \InvalidArgumentException("Statut invalide pour le signalement");
         }
         $this->status = $status;

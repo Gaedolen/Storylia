@@ -1,0 +1,168 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Utilisateurs signalés{% endblock %}
+
+{% block head %}
+    {% block stylesheets %}
+        <link rel="stylesheet" href="{{ asset('css/employe/utilisateurs_signales.css') }}">
+    {% endblock %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    <h1>
+        Utilisateurs signalés
+        <a href="#{#{{ path('employe_historique_signalements') }}#}" class="btn">Historique des signalements</a>
+    </h1>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Utilisateur signalé</th>
+                    <th>Signalé par</th>
+                    <th>Motif</th>
+                    <th>Message</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for report in reports %}
+                <tr>
+                    <td>{{ report.id }}</td>
+                    <td>
+                        {{ report.reported.pseudo }}
+                        <button
+                            type="button"
+                            class="btn-contact"
+                            data-pseudo="{{ report.reported.pseudo }}"
+                            data-action="{{ path('employe_signalement_mail_utilisateur', { id: report.id }) }}"
+                            data-token="{{ csrf_token('mail_user' ~ report.id) }}"
+                        >
+                            Contacter
+                        </button>
+                    </td>
+                    <td>
+                        {{ report.author.pseudo }}
+                        <td>
+                            {{ report.author.pseudo }}
+                            <button
+                                type="button"
+                                class="btn-contact"
+                                data-pseudo="{{ report.author.pseudo }}"
+                                data-action="{{ path('employe_signalement_mail_auteur', { id: report.id }) }}"
+                                data-token="{{ csrf_token('mail_author' ~ report.id) }}"
+                            >
+                                Contacter
+                            </button>
+                        </td>
+                    </td>
+                    <td>{{ report.reason }}</td>
+                    <td>{{ report.message }}</td>
+                    <td>{{ report.date|date('d/m/Y') }}</td>
+                    <td>
+                        {% if report.isEnCours() %}
+                            <form method="post" action="#{#{{ path('employe_traiter_signalement', {id: report.id}) }}#}" style="display:inline-block;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('traiter_report_' ~ report.id) }}">
+                                <button class="btn btn-success">Traiter</button>
+                            </form>
+
+                            <form method="post" action="#{#{{ path('employe_ignorer_signalement', {id: report.id}) }}#}" style="display:inline-block;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('ignorer_report_' ~ report.id) }}">
+                                <button class="btn btn-secondary">Ignorer</button>
+                            </form>
+
+                            <form method="post" action="#{#{{ path('employe_signalement_transmettre', {id: report.id}) }}#}" style="display:inline-block;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('transmettre' ~ report.id) }}">
+                                <button type="button" class="btn btn-warning btn-transmettre" data-userid="{{ report.reported.id }}" data-pseudo="{{ report.reported.pseudo }}">Transmettre à l’admin</button>
+                            </form>
+                        {% else %}
+                            <span>{{ report.status|capitalize }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" style="text-align:center; color: #777;">Aucun signalement pour le moment.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {# Pagination simple #}
+        {% if totalPages > 1 %}
+            <div class="pagination">
+                {% for p in 1..totalPages %}
+                    {% if p == currentPage %}
+                        <span class="current">{{ p }}</span>
+                    {% else %}
+                        <a href="{{ path('employe_utilisateurs_signales', {'page': p}) }}">{{ p }}</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Fenêtre pop-up pour envoyer un mail -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Envoyer un mail</h2>
+            <form id="contactForm" method="POST">
+                <input type="hidden" name="_token" id="modal_token">
+
+                <label>Objet</label>
+                <input type="text" name="subject" required>
+
+                <label>Motif</label>
+                <select name="reason" required>
+                    <option value="">-- Choisir un motif --</option>
+                    <option value="Comportement">Comportement</option>
+                    <option value="Contenu inapproprié">Contenu inapproprié</option>
+                    <option value="Autre">Autre</option>
+                </select>
+
+                <label>Message</label>
+                <textarea name="message" required></textarea>
+
+                <button type="submit" class="btn btn-primary">Envoyer</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Fenêtre pop-up pour signaler à l'admin -->
+    <div id="signalementModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Signaler un utilisateur à l'admin</h2>
+            {{ form_start(form, {'attr': {'id': 'form-signalement-modal'}, 'csrf_token_id': 'signalement_employe'}) }}
+                {{ form_row(form.reported) }}
+                {{ form_row(form.reason) }}
+                {{ form_row(form.message) }}
+                <button type="submit" class="btn btn-primary">Envoyer</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+    {% block javascripts %}
+        <script src="{{ asset('js/utilisateurs_signales.js') }}"></script>
+        {{ parent() }}
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const $el = $('.user-select');
+                if ($el.length) {
+                    $el.select2({
+                        width: '100%',
+                        placeholder: $el.data('placeholder') || 'Cherchez un pseudo…',
+                        allowClear: true,
+                        language: 'fr'
+                    });
+                }
+            });
+        </script>
+    {% endblock %}
+{% endblock %}

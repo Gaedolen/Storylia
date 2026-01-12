@@ -1,0 +1,255 @@
+/* ===== Fond général ===== */
+body {
+    background-color: #FAF3E0;
+    color: #3B2F2F;
+    font-family: 'Comfortaa', sans-serif;
+    line-height: 1.5;
+}
+
+main.content {
+    padding: 2rem;
+    min-height: calc(100vh - 120px);
+    box-sizing: border-box;
+}
+
+/* ===== Titres ===== */
+h1, h2, h3 {
+    color: #714B2F;
+    margin-bottom: 1rem;
+}
+
+h1 {
+    font-size: 2rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-top: 2rem;
+}
+
+.titre-page {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.btn-historique {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+    background-color: #A67856;
+}
+
+.btn-historique:hover {
+    background-color: #C97C5D;
+}
+
+/* ===== Conteneurs et encadrés ===== */
+.container-signalement,
+.table-container,
+.signalement-container {
+    background-color: #E8CBAE;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+}
+
+/* ===== Boutons ===== */
+.btn, .btn-primary, .btn-success, .btn-warning, .btn-secondary, .btn-contact {
+    background-color: #C97C5D;
+    border: none;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn:hover,
+.btn-primary:hover,
+.btn-success:hover,
+.btn-warning:hover,
+.btn-secondary:hover,
+.btn-contact:hover {
+    background-color: #A67856;
+}
+
+/* ===== Tables ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+table th, table td {
+    padding: 0.8rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+table th {
+    background-color: #C97C5D;
+    color: #fff;
+}
+
+table td button {
+    margin-top: 0.2rem;
+    margin-right: 0.3rem;
+}
+
+/* ===== Pagination ===== */
+.pagination {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.pagination a,
+.pagination span {
+    display: inline-block;
+    margin: 0 0.3rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #3B2F2F;
+    background-color: #E8CBAE;
+}
+
+.pagination a:hover {
+    background-color: #C97C5D;
+    color: #fff;
+}
+
+.pagination .current {
+    font-weight: bold;
+    background-color: #C97C5D;
+    color: #fff;
+}
+
+/* ===== Formulaires ===== */
+#form-signalement input,
+#form-signalement select,
+#form-signalement textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+/* ===== Modal générale ===== */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5); /* fond sombre semi-transparent */
+    padding-top: 80px;
+}
+
+.modal-content {
+    background-color: #E8CBAE; /* fond des cartes */
+    margin: auto;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    font-family: 'Comfortaa', sans-serif;
+    color: #3B2F2F;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Animation pour l'apparition */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Bouton fermer */
+.close {
+    color: #3B2F2F;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close:hover {
+    color: #C97C5D;
+}
+
+/* Titres */
+.modal h2 {
+    margin-top: 0;
+    color: #714B2F;
+    margin-bottom: 1rem;
+}
+
+/* Formulaire */
+#contactForm label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+}
+
+#contactForm input[type="text"],
+#contactForm textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+#contactForm textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+#contactForm button {
+    background-color: #C97C5D;
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+}
+
+#contactForm button:hover {
+    background-color: #A67856;
+}
+
+
+/* ===== Bouton contact ===== */
+.btn-contact {
+    background-color: #A67856;
+    font-size: 0.85rem;
+    padding: 0.3rem 0.5rem;
+}
+
+.btn-contact:hover {
+    background-color: #C97C5D;
+}
+
+.titre {
+    margin-top: 2rem;
+}
