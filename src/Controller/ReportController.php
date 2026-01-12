@@ -124,6 +124,19 @@ class ReportController extends AbstractController
             return new JsonResponse(['success' => false, 'message' => 'CSRF invalide.'], 403);
         }
 
+        // Eviter le double signalement
+        $existingReport = $em->getRepository(Report::class)->findOneBy([
+            'author' => $user,
+            'reported' => $utilisateur,
+        ]);
+
+        if ($existingReport) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Vous avez déjà signalé cet utilisateur.'
+            ], 409);
+        }
+
         $data = json_decode($request->getContent(), true);
         if (!$data || empty($data['reason']) || empty($data['message'])) {
             return new JsonResponse(['success' => false, 'message' => 'Données invalides.'], 400);

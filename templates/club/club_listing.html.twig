@@ -153,7 +153,7 @@
             <h3>Utilisateurs</h3>
             <div class="users-list">
                 {% for user in users %}
-                    <a href="{{ path('app_profil', {'id': user.id}) }}" class="user-card">
+                    <a href="{{ path('app_utilisateur_profil', {'id': user.id}) }}" class="user-card">
                         {% if user.profilePicture %}
                             <img src="{{ asset('uploads/profiles/' ~ user.profilePicture) }}" alt="{{ user.pseudo }}">
                         {% else %}

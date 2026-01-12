@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Utilisateur;
 use App\Entity\ReadingHistory;
 use App\Entity\Bookshelf;
+use App\Entity\Report;
 use App\Repository\ReadingStatusRepository;
 use App\Repository\UtilisateurRepository;
 use App\Form\ProfilType;
@@ -331,6 +332,16 @@ class ProfilController extends AbstractController
         $currentUser = $this->getUser();
         $isSelf = ($currentUser === $utilisateur);
 
+        
+        $hasReported = false;
+
+        if ($currentUser && !$isSelf) {
+            $hasReported = $em->getRepository(Report::class)->findOneBy([
+                'author'   => $currentUser,
+                'reported' => $utilisateur,
+            ]) !== null;
+        }
+
         // Mapping des préférences
         $preferenceLabels = [
             'scifi' => 'Science-Fiction',
@@ -397,6 +408,7 @@ class ProfilController extends AbstractController
             'lectureEnCours' => $lectureEnCours,
             'lastRead' => $lastRead,
             'preferenceLabels' => $preferenceLabels,
+            'hasReported' => $hasReported,
         ]);
     }
 
@@ -458,7 +470,7 @@ class ProfilController extends AbstractController
     }
 
     #[Route('/utilisateur/{id}/historique', name: 'app_utilisateur_historique')]
-    public function utilisateurHistorique(Utilisateur $utilisateur, ReadingHistoryRepository $historiqueRepository): Response {
+    public function utilisateurHistorique(Utilisateur $utilisateur, ReadingHistoryRepository $historiqueRepository, EntityManagerInterface $em): Response {
         $currentUser = $this->getUser();
         $isSelf = ($currentUser === $utilisateur);
 

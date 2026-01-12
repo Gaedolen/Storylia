@@ -129,3 +129,90 @@ document.addEventListener('DOMContentLoaded', () => {
     updateProgressVisual(pagesReadInput.value);
     adjustCircleSize();
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('report-user-modal');
+    const reportForm = document.getElementById('report-user-form');
+    const messageInput = document.getElementById('report-user-message');
+    const charCount = document.getElementById('report-user-char-count');
+    const closeBtn = document.getElementById('close-report-user');
+
+    // --- Ouvrir la modal ---
+    document.querySelectorAll('.btn-report-user').forEach(button => {
+        button.addEventListener('click', () => {
+            const userId = button.dataset.userId;
+            if (!userId) return;
+
+            document.getElementById('report-user-id').value = userId;
+
+            // Reset modal
+            messageInput.value = '';
+            charCount.textContent = '0 / 500';
+
+            modal.style.display = 'block';
+        });
+    });
+
+    // --- Fermer la modal ---
+    closeBtn.addEventListener('click', () => modal.style.display = 'none');
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) modal.style.display = 'none';
+    });
+
+    // --- Compteur de caractères ---
+    messageInput.addEventListener('input', () => {
+        charCount.textContent = `${messageInput.value.length} / 500`;
+    });
+
+    // --- Soumission du formulaire ---
+    reportForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const userId = document.getElementById('report-user-id').value;
+        const reason = document.getElementById('report-user-reason').value;
+        const message = messageInput.value.trim();
+        const csrfToken = document.querySelector('#report-user-form input[name="_token"]').value;
+
+        if (!reason || !message) {
+            alert("Veuillez remplir le motif et le message.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/report/user/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ reason, message })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                alert(data.message || "Utilisateur signalé.");
+                modal.style.display = 'none';
+                reportForm.reset();
+                charCount.textContent = '0 / 500';
+
+                // --- Remplacer le bouton par "Signalé ✅" ---
+                const btn = document.querySelector(`.btn-report-user[data-user-id="${userId}"]`);
+                if (btn) {
+                    btn.outerHTML = `
+                        <span class="report-badge">
+                            <svg class="check-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M20 6L9 17l-5-5" />
+                            </svg>
+                            Signalé
+                        </span>
+                    `;
+                }
+            } else {
+                alert(data.message || "Une erreur est survenue.");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Erreur lors de l'envoi du signalement.");
+        }
+    });
+});

@@ -235,6 +235,10 @@ body {
     box-shadow: 0 3px 8px rgba(0,0,0,0.1);
 }
 
+a {
+    text-decoration: none;
+}
+
 /* === Bulle d'avis === */
 .review-bubble {
     display: flex;

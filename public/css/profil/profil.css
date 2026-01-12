@@ -616,6 +616,185 @@ nav.profil-menu-horizontal .profil-links li a:active {
     transform-origin: center center;
 }
 
+/* ---- Modal signalement utilisateur ---- */
+#report-user-modal {
+    display: none; /* cachée par défaut */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* scroll si nécessaire */
+    background-color: rgba(0, 0, 0, 0.5); /* fond semi-transparent */
+    transition: opacity 0.3s ease;
+}
+
+/* Contenu de la modal */
+#report-user-modal .modal-content {
+    background-color: #fff8f0;
+    margin: 60px auto;
+    padding: 30px 25px;
+    border-radius: 20px;
+    max-width: 500px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    position: relative;
+    animation: modalFade 0.3s ease;
+}
+
+/* Animation d'apparition */
+@keyframes modalFade {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Bouton de fermeture */
+#close-report-user {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #714B2F;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+#close-report-user:hover {
+    color: #C97C5D;
+}
+
+/* Titre */
+#report-user-modal h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #714B2F;
+    text-align: center;
+}
+
+/* Formulaire */
+#report-user-modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Labels */
+#report-user-modal label {
+    font-weight: 600;
+    color: #714B2F;
+}
+
+/* Select et textarea */
+#report-user-modal select,
+#report-user-modal textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #C97C5D;
+    border-radius: 12px;
+    font-size: 1rem;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#report-user-modal select:focus,
+#report-user-modal textarea:focus {
+    border-color: #714B2F;
+    box-shadow: 0 0 5px rgba(201,124,93,0.5);
+}
+
+/* Compteur de caractères */
+#report-user-char-count {
+    font-size: 0.85rem;
+    color: #555;
+    text-align: right;
+}
+
+/* Bouton Valider */
+#report-user-modal button[type="submit"] {
+    background-color: #C97C5D;
+    color: #fff8f0;
+    font-weight: 600;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+#report-user-modal button[type="submit"]:hover {
+    background-color: #a65d42;
+    transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    #report-user-modal .modal-content {
+        margin: 30px 15px;
+        padding: 20px 15px;
+    }
+
+    #report-user-modal button[type="submit"] {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Bouton signalé */
+.btn-report-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+/* Icône cachée par défaut */
+.btn-report-user .check-icon {
+    width: 16px;
+    height: 16px;
+    stroke: white;
+    stroke-width: 3;
+    fill: none;
+    display: none;
+}
+
+/* État signalé */
+.btn-report-user.reported {
+    background-color: #C97C5D;
+    color: white;
+    pointer-events: none;
+}
+
+/* Afficher l'icône quand signalé */
+.btn-report-user.reported .check-icon {
+    display: block;
+}
+
+.report-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #e6f7ee;
+    color: #1f7a4d;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: default;
+}
+
+.check-icon {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 3;
+    fill: none;
+}
+
+
 /* --- RESPONSIVE TABLETTE & MOBILE --- */
 @media (max-width: 1024px) {
     /* Conteneur principal */

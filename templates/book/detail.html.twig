@@ -288,13 +288,15 @@
 
                     <!-- COLONNE UTILISATEUR -->
                     <div class="review-user">
-                        <img
-                            src="{{ asset('uploads/profiles/' ~ review.utilisateur.profilePicture) }}"
-                            alt="Photo {{ review.utilisateur.pseudo }}"
-                        >
-                        <span class="review-username">
-                            {{ review.utilisateur.pseudo }}
-                        </span>
+                        <a href="{{ path('app_utilisateur_profil', {'id': user.id}) }}" class="user-card">
+                            <img
+                                src="{{ asset('uploads/profiles/' ~ review.utilisateur.profilePicture) }}"
+                                alt="Photo {{ review.utilisateur.pseudo }}"
+                            >
+                            <span class="review-username">
+                                {{ review.utilisateur.pseudo }}
+                            </span>
+                        </a>
                     </div>
 
                     <!-- SÉPARATEUR -->

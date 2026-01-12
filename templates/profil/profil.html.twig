@@ -58,12 +58,53 @@
                     {% endif %}
 
                     {% if currentUser and not isSelf %}
-                        <form action="{{ path('report_user', {'id': utilisateur.id}) }}" method="POST" class="mt-2">
-                            <input type="hidden" name="_token" value="{{ csrf_token('signal_user_' ~ utilisateur.id) }}">
-                            <button type="submit" class="btn btn-warning">Signaler</button>
-                        </form>
+                        {% if hasReported %}
+                            <span class="report-badge">
+                                <svg class="check-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M20 6L9 17l-5-5" />
+                                </svg>
+                                Signalé
+                            </span>
+                        {% else %}
+                            <button
+                                type="button"
+                                class="btn btn-warning btn-report-user"
+                                data-user-id="{{ utilisateur.id }}"
+                            >
+                                Signaler
+                            </button>
+                        {% endif %}
                     {% endif %}
+
                 </div>
+
+                {# Modal de report utilisateur #}
+                <div id="report-user-modal" class="modal">
+                    <div class="modal-content">
+                        <span id="close-report-user" class="close">&times;</span>
+                        <form id="report-user-form">
+                        <input type="hidden" id="report-user-id" name="user_id" value="">
+                        
+                        <label>Motif</label>
+                        <select name="reason" id="report-user-reason" required>
+                            <option value="">-- Choisir un motif --</option>
+                            <option value="harcelement">Harcèlement / comportement toxique</option>
+                            <option value="usurpation">Usurpation d'identité</option>
+                            <option value="spam">Spam</option>
+                            <option value="contenu_inapproprie">Contenu inapproprié</option>
+                            <option value="autre">Autre</option>
+                        </select>
+
+                        <label>Message</label>
+                        <textarea id="report-user-message" name="message" maxlength="500" required></textarea>
+                        <div id="report-user-char-count">0 / 500</div>
+
+                        <input type="hidden" name="_token" value="{{ csrf_token('report_user') }}">
+                        <button type="submit" class="btn btn-warning">Signaler</button>
+                        </form>
+                    </div>
+                </div>
+
 
                 <div class="info-grid">
                     <div class="info-item">
