@@ -211,57 +211,60 @@ class EmployeController extends AbstractController
         ]);
     }
 
-    #[Route('/utilisateur-signalement/{id}', name: 'employe_utilisateur_signalement')]
-    public function detailSignalement(Report $report): Response
-    {
-        return $this->render('employe/utilisateur_signalement_detail.html.twig', [
-            'report' => $report
-        ]);
-    }
-
     #[Route('/utilisateur-signalement/{id}/transmettre', name: 'employe_signalement_transmettre', methods: ['POST'])]
     public function transmettreAdmin(
         Report $report,
         EntityManagerInterface $em,
-        Request $request,
-        MailerInterface $mailer
+        Request $request
     ): Response {
+        // Vérification CSRF
         if (!$this->isCsrfTokenValid('transmettre'.$report->getId(), $request->request->get('_token'))) {
             throw $this->createAccessDeniedException();
         }
 
+        // Récupérer le message envoyé par l'employé
+        $employeMessage = $request->request->get('employeMessage');
+
+        if ($employeMessage) {
+            $report->setEmployeMessage($employeMessage);
+        }
+
+        // Changer le statut pour indiquer que c'est transmis à l'admin
         $report->setStatus(Report::STATUS_ADMIN);
+
         $em->flush();
 
-        // Mail admin
-        $email = (new TemplatedEmail())
-            ->from('no-reply@storylia.com')
-            ->to('admin@storylia.com')
-            ->subject('Signalement transmis par un employé')
-            ->htmlTemplate('email/report_admin.html.twig')
-            ->context([
-                'report' => $report
-            ]);
-        $mailer->send($email);
-
         $this->addFlash('success', 'Signalement transmis à l’administrateur.');
+
+        // Redirection vers la page employé
         return $this->redirectToRoute('employe_utilisateurs_signales');
     }
 
-    #[Route('/utilisateur-signalement/{id}/refuser', name: 'employe_signalement_refuser', methods: ['POST'])]
-    public function refuserSignalement(
-        Report $report,
-        EntityManagerInterface $em,
-        Request $request
-    ): Response {
-        if (!$this->isCsrfTokenValid('refuser'.$report->getId(), $request->request->get('_token'))) {
+    #[Route('/utilisateur-signalement/{id}/traiter', name: 'employe_traiter_signalement', methods: ['POST'])]
+    public function traiterSignalement(Report $report, EntityManagerInterface $em, Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('traiter_report' . $report->getId(), $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $report->setStatus(Report::STATUS_TRAITE);
+        $em->flush();
+
+        $this->addFlash('success', 'Signalement traité.');
+        return $this->redirectToRoute('employe_utilisateurs_signales');
+    }
+
+    #[Route('/utilisateur-signalement/{id}/ignorer', name: 'employe_ignorer_signalement', methods: ['POST'])]
+    public function ignorerSignalement(Report $report, EntityManagerInterface $em, Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('ignorer_report' . $report->getId(), $request->request->get('_token'))) {
             throw $this->createAccessDeniedException();
         }
 
         $report->setStatus(Report::STATUS_REFUSE);
         $em->flush();
 
-        $this->addFlash('info', 'Signalement refusé.');
+        $this->addFlash('info', 'Signalement ignoré.');
         return $this->redirectToRoute('employe_utilisateurs_signales');
     }
 
@@ -339,5 +342,23 @@ class EmployeController extends AbstractController
 
         $this->addFlash('success', 'Mail envoyé à l’auteur du signalement.');
         return $this->redirectToRoute('employe_utilisateurs_signales');
+    }
+
+    #[Route('/utilisateurs-signales/historique', name: 'employe_historique_signalements')]
+    public function historiqueSignalements(
+        ReportRepository $reportRepository,
+        Request $request
+    ): Response {
+        $statusFilter = $request->query->get('status'); // traité, refusé, transmis
+        $searchUser   = $request->query->get('user');   // pseudo de l'utilisateur recherché
+
+        // Appel de ta méthode repository
+        $reports = $reportRepository->findHistorique($statusFilter, $searchUser);
+
+        return $this->render('employe/historique_signalements.html.twig', [
+            'reports' => $reports,
+            'statusFilter' => $statusFilter,
+            'searchUser' => $searchUser,
+        ]);
     }
 }

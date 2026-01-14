@@ -12,7 +12,7 @@
 {% block body %}
     <h1>
         Utilisateurs signalés
-        <a href="#{#{{ path('employe_historique_signalements') }}#}" class="btn">Historique des signalements</a>
+        <a href="{{ path('employe_historique_signalements') }}" class="btn">Historique des signalements</a>
     </h1>
 
     <div class="table-container">
@@ -46,38 +46,39 @@
                     </td>
                     <td>
                         {{ report.author.pseudo }}
-                        <td>
-                            {{ report.author.pseudo }}
-                            <button
-                                type="button"
-                                class="btn-contact"
-                                data-pseudo="{{ report.author.pseudo }}"
-                                data-action="{{ path('employe_signalement_mail_auteur', { id: report.id }) }}"
-                                data-token="{{ csrf_token('mail_author' ~ report.id) }}"
-                            >
-                                Contacter
-                            </button>
-                        </td>
+                        <button
+                            type="button"
+                            class="btn-contact"
+                            data-pseudo="{{ report.author.pseudo }}"
+                            data-action="{{ path('employe_signalement_mail_auteur', { id: report.id }) }}"
+                            data-token="{{ csrf_token('mail_author' ~ report.id) }}"
+                        >
+                            Contacter
+                        </button>
+                    </td>
                     </td>
                     <td>{{ report.reason }}</td>
                     <td>{{ report.message }}</td>
                     <td>{{ report.date|date('d/m/Y') }}</td>
                     <td>
                         {% if report.isEnCours() %}
-                            <form method="post" action="#{#{{ path('employe_traiter_signalement', {id: report.id}) }}#}" style="display:inline-block;">
-                                <input type="hidden" name="_token" value="{{ csrf_token('traiter_report_' ~ report.id) }}">
+                            <form method="post" action="{{ path('employe_traiter_signalement', {id: report.id}) }}" style="display:inline-block;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('traiter_report' ~ report.id) }}">
                                 <button class="btn btn-success">Traiter</button>
                             </form>
 
-                            <form method="post" action="#{#{{ path('employe_ignorer_signalement', {id: report.id}) }}#}" style="display:inline-block;">
-                                <input type="hidden" name="_token" value="{{ csrf_token('ignorer_report_' ~ report.id) }}">
+                            <form method="post" action="{{ path('employe_ignorer_signalement', {id: report.id}) }}" style="display:inline-block;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('ignorer_report' ~ report.id) }}">
                                 <button class="btn btn-secondary">Ignorer</button>
                             </form>
-
-                            <form method="post" action="#{#{{ path('employe_signalement_transmettre', {id: report.id}) }}#}" style="display:inline-block;">
-                                <input type="hidden" name="_token" value="{{ csrf_token('transmettre' ~ report.id) }}">
-                                <button type="button" class="btn btn-warning btn-transmettre" data-userid="{{ report.reported.id }}" data-pseudo="{{ report.reported.pseudo }}">Transmettre à l’admin</button>
-                            </form>
+                            <button
+                                type="button"
+                                class="btn btn-warning btn-transmettre"
+                                data-action="{{ path('employe_signalement_transmettre', {id: report.id}) }}"
+                                data-token="{{ csrf_token('transmettre' ~ report.id) }}"
+                            >
+                                Transmettre à l’admin
+                            </button>
                         {% else %}
                             <span>{{ report.status|capitalize }}</span>
                         {% endif %}
@@ -133,16 +134,26 @@
     </div>
 
     <!-- Fenêtre pop-up pour signaler à l'admin -->
-    <div id="signalementModal" class="modal">
+    <div id="transmettreModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Signaler un utilisateur à l'admin</h2>
-            {{ form_start(form, {'attr': {'id': 'form-signalement-modal'}, 'csrf_token_id': 'signalement_employe'}) }}
-                {{ form_row(form.reported) }}
-                {{ form_row(form.reason) }}
-                {{ form_row(form.message) }}
-                <button type="submit" class="btn btn-primary">Envoyer</button>
-            {{ form_end(form) }}
+
+            <h2>Transmettre à l’administrateur</h2>
+
+            <form id="transmettreForm" method="POST">
+                <input type="hidden" name="_token" id="transmettre_token">
+
+                <label>Message pour l’administrateur</label>
+                <textarea
+                    name="employeMessage"
+                    placeholder="Expliquez pourquoi cet utilisateur devrait être suspendu"
+                    required
+                ></textarea>
+
+                <button type="submit" class="btn btn-warning">
+                    Transmettre
+                </button>
+            </form>
         </div>
     </div>
 

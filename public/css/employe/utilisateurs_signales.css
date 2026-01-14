@@ -253,3 +253,61 @@ table td button {
 .titre {
     margin-top: 2rem;
 }
+
+/* ===== Modal Transmettre à l'admin ===== */
+
+#transmettreModal .modal-content {
+    max-width: 600px; /* plus large que la modal contact */
+}
+
+/* Formulaire transmettre */
+#transmettreForm label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    color: #3B2F2F;
+}
+
+/* Textarea large et confortable */
+#transmettreForm textarea {
+    width: 100%;
+    min-height: 180px; /* 👍 bien lisible */
+    padding: 0.75rem;
+    border-radius: 10px;
+    border: 1px solid #C2B6A9;
+    font-size: 1rem;
+    font-family: 'Comfortaa', sans-serif;
+    resize: vertical;
+    background-color: #FFF8F2;
+    color: #3B2F2F;
+    line-height: 1.5;
+}
+
+/* Focus élégant */
+#transmettreForm textarea:focus {
+    outline: none;
+    border-color: #C97C5D;
+    box-shadow: 0 0 0 3px rgba(201, 124, 93, 0.25);
+}
+
+/* Bouton transmettre */
+#transmettreForm button {
+    align-self: flex-end;
+    margin-top: 1rem;
+    background-color: #E0A458; /* plus "warning" mais doux */
+    color: #3B2F2F;
+    border: none;
+    padding: 0.7rem 1.6rem;
+    border-radius: 999px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.2s;
+}
+
+/* Hover */
+#transmettreForm button:hover {
+    background-color: #C97C5D;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}

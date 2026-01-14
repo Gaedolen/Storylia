@@ -28,6 +28,9 @@ class Report
     #[ORM\Column(type: Types::TEXT)]
     private ?string $message = null;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $employeMessage = null;
+
     #[ORM\Column(length: 50)]
     private ?string $status = self::STATUS_EN_COURS;
 
@@ -96,6 +99,17 @@ class Report
     {
         $this->message = $message;
 
+        return $this;
+    }
+
+    public function getEmployeMessage(): ?string
+    {
+        return $this->employeMessage;
+    }
+
+    public function setEmployeMessage(?string $employeMessage): self
+    {
+        $this->employeMessage = $employeMessage;
         return $this;
     }
 

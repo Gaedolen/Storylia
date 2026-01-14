@@ -1,0 +1,168 @@
+body {
+    background-color: #FAF3E0;
+    color: #3B2F2F;
+    font-family: 'Comfortaa', sans-serif;
+    line-height: 1.5;
+}
+
+main.content {
+    padding: 2rem;
+    min-height: calc(100vh - 120px);
+    box-sizing: border-box;
+}
+
+/* ===== Container et titres ===== */
+h1 {
+    font-family: 'Comfortaa', sans-serif;
+    color: #714B2F;
+    margin-bottom: 1.5rem;
+}
+
+/* ===== Formulaire de filtres ===== */
+form.filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: flex-end;
+}
+
+form.filter-form div {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Comfortaa', sans-serif;
+}
+
+form.filter-form label {
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+    color: #714B2F;
+}
+
+form.filter-form input[type="text"],
+form.filter-form select {
+    padding: 0.5rem 0.7rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 0.95rem;
+    min-width: 150px;
+    transition: all 0.2s ease-in-out;
+}
+
+form.filter-form input[type="text"]:focus,
+form.filter-form select:focus {
+    outline: none;
+    border-color: #C97C5D;
+    box-shadow: 0 0 4px rgba(201,124,93,0.5);
+}
+
+form.filter-form button {
+    background-color: #C97C5D;
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+    height: fit-content;
+}
+
+form.filter-form button:hover {
+    background-color: #A67856;
+}
+
+/* ===== Tableau ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Comfortaa', sans-serif;
+    background-color: #E8CBAE;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+thead {
+    background-color: #C97C5D;
+    color: #fff;
+}
+
+thead th {
+    padding: 0.8rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+tbody td {
+    padding: 0.8rem;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    vertical-align: top;
+}
+
+tbody tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ===== Pastilles de statut ===== */
+.badge {
+    padding: 0.3rem 0.6rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #fff;
+    display: inline-block;
+    text-align: center;
+    min-width: 70px;
+}
+
+.badge-green { background-color: #4CAF50; }   /* Traité */
+.badge-red   { background-color: #F44336; }   /* Refusé */
+.badge-orange{ background-color: #FF9800; }   /* Transmis */
+
+/* ===== Message "aucun signalement" ===== */
+tbody td[colspan] {
+    font-style: italic;
+    color: #777;
+    text-align: center;
+    padding: 1rem;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    form {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    table thead {
+        display: none;
+    }
+
+    table, tbody, tr, td {
+        display: block;
+        width: 100%;
+    }
+
+    tbody tr {
+        margin-bottom: 1rem;
+        background-color: #E8CBAE;
+        border-radius: 12px;
+        padding: 0.5rem;
+    }
+
+    tbody td {
+        padding: 0.5rem;
+        text-align: right;
+        position: relative;
+    }
+
+    tbody td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0.5rem;
+        font-weight: bold;
+        text-align: left;
+    }
+}

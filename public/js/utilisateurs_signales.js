@@ -31,25 +31,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     /* ========= MODAL TRANSMETTRE ========= */
-    const signalementModal = document.getElementById('signalementModal');
-    const signalementClose = signalementModal.querySelector('.close');
+    const signalementModal = document.getElementById('transmettreModal');
 
-    document.querySelectorAll('.btn-transmettre').forEach(btn => {
-        btn.addEventListener('click', () => {
-            signalementModal.style.display = 'block';
+    if (signalementModal) {
+        const signalementClose = signalementModal.querySelector('.close');
+        const transmettreForm = document.getElementById('transmettreForm');
+        const transmettreToken = document.getElementById('transmettre_token');
 
-            const userId = btn.dataset.userid;
-            const selectReported = signalementModal.querySelector('#form_signalement_reported');
-            if (selectReported) {
-                selectReported.value = userId;
-            }
+        document.querySelectorAll('.btn-transmettre').forEach(btn => {
+            btn.addEventListener('click', () => {
+                transmettreForm.action = btn.dataset.action;
+                transmettreToken.value = btn.dataset.token;
+
+                transmettreForm.querySelector('textarea[name="employeMessage"]').value = '';
+
+                signalementModal.style.display = 'block';
+            });
         });
-    });
 
-    signalementClose.addEventListener('click', () => signalementModal.style.display = 'none');
-
-    window.addEventListener('click', e => {
-        if (e.target === contactModal) contactModal.style.display = 'none';
-        if (e.target === signalementModal) signalementModal.style.display = 'none';
-    });
+        signalementClose.addEventListener('click', () => signalementModal.style.display = 'none');
+    }
 });
