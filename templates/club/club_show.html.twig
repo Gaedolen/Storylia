@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des clubs{% endblock %}
+{% block title %}{{ club.name }}{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('css/club/show.css') }}">
@@ -19,6 +19,70 @@
                     {% if app.user and app.user == club.creator %}
                         <a href="{{ path('club_edit', {'id': club.id}) }}" class="btn-edit">Modifier</a>
                     {% endif %}
+
+                    {% if app.user %}
+                        {% set isParticipant = club.membres|filter(p => p.id == app.user.id)|length > 0 %}
+                        {% set isCreator = club.creator.id == app.user.id %}
+
+                        {% if isParticipant and not isCreator %}
+                            <a class="btn-warning"
+                            data-bs-toggle="modal"
+                            data-bs-target="#reportClubModal"
+                            id="openReportClubBtn">
+                                Signaler un problème
+                            </a>
+                        {% endif %}
+                    {% endif %}
+
+                    <!-- Modal de signalement du club -->
+                    <div class="modal fade" id="reportClubModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                
+                                <!-- En-tête -->
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Signaler un problème sur {{ club.name }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                </div>
+
+                                <!-- Corps du modal -->
+                                <div class="modal-body">
+                                    <form id="reportClubForm" method="post" action="{{ path('report_club', { id: club.id }) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('report_club') }}">
+                                        <label for="reportReason">Motif :</label>
+                                        <select id="reason" name="reason" required>
+                                            <option value="" disabled selected>Choisir un motif</option>
+                                            <option value="spam">Spam ou publicité</option>
+                                            <option value="offensant">Contenu offensant</option>
+                                            <option value="faux_club">Faux club</option>
+                                            <option value="autre">Autre</option>
+                                        </select>
+
+                                        <label for="reportMessage">Message :</label>
+                                        <textarea id="message" name="message" maxlength="500" oninput="updateCharCount(this)" required></textarea>
+                                        <div class="char-count">
+                                            <span id="charCount-report">0</span> / 500 caractères
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn-warning">Envoyer le signalement</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Script pour compteur de caractères -->
+                    <script>
+                    function updateCharCount(textarea) {
+                        const max = textarea.getAttribute('maxlength');
+                        const remaining = max - textarea.value.length;
+                        document.getElementById('charCount-report').innerText = remaining + ' caractères restants';
+                    }
+                    </script>
+
+
                 </div>
             </div>
 
@@ -195,7 +259,7 @@
                                     <input 
                                         type="radio" 
                                         id="proposal-{{ proposal.id }}" 
-                                        name="vote[bookProposal]"  {# correspond au tableau attendu côté controller #}
+                                        name="vote[bookProposal]"
                                         value="{{ proposal.id }}"
                                     >
                                     {% if proposal.id in leadingProposals %}
@@ -252,7 +316,7 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
 
-        // Modal de vote (custom)
+        // Modal de vote
         (() => {
             const voteBtn = document.getElementById('vote-btn');
             const voteModal = document.getElementById('voteModal');
@@ -270,42 +334,100 @@
         const reviewForm = document.getElementById('reviewForm');
         const textarea = document.getElementById('comment');
         const charCount = document.getElementById('charCount');
-        if (!reviewForm || !textarea || !charCount) return;
 
-        textarea.addEventListener('input', () => {
-            charCount.textContent = textarea.value.length;
-        });
+        if (reviewForm && textarea && charCount) {
 
-        const reviewUrl = "{{ path('club_review_add') }}";
+            textarea.addEventListener('input', () => {
+                charCount.textContent = textarea.value.length;
+            });
 
-        reviewForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const monthId = reviewForm.dataset.month;
-            if (!monthId) return console.error("data-month manquant");
+            const reviewUrl = "{{ path('club_review_add') }}";
 
-            const data = {
-                comment: textarea.value,
-                readingMonthId: monthId,
-                rating: 5
-            };
+            reviewForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const monthId = reviewForm.dataset.month;
+                if (!monthId) return console.error("data-month manquant");
 
-            try {
-                const response = await fetch(reviewUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(data)
-                });
+                const data = {
+                    comment: textarea.value,
+                    readingMonthId: monthId,
+                    rating: 5
+                };
 
-                const result = await response.json();
-                if (response.ok && result.success) {
-                    location.reload(); // Recharge pour désactiver le bouton
-                } else {
-                    console.error("Erreur:", result.error || response.statusText);
+                try {
+                    const response = await fetch(reviewUrl, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(data)
+                    });
+
+                    const result = await response.json();
+                    if (response.ok && result.success) {
+                        location.reload();
+                    } else {
+                        console.error("Erreur:", result.error || response.statusText);
+                    }
+                } catch (err) {
+                    console.error("Erreur réseau :", err);
                 }
-            } catch (err) {
-                console.error("Erreur réseau :", err);
-            }
-        });
+            });
+        }
+        
+        // Modal signalement club
+        const reportForm = document.getElementById('reportClubForm');
+        const modalEl = document.getElementById('reportClubModal');
+        const openBtn = document.getElementById('openReportClubBtn');
+
+        if (reportForm && modalEl) {
+
+            // Quand le modal est complètement fermé → rendre le focus au bouton
+            modalEl.addEventListener('hidden.bs.modal', () => {
+                if (openBtn) {
+                    openBtn.focus();
+                }
+            });
+
+            reportForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const reason = reportForm.reason.value.trim();
+                const message = document.getElementById('message').value.trim();
+                const csrfToken = reportForm.querySelector('input[name="_token"]').value;
+
+                if (!reason || !message) {
+                    alert("Tous les champs sont requis.");
+                    return;
+                }
+
+                try {
+                    const response = await fetch(reportForm.action, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": csrfToken
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({ reason, message, _token: csrfToken })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.success) {
+                        alert(result.message || "Signalement envoyé !");
+                        reportForm.reset();
+
+                        const modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) modal.hide();
+
+                    } else {
+                        alert(result.message || "Erreur lors du signalement.");
+                    }
+                } catch (err) {
+                    console.error("Erreur réseau :", err);
+                    alert("Erreur réseau.");
+                }
+            });
+        }
     });
     </script>
 

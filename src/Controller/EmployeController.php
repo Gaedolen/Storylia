@@ -349,8 +349,8 @@ class EmployeController extends AbstractController
         ReportRepository $reportRepository,
         Request $request
     ): Response {
-        $statusFilter = $request->query->get('status'); // traité, refusé, transmis
-        $searchUser   = $request->query->get('user');   // pseudo de l'utilisateur recherché
+        $statusFilter = $request->query->get('status');
+        $searchUser   = $request->query->get('user');
 
         // Appel de ta méthode repository
         $reports = $reportRepository->findHistorique($statusFilter, $searchUser);

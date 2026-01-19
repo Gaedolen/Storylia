@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Report;
 use App\Entity\Book;
 use App\Entity\Utilisateur;
+use App\Entity\Club;
 use App\Entity\Review;
 use App\Repository\ReviewRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -153,5 +154,56 @@ class ReportController extends AbstractController
         $em->flush();
 
         return new JsonResponse(['success' => true, 'message' => 'Utilisateur signalé.']);
+    }
+
+    #[Route('/club/{id}', name: 'club', methods: ['POST'])]
+    public function reportClub(Club $club, Request $request, EntityManagerInterface $em, CsrfTokenManagerInterface $csrfTokenManager): JsonResponse 
+    {
+        /** @var \App\Entity\Utilisateur $user */
+        $user = $this->getUser();
+
+        if (!$user) {
+            return new JsonResponse(['success' => false, 'message' => 'Non authentifié.'], 401);
+        }
+
+        // Récupération des données JSON
+        $data = json_decode($request->getContent(), true);
+
+        // On récupère le token soit depuis JSON soit depuis header
+        $csrfToken = $data['_token'] ?? $request->headers->get('X-CSRF-TOKEN');
+        $reason = $data['reason'] ?? null;
+        $message = $data['message'] ?? null;
+
+        // Vérification CSRF
+        if (!$csrfToken || !$csrfTokenManager->isTokenValid(new CsrfToken('report_club', $csrfToken))) {
+            return new JsonResponse(['success' => false, 'message' => 'CSRF invalide.']);
+        }
+
+        // Vérifier que l'utilisateur est participant mais pas créateur
+        $isParticipant = $club->getMembres()->contains($user);
+        $isCreator = $club->getCreator() === $user;
+        if (!$isParticipant || $isCreator) {
+            return new JsonResponse(['success' => false, 'message' => 'Vous ne pouvez pas signaler ce club.'], 403);
+        }
+
+        // Validation des données
+        if (!$reason || !$message) {
+            return new JsonResponse(['success' => false, 'message' => 'Données invalides.'], 400);
+        }
+
+        
+
+
+        $report = new Report();
+        $report->setAuthor($user);
+        $report->setReportedClub($club);
+        $report->setReason($reason);
+        $report->setMessage($message);
+        $report->setStatus('en_cours');
+
+        $em->persist($report);
+        $em->flush();
+
+        return new JsonResponse(['success' => true, 'message' => 'Signalement envoyé !']);
     }
 }
