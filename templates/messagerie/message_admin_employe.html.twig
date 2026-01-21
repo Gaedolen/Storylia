@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Messagerie{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/messagerie/message_admin_employe.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="messenger">
+        <h2>Messagerie Employés / Admin</h2>
+
+        <div class="messages">
+            {% for msg in messages %}
+                {% set classe = msg.sender.id == app.user.id ? 'sender' : 'receiver' %}
+
+                <div class="message {{ classe }}">
+                    <div class="message-pseudo">
+                        {{ msg.sender.pseudo }}
+                    </div>
+
+                    <div class="message-bubble">
+                        {{ msg.content }}
+                    </div>
+
+                    <small class="message-date">
+                        {{ msg.createdAt|date('d/m/Y H:i') }}
+                    </small>
+                </div>
+            {% else %}
+                <p style="text-align:center; color:#6B6B6B;">Aucun message pour le moment.</p>
+            {% endfor %}
+        </div>
+
+        <form method="post" action="{{ path('messagerie_send') }}" class="messenger-form">
+            <input type="hidden" name="receiver_id" value="1">
+            <textarea name="content" placeholder="Écrire un message…"></textarea>
+            <button type="submit">Envoyer</button>
+        </form>
+    </div>
+
+    <div class="back-dashboard">
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('admin_dashboard') }}" class="btn-back">
+                ⬅ Retour au dashboard admin
+            </a>
+        {% elseif is_granted('ROLE_EMPLOYE') %}
+            <a href="{{ path('employe_dashboard') }}" class="btn-back">
+                ⬅ Retour au dashboard employé
+            </a>
+        {% endif %}
+    </div>
+
+    <script>
+        const appUser = {{ app.user.id }};
+    </script>
+    <script src="{{ asset('js/messagerie.js') }}"></script>
+{% endblock %}

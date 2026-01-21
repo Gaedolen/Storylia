@@ -560,18 +560,4 @@ class EmployeController extends AbstractController
             'searchClub' => $searchClub,
         ]);
     }
-
-    #[Route('/messagerie', name: 'employe_messagerie')]
-    public function messagerie(EntityManagerInterface $em): Response
-    {
-        $user = $this->getUser();
-
-        // Récupère tous les messages échangés avec l'admin
-        $messages = $em->getRepository(Message::class)
-                    ->findByUserAndAdmin($user);
-
-        return $this->render('employe/messagerie.html.twig', [
-            'messages' => $messages,
-        ]);
-    }
 }

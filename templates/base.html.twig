@@ -42,7 +42,17 @@
             <header class="navbar-custom">
                 <div class="container-header">
                     <div class="logo-left">
-                        <a href="{{ path('app_accueil') }}"><img src="{{ asset('images/logo.PNG') }}" alt="Storylia" class="logo"></a>
+                        <a href="
+                            {% if is_granted('ROLE_ADMIN') %}
+                                {{ path('admin_dashboard') }}
+                            {% elseif is_granted('ROLE_EMPLOYE') %}
+                                {{ path('employe_dashboard') }}
+                            {% else %}
+                                {{ path('app_accueil') }}
+                            {% endif %}
+                        ">
+                            <img src="{{ asset('images/logo.PNG') }}" alt="Storylia" class="logo">
+                        </a>
                     </div>
 
                     <div class='menu-section'>

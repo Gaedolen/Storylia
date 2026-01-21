@@ -57,6 +57,13 @@
         </div>
     </div>
 
+    <div class="dashboard-section">
+        <h2>Messagerie</h2>
+        <div class="admin-actions">
+            <a href="{{ path('messagerie_index') }}" class="btn-message">Messagerie Employés / Admin</a>
+        </div>
+    </div>
+
     {# === Flash messages === #}
     {% for label, messages in app.flashes %}
         {% for message in messages %}

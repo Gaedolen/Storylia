@@ -97,6 +97,8 @@ body {
 .btn-employe { background-color: #5F7F5F; }
 .btn-utilisateur { background-color: #A67856; }
 .btn-livres { background-color: #C97C5D; }
+.btn-message { background-color: #3B2F2F; }
+
 
 /* === Flash messages === */
 .alert {
