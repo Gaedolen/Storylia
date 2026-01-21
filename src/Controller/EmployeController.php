@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Repository\ReviewRepository;
 use App\Entity\Report;
 use App\Entity\Book;
+use App\Entity\Message;
 use App\Repository\ReportRepository;
 use App\Form\BookType;
 use App\Form\ReportType;
@@ -557,6 +558,20 @@ class EmployeController extends AbstractController
             'reports' => $reports,
             'statusFilter' => $statusFilter,
             'searchClub' => $searchClub,
+        ]);
+    }
+
+    #[Route('/messagerie', name: 'employe_messagerie')]
+    public function messagerie(EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+
+        // Récupère tous les messages échangés avec l'admin
+        $messages = $em->getRepository(Message::class)
+                    ->findByUserAndAdmin($user);
+
+        return $this->render('employe/messagerie.html.twig', [
+            'messages' => $messages,
         ]);
     }
 }
