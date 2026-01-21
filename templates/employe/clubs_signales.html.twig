@@ -1,0 +1,181 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Clubs signalés{% endblock %}
+
+{% block head %}
+    {% block stylesheets %}
+        <link rel="stylesheet" href="{{ asset('css/employe/utilisateurs_signales.css') }}">
+    {% endblock %}
+{% endblock %}
+
+{% block body %}
+    <h1>
+        Clubs signalés
+        <a href="{{ path('employe_historique_clubs_signalements') }}" class="btn">Historique des signalements</a>
+    </h1>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Club signalé</th>
+                    <th>Créateur du club</th>
+                    <th>Signalé par</th>
+                    <th>Motif</th>
+                    <th>Message</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for report in reports %}
+                <tr>
+                    <td>{{ report.id }}</td>
+
+                    <td>
+                        {{ report.reportedClub.name }}
+                    </td>
+
+                    <td>
+                        {{ report.reportedClub.creator.pseudo }}
+
+                        <button
+                            type="button"
+                            class="btn-contact"
+                            data-pseudo="{{ report.reportedClub.creator.pseudo }}"
+                            data-action="{{ path('employe_club_signalement_mail_createur', { id: report.id }) }}"
+                            data-token="{{ csrf_token('mail_creator' ~ report.id) }}"
+                        >
+                            Contacter
+                        </button>
+                    </td>
+
+                    <td>
+                        {{ report.author.pseudo }}
+                        <button
+                            type="button"
+                            class="btn-contact"
+                            data-pseudo="{{ report.author.pseudo }}"
+                            data-action="{{ path('employe_club_signalement_mail_auteur', { id: report.id }) }}"
+                            data-token="{{ csrf_token('mail_author' ~ report.id) }}"
+                        >
+                            Contacter
+                        </button>
+                    </td>
+
+                    <td>{{ report.reason }}</td>
+                    <td>{{ report.message }}</td>
+                    <td>{{ report.date|date('d/m/Y') }}</td>
+
+                    <td>
+                        {% if report.isEnCours() %}
+                            <form method="post"
+                                action="{{ path('employe_club_traiter_signalement', {id: report.id}) }}"
+                                style="display:inline-block;">
+                                <input type="hidden" name="_token"
+                                    value="{{ csrf_token('traiter_report' ~ report.id) }}">
+                                <button class="btn btn-success">Traiter</button>
+                            </form>
+
+                            <form method="post"
+                                action="{{ path('employe_club_ignorer_signalement', {id: report.id}) }}"
+                                style="display:inline-block;">
+                                <input type="hidden" name="_token"
+                                    value="{{ csrf_token('ignorer_report' ~ report.id) }}">
+                                <button class="btn btn-secondary">Ignorer</button>
+                            </form>
+
+                            <button
+                                type="button"
+                                class="btn btn-warning btn-transmettre"
+                                data-action="{{ path('employe_club_signalement_transmettre', {id: report.id}) }}"
+                                data-token="{{ csrf_token('transmettre' ~ report.id) }}"
+                            >
+                                Transmettre à l’admin
+                            </button>
+                        {% else %}
+                            <span>{{ report.status|capitalize }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="7" style="text-align:center; color: #777;">
+                        Aucun signalement pour le moment.
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {# Pagination (structure conservée) #}
+        {% if totalPages > 1 %}
+            <div class="pagination">
+                {% for p in 1..totalPages %}
+                    {% if p == currentPage %}
+                        <span class="current">{{ p }}</span>
+                    {% else %}
+                        <a href="{{ path('employe_clubs_signales', {'page': p}) }}">{{ p }}</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Fenêtre pop-up pour envoyer un mail à l’auteur -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Envoyer un mail</h2>
+            <form id="contactForm" method="POST">
+                <input type="hidden" name="_token" id="modal_token">
+
+                <label>Objet</label>
+                <input type="text" name="subject" required>
+
+                <label>Motif</label>
+                <select name="reason" required>
+                    <option value="">-- Choisir un motif --</option>
+                    <option value="Club problématique">Club problématique</option>
+                    <option value="Contenu inapproprié">Contenu inapproprié</option>
+                    <option value="Autre">Autre</option>
+                </select>
+
+                <label>Message</label>
+                <textarea name="message" required></textarea>
+
+                <button type="submit" class="btn btn-primary">Envoyer</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Fenêtre pop-up pour transmettre à l’admin -->
+    <div id="transmettreModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+
+            <h2>Transmettre à l’administrateur</h2>
+
+            <form id="transmettreForm" method="POST">
+                <input type="hidden" name="_token" id="transmettre_token">
+
+                <label>Message pour l’administrateur</label>
+                <textarea
+                    name="employeMessage"
+                    placeholder="Expliquez pourquoi ce club devrait être suspendu"
+                    required
+                ></textarea>
+
+                <button type="submit" class="btn btn-warning">
+                    Transmettre
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {% block javascripts %}
+        <script src="{{ asset('js/utilisateurs_signales.js') }}"></script>
+        {{ parent() }}
+    {% endblock %}
+{% endblock %}

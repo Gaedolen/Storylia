@@ -25,12 +25,20 @@
                         {% set isCreator = club.creator.id == app.user.id %}
 
                         {% if isParticipant and not isCreator %}
-                            <a class="btn-warning"
-                            data-bs-toggle="modal"
-                            data-bs-target="#reportClubModal"
-                            id="openReportClubBtn">
-                                Signaler un problème
-                            </a>
+                            {% if hasReportedClub %}
+                                <button class="btn-warning"
+                                        disabled
+                                        style="opacity:0.6; cursor:not-allowed;">
+                                    Signalement envoyé ✓
+                                </button>
+                            {% else %}
+                                <a class="btn-warning"
+                                data-bs-toggle="modal"
+                                data-bs-target="#reportClubModal"
+                                id="openReportClubBtn">
+                                    Signaler un problème
+                                </a>
+                            {% endif %}
                         {% endif %}
                     {% endif %}
 
@@ -419,6 +427,15 @@
                         const modal = bootstrap.Modal.getInstance(modalEl);
                         if (modal) modal.hide();
 
+                        if (openBtn) {
+                            openBtn.textContent = "Signalement envoyé ✓";
+                            openBtn.classList.add("disabled");
+                            openBtn.style.pointerEvents = "none";
+                            openBtn.style.opacity = "0.6";
+                            openBtn.removeAttribute("data-bs-toggle");
+                            openBtn.removeAttribute("data-bs-target");
+                            openBtn.setAttribute("aria-disabled", "true");
+                        }
                     } else {
                         alert(result.message || "Erreur lors du signalement.");
                     }

@@ -20,6 +20,7 @@ use App\Repository\ClubReadingMonthRepository;
 use App\Repository\BookProposalRepository;
 use App\Repository\ClubReviewRepository;
 use App\Repository\ClubRepository;
+use App\Repository\ReportRepository;
 use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -133,13 +134,8 @@ class ClubController extends AbstractController
     }
 
     #[Route('/clubs/{id}', name: 'club_show', methods: ['GET'])]
-    public function show(
-        Club $club,
-        ClubReadingMonthRepository $clubReadingMonthRepository,
-        ClubReviewRepository $clubReviewRepository,
-        BookProposalRepository $bookProposalRepository
-    ): Response {
-
+    public function show(Club $club, ClubReadingMonthRepository $clubReadingMonthRepository, ClubReviewRepository $clubReviewRepository, BookProposalRepository $bookProposalRepository, ReportRepository $reportRepository): Response 
+    {
         $formatter = new \IntlDateFormatter(
             'fr_FR',
             \IntlDateFormatter::FULL,
@@ -172,7 +168,16 @@ class ClubController extends AbstractController
             ? ucfirst($formatter->format(new DateTime($bookOfNextNextMonthReading->getMonth() . '-01')))
             : '';
 
-        // --- Avis ---
+        $hasReportedClub = false;
+
+        if ($this->getUser()) {
+            $hasReportedClub = (bool) $reportRepository->findOneBy([
+                'author' => $this->getUser(),
+                'reportedClub' => $club,
+            ]);
+        }
+
+        // Avis 
         $lastReviews = $clubReviewRepository->findLastReviewsByClub($club, 3);
 
         // Bloque le btn d'avis si l'utilisateur en a déjà laissé un
@@ -266,7 +271,8 @@ class ClubController extends AbstractController
             'userHasProposed' => $userHasProposed,
             'userHasVoted' => $userHasVoted,
             'userCanVote' => $userCanVote,
-            'leadingProposals' => $leadingProposals
+            'leadingProposals' => $leadingProposals,
+            'hasReportedClub' => $hasReportedClub
         ]);
     }
 

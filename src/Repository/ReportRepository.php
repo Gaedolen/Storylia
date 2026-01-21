@@ -50,6 +50,31 @@ class ReportRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function findHistoriqueClubs(?string $status, ?string $searchClub): array
+    {
+        $qb = $this->createQueryBuilder('r')
+            ->leftJoin('r.reportedClub', 'c')
+            ->addSelect('c')
+            ->leftJoin('r.author', 'a')
+            ->addSelect('a')
+            ->where('r.reportedClub IS NOT NULL');
+
+        if ($status) {
+            $qb->andWhere('r.status = :status')
+            ->setParameter('status', $status);
+        }
+
+        if ($searchClub) {
+            $qb->andWhere('c.name LIKE :club')
+            ->setParameter('club', '%' . $searchClub . '%');
+        }
+
+        return $qb
+            ->orderBy('r.date', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Report[] Returns an array of Report objects
     //     */

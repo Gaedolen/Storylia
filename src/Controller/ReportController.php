@@ -191,8 +191,18 @@ class ReportController extends AbstractController
             return new JsonResponse(['success' => false, 'message' => 'Données invalides.'], 400);
         }
 
-        
+        // Eviter le double signalement pour ce club
+        $existingReport = $em->getRepository(Report::class)->findOneBy([
+            'author' => $user,
+            'reportedClub' => $club,
+        ]);
 
+        if ($existingReport) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Vous avez déjà signalé ce club.'
+            ], 409);
+        }
 
         $report = new Report();
         $report->setAuthor($user);

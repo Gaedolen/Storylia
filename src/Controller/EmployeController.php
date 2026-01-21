@@ -361,4 +361,202 @@ class EmployeController extends AbstractController
             'searchUser' => $searchUser,
         ]);
     }
+
+    #[Route('/clubs-signales', name: 'employe_clubs_signales')]
+    public function clubsSignales(ReportRepository $reportRepository): Response
+    {
+        $reports = $reportRepository->createQueryBuilder('r')
+            ->where('r.reportedClub IS NOT NULL')
+            ->andWhere('r.status = :status')
+            ->setParameter('status', Report::STATUS_EN_COURS)
+            ->orderBy('r.date', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        return $this->render('employe/clubs_signales.html.twig', [
+            'reports' => $reports,
+            'currentPage' => 1,
+            'totalPages' => 1,
+        ]);
+    }
+
+    #[Route('/club-signalement/{id}/transmettre', name: 'employe_club_signalement_transmettre', methods: ['POST'])]
+    public function transmettreAdminClub(
+        Report $report,
+        EntityManagerInterface $em,
+        Request $request
+    ): Response {
+        if (!$this->isCsrfTokenValid('transmettre'.$report->getId(), $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        // Sécurité métier : on vérifie que c’est bien un report de club
+        if (!$report->getReportedClub()) {
+            throw $this->createNotFoundException('Ce signalement ne concerne pas un club.');
+        }
+
+        $employeMessage = $request->request->get('employeMessage');
+
+        if ($employeMessage) {
+            $report->setEmployeMessage($employeMessage);
+        }
+
+        $report->setStatus(Report::STATUS_ADMIN);
+        $em->flush();
+
+        $this->addFlash('success', 'Signalement de club transmis à l’administrateur.');
+
+        return $this->redirectToRoute('employe_clubs_signales');
+    }
+
+    #[Route('/club-signalement/{id}/traiter', name: 'employe_club_traiter_signalement', methods: ['POST'])]
+    public function traiterSignalementClub(
+        Report $report,
+        EntityManagerInterface $em,
+        Request $request
+    ): Response {
+        if (!$this->isCsrfTokenValid('traiter_report' . $report->getId(), $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if (!$report->getReportedClub()) {
+            throw $this->createNotFoundException('Ce signalement ne concerne pas un club.');
+        }
+
+        $report->setStatus(Report::STATUS_TRAITE);
+        $em->flush();
+
+        $this->addFlash('success', 'Signalement de club traité.');
+
+        return $this->redirectToRoute('employe_clubs_signales');
+    }
+
+    #[Route('/club-signalement/{id}/ignorer', name: 'employe_club_ignorer_signalement', methods: ['POST'])]
+    public function ignorerSignalementClub(
+        Report $report,
+        EntityManagerInterface $em,
+        Request $request
+    ): Response {
+        if (!$this->isCsrfTokenValid('ignorer_report' . $report->getId(), $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if (!$report->getReportedClub()) {
+            throw $this->createNotFoundException('Ce signalement ne concerne pas un club.');
+        }
+
+        $report->setStatus(Report::STATUS_REFUSE);
+        $em->flush();
+
+        $this->addFlash('info', 'Signalement de club ignoré.');
+
+        return $this->redirectToRoute('employe_clubs_signales');
+    }
+
+    #[Route('/club-signalement/{id}/mail-auteur', name: 'employe_club_signalement_mail_auteur', methods: ['POST'])]
+    public function mailAuteurSignalementClub(
+        Report $report,
+        Request $request,
+        MailerInterface $mailer
+    ): Response {
+        if (!$this->isCsrfTokenValid('mail_author'.$report->getId(), $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if (!$report->getReportedClub()) {
+            throw $this->createNotFoundException('Ce signalement ne concerne pas un club.');
+        }
+
+        $author = $report->getAuthor();
+
+        $subject = $request->request->get('subject');
+        $reason  = $request->request->get('reason');
+        $message = $request->request->get('message');
+
+        $email = (new TemplatedEmail())
+            ->from('moderation@storylia.com')
+            ->to($author->getEmail())
+            ->subject($subject)
+            ->htmlTemplate('email/signalement_auteur.html.twig')
+            ->context([
+                'user'    => $author,
+                'report'  => $report,
+                'subject' => $subject,
+                'reason'  => $reason,
+                'message' => $message,
+            ]);
+
+        $mailer->send($email);
+
+        $this->addFlash('success', 'Mail envoyé à l’auteur du signalement.');
+
+        return $this->redirectToRoute('employe_clubs_signales');
+    }
+
+    #[Route('/club-signalement/{id}/mail-createur', name: 'employe_club_signalement_mail_createur', methods: ['POST'])]
+    public function mailCreateurClub(
+        Report $report,
+        Request $request,
+        MailerInterface $mailer
+    ): Response {
+        if (!$this->isCsrfTokenValid('mail_creator'.$report->getId(), $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $club = $report->getReportedClub();
+
+        if (!$club) {
+            $this->addFlash('danger', 'Aucun club signalé.');
+            return $this->redirectToRoute('employe_clubs_signales');
+        }
+
+        $creator = $club->getCreator();
+
+        if (!$creator) {
+            $this->addFlash('danger', 'Ce club n’a pas de créateur associé.');
+            return $this->redirectToRoute('employe_clubs_signales');
+        }
+
+        // Données du formulaire
+        $subject = $request->request->get('subject');
+        $reason  = $request->request->get('reason');
+        $message = $request->request->get('message');
+
+        $email = (new TemplatedEmail())
+            ->from('moderation@storylia.com')
+            ->to($creator->getEmail())
+            ->subject($subject)
+            ->htmlTemplate('email/signalement_createur_club.html.twig')
+            ->context([
+                'user'    => $creator,
+                'club'    => $club,
+                'report'  => $report,
+                'subject' => $subject,
+                'reason'  => $reason,
+                'message' => $message,
+            ]);
+
+        $mailer->send($email);
+
+        $this->addFlash('success', 'Mail envoyé au créateur du club.');
+        return $this->redirectToRoute('employe_clubs_signales');
+    }
+
+    #[Route('/clubs-signales/historique', name: 'employe_historique_clubs_signalements')]
+    public function historiqueClubsSignalements(
+        ReportRepository $reportRepository,
+        Request $request
+    ): Response {
+        $statusFilter = $request->query->get('status');
+        $searchClub   = $request->query->get('club');
+
+        // Méthode repository spécifique clubs
+        $reports = $reportRepository->findHistoriqueClubs($statusFilter, $searchClub);
+
+        return $this->render('employe/historique_clubs_signalements.html.twig', [
+            'reports' => $reports,
+            'statusFilter' => $statusFilter,
+            'searchClub' => $searchClub,
+        ]);
+    }
 }

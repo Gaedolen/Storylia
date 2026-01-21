@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Historique des signalements utilisateurs{% endblock %}
+{% block title %}Historique des signalements de clubs{% endblock %}
 
 {% block stylesheets %}
-        <link rel="stylesheet" href="{{ asset('css/employe/historique_signalements.css') }}">
-    {% endblock %}
+    <link rel="stylesheet" href="{{ asset('css/employe/historique_signalements.css') }}">
+{% endblock %}
 
 {% block body %}
-    <h1>Historique des signalements utilisateurs</h1>
+    <h1>Historique des signalements de clubs</h1>
 
     <form method="get" class="filter-form">
         <div>
@@ -16,13 +16,18 @@
                 <option value="">Tous</option>
                 <option value="traite" {% if statusFilter == 'traite' %}selected{% endif %}>Traité</option>
                 <option value="refuse" {% if statusFilter == 'refuse' %}selected{% endif %}>Refusé</option>
-                <option value="admin" {% if statusFilter == 'admin' %}selected{% endif %}>Transmis</option>
+                <option value="transmis_admin" {% if statusFilter == 'transmis_admin' %}selected{% endif %}>Transmis</option>
             </select>
         </div>
 
         <div>
-            <label>Utilisateur :</label>
-            <input type="text" name="user" value="{{ searchUser }}" placeholder="Pseudo…">
+            <label>Club :</label>
+            <input
+                type="text"
+                name="club"
+                value="{{ searchClub }}"
+                placeholder="Nom du club…"
+            >
         </div>
 
         <button type="submit" class="btn btn-primary">Filtrer</button>
@@ -32,7 +37,8 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Utilisateur signalé</th>
+                <th>Club signalé</th>
+                <th>Créateur</th>
                 <th>Signalé par</th>
                 <th>Motif</th>
                 <th>Message</th>
@@ -44,24 +50,39 @@
         {% for report in reports %}
             <tr>
                 <td>{{ report.id }}</td>
-                <td>{{ report.reported.pseudo }}</td>
+
+                <td>{{ report.reportedClub.name }}</td>
+
+                <td>
+                    {% if report.reportedClub.creator is not null %}
+                        {{ report.reportedClub.creator.pseudo }}
+                    {% else %}
+                        <span style="color:#999;">—</span>
+                    {% endif %}
+                </td>
+
                 <td>{{ report.author.pseudo }}</td>
+
                 <td>{{ report.reason }}</td>
                 <td>{{ report.message }}</td>
+
                 <td>
                     {% if report.status == 'traite' %}
                         <span class="badge badge-green">Traité</span>
                     {% elseif report.status == 'refuse' %}
                         <span class="badge badge-red">Refusé</span>
-                    {% elseif report.status == 'admin' %}
+                    {% elseif report.status == 'transmis_admin' %}
                         <span class="badge badge-orange">Transmis</span>
                     {% endif %}
                 </td>
+
                 <td>{{ report.date|date('d/m/Y H:i') }}</td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="7" style="text-align:center; color: #777;">Aucun signalement.</td>
+                <td colspan="8" style="text-align:center; color: #777;">
+                    Aucun signalement de club.
+                </td>
             </tr>
         {% endfor %}
         </tbody>
