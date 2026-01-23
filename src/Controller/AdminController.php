@@ -131,7 +131,7 @@ class AdminController extends AbstractController
     }
 
     #[Route('/import-books', name: 'import_books', methods: ['GET'])]
-    public function importBooks(BookApiService $apiService, BookCreationService $creationService, EntityManagerInterface $em): Response
+    public function importBooks(Request $request, BookApiService $apiService, BookCreationService $creationService, EntityManagerInterface $em): Response
     {
         set_time_limit(0);
         ini_set('memory_limit', '2048M');
@@ -195,12 +195,19 @@ class AdminController extends AbstractController
         $em->flush();
         $em->clear();
 
+        if ($request->isXmlHttpRequest()) {
+            return $this->json([
+                'success' => true,
+                'message' => "$totalImported livre(s) importé(s)."
+            ]);
+        }
+
         $this->addFlash('success', "$totalImported livre(s) importé(s).");
         return $this->redirectToRoute('admin_dashboard');
     }
 
     #[Route('/update-books', name: 'update_books', methods: ['GET'])]
-    public function updateBooks(BookApiService $apiService, BookCreationService $creationService, EntityManagerInterface $em): Response
+    public function updateBooks(Request $request, BookApiService $apiService, BookCreationService $creationService, EntityManagerInterface $em): Response
     {
         set_time_limit(0);
         ini_set('memory_limit', '2048M');
@@ -235,6 +242,13 @@ class AdminController extends AbstractController
         $em->flush();
         $em->clear();
 
+        if ($request->isXmlHttpRequest()) {
+            return $this->json([
+                'success' => true,
+                'message' => "$count livre(s) mis à jour."
+            ]);
+        }
+
         $this->addFlash('success', "$count livre(s) mis à jour.");
         return $this->redirectToRoute('admin_dashboard');
     }
@@ -243,7 +257,7 @@ class AdminController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function employes(UtilisateurRepository $userRepository): Response
     {
-        $employes = $userRepository->findByRoleLibelle('EMPLOYE');
+        $employes = $userRepository->findByRoleLibelle('ROLE_EMPLOYE');
 
         return $this->render('admin/employes.html.twig', [
             'employes' => $employes

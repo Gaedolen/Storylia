@@ -1,40 +1,56 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const importBtn = document.getElementById('import-books-btn');
-    const resultDiv = document.getElementById('import-result');
 
-    if (!importBtn) return;
+    const loadingModal = document.getElementById('loadingModal');
+    const loader = document.getElementById('loader');
+    const loadingText = document.getElementById('loadingText');
+    const resultText = document.getElementById('resultText');
+    const closeModal = document.getElementById('closeModal');
 
-    importBtn.addEventListener('click', function() {
-        resultDiv.innerHTML = '<p>Importation en cours...</p>';
+    function openModal() {
+        loader.style.display = 'block';
+        loadingText.style.display = 'block';
+        resultText.style.display = 'none';
+        closeModal.style.display = 'none';
+        loadingModal.style.display = 'flex';
+    }
 
-        // Vérifier que l'URL est définie
-        const url = importBtn.dataset.url;
-        if (!url) {
-            resultDiv.innerHTML = '<p style="color:red;">Erreur : URL d’importation non définie</p>';
-            return;
-        }
+    function closeModalFunc() {
+        loadingModal.style.display = 'none';
+    }
 
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Content-Type': 'application/json'
+    closeModal.addEventListener('click', closeModalFunc);
+
+    // Gestion des boutons import / update
+    document.querySelectorAll('.btn-import, .btn-ajout').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            const url = btn.getAttribute('href');
+            console.log('Clic sur', url);
+
+            openModal();
+
+            try {
+                const response = await fetch(url, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                const data = await response.json();
+
+                loader.style.display = 'none';
+                loadingText.style.display = 'none';
+                resultText.style.display = 'block';
+                closeModal.style.display = 'inline-block';
+
+                resultText.innerHTML = `Opération terminée : <br>${data.message}`;
+            } catch (err) {
+                loader.style.display = 'none';
+                loadingText.style.display = 'none';
+                resultText.style.display = 'block';
+                closeModal.style.display = 'inline-block';
+
+                resultText.innerHTML = `Erreur : ${err}`;
             }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                resultDiv.innerHTML = `
-                    <p>Livres importés : ${data.imported_count}</p>
-                    <p>Livres déjà existants : ${data.already_exists_count}</p>
-                `;
-            } else {
-                resultDiv.innerHTML = `<p style="color:red;">Erreur : ${data.message}</p>`;
-            }
-        })
-        .catch(err => {
-            console.error(err);
-            resultDiv.innerHTML = `<p style="color:red;">Erreur : ${err}</p>`;
         });
     });
 });

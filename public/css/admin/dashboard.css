@@ -111,3 +111,71 @@ body {
 .alert-success { background-color: #DFF0D8; color: #3B2F2F; }
 .alert-error,
 .alert-danger { background-color: #F8D7DA; color: #3B2F2F; }
+
+/* === Modal === */
+/* Modal de chargement / résultat */
+.modal-loading {
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: rgba(0,0,0,0.4);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+    font-family: 'Arial', sans-serif;
+}
+
+.modal-content {
+    background: #eed6be;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.loader {
+    border: 6px solid #e0e0e0;
+    border-top: 6px solid #5F7F5F;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 1rem auto;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#loadingText {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+#resultText {
+    font-size: 1rem;
+    color: #333;
+}
+
+#closeModal {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    background-color: #5F7F5F;
+    color: white;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#closeModal:hover {
+    background-color: #A67856;
+    color: white;
+}

@@ -7,74 +7,75 @@
 {% endblock %}
 
 {% block body %}
-<div class="admin-dashboard">
+    <div class="admin-dashboard">
 
-    <h1>Tableau de bord administrateur</h1>
-    <p class="admin-intro">
-        Depuis cette page, vous pouvez gérer les fonctionnalités principales de la plateforme.
-    </p>
+        <h1>Tableau de bord administrateur</h1>
+        <p class="admin-intro">
+            Depuis cette page, vous pouvez gérer les fonctionnalités principales de la plateforme.
+        </p>
 
-    {# === Résumé général === #}
-    <div class="dashboard-summary">
-        <div class="summary-card">
-            <div class="summary-title">Livres totaux</div>
-            <div class="summary-value">{{ totalBooks }}</div>
-        </div>
-        <div class="summary-card">
-            <div class="summary-title">Clubs créés</div>
-            <div class="summary-value">{{ totalClubs }}</div>
-        </div>
-        <div class="summary-card">
-            <div class="summary-title">Utilisateurs</div>
-            <div class="summary-value">{{ totalUsers }}</div>
-        </div>
-        <div class="summary-card">
-            <div class="summary-title">Participants aux clubs</div>
-            <div class="summary-value">{{ totalParticipants }}</div>
-        </div>
-        <div class="summary-card">
-            <div class="summary-title">Livres créés par utilisateurs</div>
-            <div class="summary-value">{{ totalUserBooks }}</div>
-        </div>
-    </div>
-
-    {# === Gestion des livres === #}
-    <div class="dashboard-section">
-        <h2>Gestion des livres</h2>
-        <div class="admin-actions">
-            <a href="{{ path('import_books') }}" class="btn-import">Importer des livres</a>
-            <a href="{{ path('update_books') }}" class="btn-ajout">Mettre à jour les livres</a>
-            <a href="{{ path('app_recherche_livre') }}" class="btn-livres">Gestion des livres du site</a>
-        </div>
-    </div>
-
-    {# === Gestion des utilisateurs === #}
-    <div class="dashboard-section">
-        <h2>Gestion des utilisateurs</h2>
-        <div class="admin-actions">
-            <a href="{{ path('admin_gestion_utilisateurs') }}" class="btn-utilisateur">Gérer les utilisateurs</a>
-            <a href="{{ path('admin_employes') }}" class="btn-employe">Gérer les employés</a>
-            <a href="{{ path('clubs_signales') }}" class="btn-club">Gérer les clubs problématiques</a>
-        </div>
-    </div>
-
-    <div class="dashboard-section">
-        <h2>Messagerie</h2>
-        <div class="admin-actions">
-            <a href="{{ path('messagerie_index') }}" class="btn-message">Messagerie Employés / Admin</a>
-        </div>
-    </div>
-
-    {# === Flash messages === #}
-    {% for label, messages in app.flashes %}
-        {% for message in messages %}
-            <div class="alert alert-{{ label }} mt-3" role="alert">
-                {{ message }}
+        {# === Résumé général === #}
+        <div class="dashboard-summary">
+            <div class="summary-card">
+                <div class="summary-title">Livres totaux</div>
+                <div class="summary-value">{{ totalBooks }}</div>
             </div>
-        {% endfor %}
-    {% endfor %}
+            <div class="summary-card">
+                <div class="summary-title">Clubs créés</div>
+                <div class="summary-value">{{ totalClubs }}</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-title">Utilisateurs</div>
+                <div class="summary-value">{{ totalUsers }}</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-title">Participants aux clubs</div>
+                <div class="summary-value">{{ totalParticipants }}</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-title">Livres créés par utilisateurs</div>
+                <div class="summary-value">{{ totalUserBooks }}</div>
+            </div>
+        </div>
 
-</div>
+        {# === Gestion des livres === #}
+        <div class="dashboard-section">
+            <h2>Gestion des livres</h2>
+            <div class="admin-actions">
+                <a href="{{ path('import_books') }}" class="btn-import">Importer des livres</a>
+                <a href="{{ path('update_books') }}" class="btn-ajout">Mettre à jour les livres</a>
+                <a href="{{ path('app_recherche_livre') }}" class="btn-livres">Gestion des livres du site</a>
+            </div>
+        </div>
+
+        {# === Gestion des utilisateurs === #}
+        <div class="dashboard-section">
+            <h2>Gestion des utilisateurs</h2>
+            <div class="admin-actions">
+                <a href="{{ path('admin_gestion_utilisateurs') }}" class="btn-utilisateur">Gérer les utilisateurs</a>
+                <a href="{{ path('admin_employes') }}" class="btn-employe">Gérer les employés</a>
+                <a href="{{ path('clubs_signales') }}" class="btn-club">Gérer les clubs problématiques</a>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <h2>Messagerie</h2>
+            <div class="admin-actions">
+                <a href="{{ path('messagerie_index') }}" class="btn-message">Messagerie Employés / Admin</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal de chargement / résultat -->
+    <div id="loadingModal" class="modal-loading" style="display:none;">
+        <div class="modal-content">
+            <div id="loader" class="loader"></div>
+            <p id="loadingText">Chargement en cours...<br>Cette opération peut durer plusieurs minutes.</br></p>
+            <div id="resultText" style="display:none;"></div>
+            <button id="closeModal" style="display:none;">Fermer</button>
+        </div>
+    </div>
 
 <script src="{{ asset('js/dashboardAdmin.js') }}"></script>
 {% endblock %}
