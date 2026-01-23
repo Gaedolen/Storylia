@@ -42,15 +42,7 @@
             <header class="navbar-custom">
                 <div class="container-header">
                     <div class="logo-left">
-                        <a href="
-                            {% if is_granted('ROLE_ADMIN') %}
-                                {{ path('admin_dashboard') }}
-                            {% elseif is_granted('ROLE_EMPLOYE') %}
-                                {{ path('employe_dashboard') }}
-                            {% else %}
-                                {{ path('app_accueil') }}
-                            {% endif %}
-                        ">
+                        <a href="{% if is_granted('ROLE_ADMIN') %}{{ path('admin_dashboard') }}{% elseif is_granted('ROLE_EMPLOYE') %}{{ path('employe_dashboard') }}{% else %}{{ path('app_accueil') }}{% endif %}">
                             <img src="{{ asset('images/logo.PNG') }}" alt="Storylia" class="logo">
                         </a>
                     </div>
@@ -71,10 +63,13 @@
                                     <a href="{{ path('admin_dashboard') }}">Accueil</a>
                                     <span class="separator">|</span>
 
-                                    <a href="#">Gérer les employés</a>
+                                    <a href="{{ path('admin_employes') }}">Gérer les employés</a>
                                     <span class="separator">|</span>
 
-                                    <a href="#">Gérer les utilisateurs</a>
+                                    <a href="{{ path('admin_gestion_utilisateurs') }}">Gérer les utilisateurs</a>
+                                    <span class="separator">|</span>
+
+                                    <a href="{{ path('clubs_signales') }}">Gérer les clubs problématiques</a>
                                 {% elseif is_granted('ROLE_EMPLOYE') %}
                                     <a href="{{ path('employe_dashboard') }}">Accueil</a>
                                     <span class="separator">|</span>
@@ -108,7 +103,7 @@
                                 <a href="{{ path('app_accueil') }}">Accueil</a>
                                 <span class="separator">|</span>
 
-                                <a href="#">Club Lecture</a>
+                                <a href="{{ path('app_login') }}">Club Lecture</a>
                                 <span class="separator">|</span>
 
                                 <a href="{{ path('app_recherche_livre') }}">Livres</a>

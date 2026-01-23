@@ -95,10 +95,10 @@ body {
 .btn-import { background-color: #C97C5D; }
 .btn-ajout { background-color: #714B2F; }
 .btn-employe { background-color: #5F7F5F; }
+.btn-club { background-color: #A67856; }
 .btn-utilisateur { background-color: #A67856; }
 .btn-livres { background-color: #C97C5D; }
 .btn-message { background-color: #3B2F2F; }
-
 
 /* === Flash messages === */
 .alert {

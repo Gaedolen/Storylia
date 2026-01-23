@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body { font-family: 'Comfortaa', sans-serif; background-color: #FAF3E0; color: #3B2F2F; padding: 20px; }
+            .container { background-color: #E8CBAE; padding: 20px; border-radius: 12px; max-width: 600px; margin: auto; }
+            h2 { color: #714B2F; }
+            p { line-height: 1.5; }
+            .reason { font-weight: bold; color: #C97C5D; }
+            .footer { margin-top: 20px; font-size: 0.9rem; color: #6B6B6B; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Votre club "{{ club.name }}" a été suspendu</h2>
+            <p>Bonjour {{ user.pseudo }},</p>
+            <p>Votre club a été suspendu pour une durée indéterminée.</p>
+            <p>Raison : <span class="reason">{{ reason }}</span></p>
+            <p>Vous pouvez contacter un administrateur pour plus de détails.</p>
+            <p class="footer">L'équipe Storylia</p>
+        </div>
+    </body>
+</html>

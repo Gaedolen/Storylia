@@ -1,0 +1,112 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des clubs signalés{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('css/admin/gestion_utilisateurs.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="admin-dashboard">
+        <div class="page-title" style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>Gestion des clubs signalés</h1>
+
+            <a href="{{ path('admin_clubs_historique') }}" class="btn unsuspend-btn">
+                Historique
+            </a>
+        </div>
+
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>Nom du club</th>
+                    <th>Créateur</th>
+                    <th>Reporté par</th>
+                    <th>Raison</th>
+                    <th>Message employé</th>
+                    <th>Employé</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in reports %}
+                    {% set club = report.reportedClub %}
+                    {% set author = report.author %}
+
+                    <tr>
+                        <td>{{ club.name }}</td>
+                        <td>{{ club.creator.pseudo }}</td>
+                        <td>{{ author.pseudo }}</td>
+                        <td>{{ report.reason }}</td>
+                        <td>{{ report.employeMessage }}</td>
+                        <td>
+                            {% if report.transmittedBy %}
+                                {{ report.transmittedBy.pseudo }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if report.status == 'transmis_admin' %}
+                                <!-- Bouton pour suspendre le club -->
+                                <button class="btn suspend-btn"
+                                        data-url="{{ path('club_suspendre', {'id': club.id}) }}"
+                                        data-report-id="{{ report.id }}"
+                                        data-club-id="{{ club.id }}"
+                                        data-csrf="{{ csrf_token('suspend_club_' ~ club.id) }}">
+                                    Suspendre
+                                </button>
+                                <!-- Bouton pour ignorer le report -->
+                                <button class="btn unsuspend-btn"
+                                        data-url="{{ path('report_ignore', {'id': report.id}) }}"
+                                        data-csrf="{{ csrf_token('ignore_report_' ~ report.id) }}">
+                                    Ignorer
+                                </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="no-users">Aucun club signalé.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {# Modal pour suspendre un club #}
+        <div id="suspendModal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Suspendre le club <span id="modalClubName"></span></h2>
+                <form id="suspendForm">
+                    <input type="hidden" name="_token" id="csrfToken">
+                    <input type="hidden" id="clubIdInput">
+
+                    <div class="form-group">
+                        <label>Raison :</label>
+                        <select id="reasonSelect">
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Comportement inapproprié">Comportement inapproprié</option>
+                            <option value="Violation des règles">Violation des règles</option>
+                            <option value="Contenu offensant">Contenu offensant</option>
+                            <option value="autres">Autres</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group hidden" id="otherReasonDiv">
+                        <label>Autre raison :</label>
+                        <input type="text" id="otherReason">
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" id="cancelModal" class="btn cancel-btn">Annuler</button>
+                        <button type="submit" class="btn suspend-confirm-btn">Suspendre</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/gestion_clubs.js') }}"></script>
+{% endblock %}

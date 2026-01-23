@@ -1,0 +1,117 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique des clubs signalés{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('css/admin/gestion_utilisateurs.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="history-header">
+        <a href="{{ path('clubs_signales') }}" class="btn back-btn">
+            ← Retour aux signalements
+        </a>
+    </div>
+
+    <div class="admin-dashboard">
+        <h1 class="page-title">
+            Historique des clubs signalés
+        </h1>
+
+        {# Filtres #}
+        <div class="filters-container">
+            <label for="clubName">Club :</label>
+            <input type="text" id="clubName" name="clubName" value="{{ app.request.get('clubName')|default('') }}">
+
+            <label for="statusFilter">Status :</label>
+            <select id="statusFilter" name="statusFilter">
+                <option value="">Tous</option>
+                <option value="traite" {% if app.request.get('statusFilter') == 'traite' %}selected{% endif %}>Traité</option>
+                <option value="refuse" {% if app.request.get('statusFilter') == 'refuse' %}selected{% endif %}>Refusé</option>
+            </select>
+
+            <label for="orderFilter">Trier par :</label>
+            <select id="orderFilter" name="orderFilter">
+                <option value="date_desc" {% if app.request.get('orderFilter') == 'date_desc' %}selected{% endif %}>Date décroissante</option>
+                <option value="date_asc" {% if app.request.get('orderFilter') == 'date_asc' %}selected{% endif %}>Date croissante</option>
+                <option value="alpha_asc" {% if app.request.get('orderFilter') == 'alpha_asc' %}selected{% endif %}>Nom A→Z</option>
+                <option value="alpha_desc" {% if app.request.get('orderFilter') == 'alpha_desc' %}selected{% endif %}>Nom Z→A</option>
+            </select>
+
+            <button type="submit">Filtrer</button>
+        </div>
+
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>Nom du club</th>
+                    <th>Créateur</th>
+                    <th>Signalé par</th>
+                    <th>Transmis par</th>
+                    <th>Raison</th>
+                    <th>Message employé</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in reports %}
+                    {% set club = report.reportedClub %}
+                    <tr>
+                        <td>
+                            {{ report.reportedClub.name }}
+                            {% if club.status == 'actif' %}
+                                <span class="badge badge-green">Actif</span>
+                            {% else %}
+                                <span class="badge badge-red">Inactif</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ report.reportedClub.creator.pseudo }}</td>
+                        <td>{{ report.author.pseudo }}</td>
+                        <td>{{ report.transmittedBy ? report.transmittedBy.pseudo : '-' }}</td>
+                        <td>{{ report.reason }}</td>
+                        <td>{{ report.employeMessage }}</td>
+                        <td>{{ report.date|date('d/m/Y H:i') }}</td>
+                        <td>
+                            {% if report.status == 'traite' %}
+                                <span class="badge badge-green">Traité</span>
+                            {% elseif report.status == 'refuse' %}
+                                <span class="badge badge-red">Refusé</span>
+                            {% else %}
+                                <span class="badge badge-orange">En attente</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if report.reportedClub.status == 'inactif' %}
+                                <button class="btn unsuspend-btn reactivate-btn"
+                                        data-url="{{ path('club_unsuspendre', {'id': report.reportedClub.id}) }}"
+                                        data-club-id="{{ report.reportedClub.id }}"
+                                        data-csrf="{{ csrf_token('unsuspend_club_' ~ report.reportedClub.id) }}">
+                                    Réactiver
+                                </button>
+                            {% else %}
+                                <button class="btn suspend-btn"
+                                        data-url="{{ path('club_suspendre', {'id': report.reportedClub.id}) }}"
+                                        data-report-id="{{ report.id }}"
+                                        data-club-id="{{ report.reportedClub.id }}"
+                                        data-csrf="{{ csrf_token('suspend_club_' ~ report.reportedClub.id) }}">
+                                    Suspendre
+                                </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="no-users">Aucun signalement trouvé.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/gestion_clubs.js') }}"></script>
+{% endblock %}
+

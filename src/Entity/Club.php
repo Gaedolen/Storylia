@@ -57,6 +57,9 @@ class Club
     #[ORM\Column(length: 50)]
     private ?string $status = self::STATUS_ACTIF;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $suspendReason = null;
+
     #[ORM\OneToMany(mappedBy: "club", targetEntity: Book::class)]
     private Collection $books;
 
@@ -148,6 +151,17 @@ class Club
         return $this->status;
     }
 
+    public function getSuspendReason(): ?string
+    {
+        return $this->suspendReason;
+    }
+
+    public function setSuspendReason(?string $reason): static
+    {
+        $this->suspendReason = $reason;
+        return $this;
+    }
+
     /**
      * @return Collection<int, Book>
      */
@@ -236,18 +250,5 @@ class Club
             }
         }
         return $this;
-    }
-
-    public function getTotalBooksRead(): int
-    {
-        $count = 0;
-
-        foreach ($this->readingMonths as $rm) {
-            if ($rm->getBook() !== null && $rm->getBook()->isVoted()) {
-                $count++;
-            }
-        }
-
-        return $count;
     }
 }

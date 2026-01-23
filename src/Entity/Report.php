@@ -31,6 +31,9 @@ class Report
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $employeMessage = null;
 
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    private ?Utilisateur $transmittedBy = null;
+
     #[ORM\Column(length: 50)]
     private ?string $status = self::STATUS_EN_COURS;
 
@@ -110,6 +113,17 @@ class Report
     public function setEmployeMessage(?string $employeMessage): self
     {
         $this->employeMessage = $employeMessage;
+        return $this;
+    }
+
+    public function getTransmittedBy(): ?Utilisateur
+    {
+        return $this->transmittedBy;
+    }
+
+    public function setTransmittedBy(?Utilisateur $user): self
+    {
+        $this->transmittedBy = $user;
         return $this;
     }
 

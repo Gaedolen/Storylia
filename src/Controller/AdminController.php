@@ -14,9 +14,11 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use App\Form\EmployeType;
 use App\Entity\Role;
+use App\Entity\Club;
 use App\Entity\Utilisateur;
 use App\Entity\Report;
 use Doctrine\ORM\EntityManagerInterface;
@@ -422,6 +424,254 @@ class AdminController extends AbstractController
             'success' => true,
             'userId' => $user->getId(),
             'suspendToken' => $suspendToken
+        ]);
+    }
+
+    #[Route('/clubs/signales', name: 'clubs_signales')]
+    public function gestionClubsSignales(EntityManagerInterface $em): Response
+    {
+        // On récupère les reports avec le status "transmis_admin"
+        $reports = $em->getRepository(Report::class)->findBy([
+            'status' => 'transmis_admin',
+        ]);
+
+        // On garde seulement ceux qui concernent un club
+        $reportsClubs = [];
+
+        foreach ($reports as $report) {
+            if ($report->getReportedClub() !== null) {
+                $reportsClubs[] = $report;
+            }
+        }
+
+        return $this->render('admin/gestion_clubs_signales.html.twig', [
+            'reports' => $reportsClubs,
+        ]);
+    }
+
+    #[Route('/club/suspendre/{id}', name: 'club_suspendre', methods: ['POST'])]
+    public function suspendreClub(
+        int $id,
+        Request $request,
+        EntityManagerInterface $em,
+        CsrfTokenManagerInterface $csrfTokenManager,
+        MailerInterface $mailer,
+        LoggerInterface $logger
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true) ?? [];
+
+        // --- Récupération du club ---
+        $club = $em->getRepository(Club::class)->find($id);
+        if (!$club) {
+            return $this->json(['success' => false, 'error' => 'Club non trouvé'], 404);
+        }
+
+        // --- Récupération du report ---
+        $reportId = $data['report_id'] ?? null;
+        if (!$reportId) {
+            return $this->json(['success' => false, 'error' => 'Report non trouvé'], 400);
+        }
+        $report = $em->getRepository(Report::class)->find($reportId);
+        if (!$report) {
+            return $this->json(['success' => false, 'error' => 'Report non trouvé'], 404);
+        }
+
+        // --- CSRF check ---
+        $csrfToken = $data['_token'] ?? null;
+        if (!$csrfToken || !$this->isCsrfTokenValid('suspend_club_' . $club->getId(), $csrfToken)) {
+            return $this->json(['success' => false, 'error' => 'Token CSRF invalide'], 400);
+        }
+
+        // --- Traitement du motif ---
+        $reason = $data['reason'] ?? '';
+        if ($reason === 'autres') {
+            $reason = $data['otherReason'] ?? 'Signalement employé';
+        }
+
+        // --- Mise à jour du club ---
+        $club->setStatus(Club::STATUS_INACTIF);
+        $club->setSuspendReason($reason);
+
+        // --- Mise à jour du report ---
+        $report->setStatus('traite');
+        $em->flush();
+
+        // --- Récupération du créateur et des membres ---
+        $connection = $em->getConnection();
+        $sql = 'SELECT u.id FROM utilisateur u 
+                INNER JOIN utilisateur_club uc ON u.id = uc.utilisateur_id 
+                WHERE uc.club_id = :clubId';
+        $stmt = $connection->prepare($sql);
+        $result = $stmt->executeQuery(['clubId' => $club->getId()]);
+        $memberIds = $result->fetchAllAssociative();
+
+        $recipients = [];
+        if ($club->getCreator()) {
+            $recipients[] = $club->getCreator();
+        }
+
+        foreach ($memberIds as $row) {
+            $user = $em->getRepository(Utilisateur::class)->find($row['id']);
+            if ($user && $user->getEmail() && $user !== $club->getCreator()) {
+                $recipients[] = $user;
+            }
+        }
+
+        // --- Envoi des mails ---
+        foreach ($recipients as $user) {
+            try {
+                if ($user === $club->getCreator()) {
+                    $template = 'email/club_suspendu_owner.html.twig';
+                    $subject = 'Votre club a été suspendu : ' . $club->getName();
+                } else {
+                    $template = 'email/club_suspendu_member.html.twig';
+                    $subject = 'Le club "' . $club->getName() . '" a été suspendu';
+                }
+
+                $email = (new TemplatedEmail())
+                    ->from('noreply@storylia.com')
+                    ->to($user->getEmail())
+                    ->subject($subject)
+                    ->htmlTemplate($template)
+                    ->context([
+                        'club' => $club,
+                        'user' => $user,
+                        'reason' => $reason,
+                    ]);
+
+                $mailer->send($email);
+                $logger->info('Mail envoyé à : ' . $user->getEmail());
+            } catch (\Exception $e) {
+                $logger->error('Erreur envoi mail suspendre club (user ' . $user->getId() . ') : ' . $e->getMessage());
+            }
+        }
+
+        $unsuspendToken = $csrfTokenManager->getToken('unsuspend_club_' . $club->getId())->getValue();
+
+        return $this->json([
+            'success' => true,
+            'clubId' => $club->getId(),
+            'unsuspendToken' => $unsuspendToken
+        ]);
+    }
+
+    #[Route('/club/unsuspendre/{id}', name: 'club_unsuspendre', methods: ['POST'])]
+    public function unsuspendreClub(
+        int $id,
+        EntityManagerInterface $em,
+        CsrfTokenManagerInterface $csrfTokenManager,
+        MailerInterface $mailer
+    ): JsonResponse
+    {
+        $club = $em->getRepository(Club::class)->find($id);
+        if (!$club) {
+            return $this->json(['success' => false, 'error' => 'Club non trouvé'], 404);
+        }
+
+        $club->setStatus(Club::STATUS_ACTIF);
+        $club->setSuspendReason(null);
+        $em->flush();
+
+        // --- Mail commun pour le créateur et les membres ---
+        $recipients = [];
+
+        if ($club->getCreator() && $club->getCreator()->getEmail()) {
+            $recipients[] = $club->getCreator();
+        }
+
+        foreach ($club->getMembres() as $member) {
+            if ($member->getEmail()) {
+                $recipients[] = $member;
+            }
+        }
+
+        foreach ($recipients as $user) {
+            $email = (new TemplatedEmail())
+                ->from('noreply@storylia.com')
+                ->to($user->getEmail())
+                ->subject('Le club "' . $club->getName() . '" est de nouveau accessible')
+                ->htmlTemplate('email/club_reaccessible.html.twig')
+                ->context([
+                    'club' => $club,
+                    'user' => $user,
+                ]);
+
+            $mailer->send($email);
+        }
+
+        return $this->json([
+            'success' => true,
+            'clubId' => $club->getId(),
+        ]);
+    }
+
+        #[Route('/report/ignore/{id}', name: 'report_ignore', methods: ['POST'])]
+    public function ignoreReport(int $id, EntityManagerInterface $em): JsonResponse {
+        $report = $em->getRepository(Report::class)->find($id);
+        if (!$report) return $this->json(['success' => false, 'error' => 'Report non trouvé'], 404);
+
+        $report->setStatus('refuse');
+        $em->flush();
+
+        return $this->json(['success' => true]);
+    }
+
+    #[Route('/clubs/historique', name: 'admin_clubs_historique')]
+    public function historiqueClubs(
+        EntityManagerInterface $em,
+        Request $request
+    ): Response {
+        // Récupération des filtres et tri depuis l'URL
+        $clubName = $request->query->get('club', '');
+        $sort = $request->query->get('sort', 'date_desc');
+        $status = $request->query->get('status', 'traite_refuse'); 
+
+        // Création de la query
+        $qb = $em->getRepository(Report::class)->createQueryBuilder('r')
+            ->join('r.reportedClub', 'c')
+            ->join('r.author', 'a')
+            ->addSelect('c, a');
+
+        // Filtre nom de club
+        if ($clubName) {
+            $qb->andWhere('c.name LIKE :clubName')
+                ->setParameter('clubName', "%$clubName%");
+        }
+
+        // Filtre statut
+        if ($status === 'traite_refuse') {
+            $qb->andWhere('r.status IN (:statuses)')
+            ->setParameter('statuses', ['traite', 'refuse']);
+        } elseif ($status) {
+            $qb->andWhere('r.status = :status')
+            ->setParameter('status', $status);
+        }
+
+        // Tri
+        switch ($sort) {
+            case 'name_asc':
+                $qb->orderBy('c.name', 'ASC');
+                break;
+            case 'name_desc':
+                $qb->orderBy('c.name', 'DESC');
+                break;
+            case 'date_asc':
+                $qb->orderBy('r.date', 'ASC');
+                break;
+            case 'date_desc':
+            default:
+                $qb->orderBy('r.date', 'DESC');
+        }
+
+        $reports = $qb->getQuery()->getResult();
+
+        return $this->render('admin/historique_clubs.html.twig', [
+            'reports' => $reports,
+            'filters' => [
+                'club' => $clubName,
+                'sort' => $sort,
+                'status' => $status,
+            ],
         ]);
     }
 }
