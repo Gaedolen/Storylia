@@ -1,0 +1,132 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique des utilisateurs signalés{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('css/admin/gestion_utilisateurs.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="history-header">
+        <a href="{{ path('admin_gestion_utilisateurs') }}" class="btn back-btn">
+            ← Retour aux utilisateurs
+        </a>
+    </div>
+
+    <div class="admin-dashboard">
+        <h1 class="page-title">
+            Historique des utilisateurs signalés
+        </h1>
+
+        {# Filtres #}
+        <form method="get" action="{{ path('admin_utilisateur_historique') }}" class="filters-container">
+            <label for="userName">Utilisateur :</label>
+            <input type="text" id="userName" name="userName"
+                value="{{ app.request.get('userName')|default('') }}">
+
+            <label for="statusFilter">Statut :</label>
+            <select id="statusFilter" name="statusFilter">
+                <option value="">Tous</option>
+                <option value="traite" {% if app.request.get('statusFilter') == 'traite' %}selected{% endif %}>Traité</option>
+                <option value="refuse" {% if app.request.get('statusFilter') == 'refuse' %}selected{% endif %}>Refusé</option>
+            </select>
+
+            <label for="orderFilter">Trier par :</label>
+            <select id="orderFilter" name="orderFilter">
+                <option value="date_desc" {% if app.request.get('orderFilter') == 'date_desc' %}selected{% endif %}>Date décroissante</option>
+                <option value="date_asc" {% if app.request.get('orderFilter') == 'date_asc' %}selected{% endif %}>Date croissante</option>
+                <option value="alpha_asc" {% if app.request.get('orderFilter') == 'alpha_asc' %}selected{% endif %}>Nom A→Z</option>
+                <option value="alpha_desc" {% if app.request.get('orderFilter') == 'alpha_desc' %}selected{% endif %}>Nom Z→A</option>
+            </select>
+
+            <button type="submit" class="btn">Filtrer</button>
+        </form>
+
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>Utilisateur</th>
+                    <th>Email</th>
+                    <th>Signalé par</th>
+                    <th>Transmis par</th>
+                    <th>Raison</th>
+                    <th class="message-employe">Message employé</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in reports %}
+                    {% set reasonLabels = {
+                        'harcelement': 'Harcèlement / comportement toxique',
+                        'usurpation': 'Usurpation d’identité',
+                        'spam': 'Spam',
+                        'contenu_inapproprie': 'Contenu inapproprié'
+                    } %}
+
+                    {% if report.reported %}
+                        {% set userReported = report.reported %}
+                        <tr>
+                            <td>
+                                <a href="{{ path('app_utilisateur_profil', {'id': userReported.id}) }}">
+                                    {{ userReported.pseudo }}
+                                    {% if userReported.status == 'actif' %}
+                                        <span class="badge badge-green">Actif</span>
+                                    {% else %}
+                                        <span class="badge badge-red">Suspendu</span>
+                                    {% endif %}
+                                </a>
+                            </td>
+                            <td>{{ userReported.email }}</td>
+                            <td>
+                                <a href="{{ path('app_utilisateur_profil', {'id': report.author.id}) }}">
+                                    {{ report.author.pseudo }}
+                                </a>
+                            </td>
+                            <td>{{ report.transmittedBy ? report.transmittedBy.pseudo : '-' }}</td>
+                            <td>{{ reasonLabels[report.reason] ?? report.reason }}</td>
+                            <td class="message-employe">{{ report.employeMessage ?: '-' }}</td>
+                            <td>{{ report.date|date('d/m/Y') }}</td>
+                            <td>
+                                {% if report.status == 'traite' %}
+                                    <span class="badge badge-green">Traité</span>
+                                {% elseif report.status == 'refuse' %}
+                                    <span class="badge badge-red">Refusé</span>
+                                {% else %}
+                                    <span class="badge badge-orange">En attente</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if userReported.status == 'suspendu' %}
+                                    <button class="btn unsuspend-btn reactivate-btn"
+                                            data-url="{{ path('admin_unsuspendre_utilisateur', {'id': userReported.id}) }}"
+                                            data-user-id="{{ userReported.id }}"
+                                            data-csrf="{{ csrf_token('unsuspend_user_' ~ userReported.id) }}">
+                                        Réactiver
+                                    </button>
+                                {% else %}
+                                    <button class="btn suspend-btn"
+                                            data-url="{{ path('admin_suspendre_utilisateur', {'id': userReported.id}) }}"
+                                            data-report-id="{{ report.id }}"
+                                            data-user-id="{{ userReported.id }}"
+                                            data-csrf="{{ csrf_token('suspend_user_' ~ userReported.id) }}">
+                                        Suspendre
+                                    </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% else %}
+                    <tr>
+                        <td colspan="9" class="no-users">Aucun signalement trouvé.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/gestion_utilisateurs.js') }}"></script>
+{% endblock %}

@@ -8,63 +8,124 @@
 
 {% block body %}
     <div class="admin-dashboard">
-        <h1 class="page-title">Gestion des utilisateurs</h1>
+        <div class="page-title" style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>Gestion des utilisateurs</h1>
+
+            <a href="{{ path('admin_utilisateur_historique') }}" class="btn unsuspend-btn">
+                Historique
+            </a>
+        </div>
 
         <table class="users-table">
             <thead>
                 <tr>
-                    <th>Pseudo</th>
+                    <th>Utilisateur</th>
                     <th>Email</th>
-                    <th>Status</th>
+                    <th>Signalé par</th>
+                    <th>Transmis par</th>
+                    <th>Raison</th>
+                    <th class="message-employe">Message employé</th>
+                    <th>Date</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for user in users %}
+                {% for report in reportsByUser %}
+                    {% set userReported = report.reported %}
+
                     <tr>
-                        <td>{{ user.pseudo }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>
-                            {% if user.isSuspendu() %}
-                                <span class="status suspended">Suspendu</span>
-                                {% if user.suspendReason %}
-                                    <span class="tooltip" title="{{ user.suspendReason }}">&#x1F6C8;</span>
-                                {% endif %}
+                        <td class="td-user">
+                            {% if userReported %}
+                                <a href="{{ path('app_utilisateur_profil', {'id': userReported.id}) }}">
+                                    {{ userReported.pseudo }}
+                                </a>
+                                <button type="button"
+                                        class="btn btn-contact"
+                                        data-pseudo="{{ userReported.pseudo }}"
+                                        data-action="{{ path('admin_signalement_mail_utilisateur', {'id': report.id}) }}"
+                                        data-token="{{ csrf_token('mail_user' ~ report.id) }}">
+                                    Contacter
+                                </button>
                             {% else %}
-                                <span class="status active">Actif</span>
+                                -
                             {% endif %}
                         </td>
+
                         <td>
-                            {% if user.isSuspendu() %}
-                                <button class="btn unsuspend-btn"
-                                        data-user-id="{{ user.id }}"
-                                        data-csrf="{{ user.suspendToken|default('') }}">
-                                    Réactiver
-                                </button>
+                            {% if userReported %}
+                                {{ userReported.email }}
                             {% else %}
-                                <button class="btn suspend-btn"
-                                        data-user-id="{{ user.id }}"
-                                        data-pseudo="{{ user.pseudo }}"
-                                        data-csrf="{{ user.suspendToken|default('') }}">
-                                    Suspendre
-                                </button>
+                                -
+                            {% endif %}
+                        </td>
+                        <td class="td-user">
+                            <a href="{{ path('app_utilisateur_profil', {'id': report.author.id}) }}">
+                                {{ report.author.pseudo }}
+                            </a>
+                            <button type="button"
+                                    class="btn btn-contact"
+                                    data-pseudo="{{ report.author.pseudo }}"
+                                    data-action="{{ path('admin_signalement_mail_auteur', {'id': report.id}) }}"
+                                    data-token="{{ csrf_token('mail_author' ~ report.id) }}">
+                                Contacter
+                            </button>
+                        </td>
+                        <td>
+                            {% if report.transmittedBy %}
+                                {{ report.transmittedBy.pseudo }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>{{ report.reason }}</td>
+                        <td class="message-employe">
+                            {% if report.employeMessage %}
+                                {{ report.employeMessage }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>{{ report.date|date('d/m/Y') }}</td>
+                        <td>
+                            {% if userReported %}
+                                {% if userReported.isSuspendu() %}
+                                    <form method="POST" action="{{ path('admin_unsuspendre_utilisateur', {'id': userReported.id}) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('unsuspend_user_' ~ userReported.id) }}">
+                                        <button type="submit" class="btn unsuspend-btn">Réactiver</button>
+                                    </form>
+
+                                {% else %}
+                                    <button class="btn suspend-btn"
+                                            data-user-id="{{ userReported.id }}"
+                                            data-csrf="{{ csrf_token('suspend_user_' ~ userReported.id) }}">
+                                        Suspendre
+                                    </button>
+                                    <form method="POST" action="{{ path('admin_ignorer_signalement', {'id': report.id}) }}" style="display:inline;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('ignorer_report' ~ report.id) }}">
+                                        <button type="submit" class="btn ignore-btn">Ignorer</button>
+                                    </form>
+                                {% endif %}
+                            {% else %}
+                                -
                             {% endif %}
                         </td>
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="4" class="no-users">Aucun utilisateur trouvé.</td>
+                        <td colspan="8" class="no-users">Aucun signalement trouvé.</td>
                     </tr>
                 {% endfor %}
-            </tbody>
+                </tbody>
         </table>
 
-        {# Modal pour suspendre #}
+        {# Modal pour suspendre un utilisateur #}
         <div id="suspendModal" class="modal hidden">
             <div class="modal-content">
                 <h2>Suspendre l'utilisateur <span id="modalPseudo"></span></h2>
                 <form id="suspendForm">
                     <input type="hidden" name="_token" id="csrfToken">
+                    <input type="hidden" id="userIdInput">
+
                     <div class="form-group">
                         <label>Raison :</label>
                         <select id="reasonSelect">
@@ -74,10 +135,12 @@
                             <option value="autres">Autres</option>
                         </select>
                     </div>
+
                     <div class="form-group hidden" id="otherReasonDiv">
                         <label>Autre raison :</label>
                         <input type="text" id="otherReason">
                     </div>
+
                     <div class="modal-actions">
                         <button type="button" id="cancelModal" class="btn cancel-btn">Annuler</button>
                         <button type="submit" class="btn suspend-confirm-btn">Suspendre</button>
@@ -85,8 +148,31 @@
                 </form>
             </div>
         </div>
-    </div>
 
+        {# Modal pour envoyer un mail #}
+        <div id="contactModal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Envoyer un mail à <span id="contactModalPseudo"></span></h2>
+                <form id="contactForm" method="POST">
+                    <input type="hidden" name="_token" id="modal_token">
+                    <label>Objet</label>
+                    <input type="text" name="subject" required>
+                    <label>Motif</label>
+                    <select name="reason" required>
+                        <option value="">-- Choisir un motif --</option>
+                        <option value="Comportement">Comportement</option>
+                        <option value="Contenu inapproprié">Contenu inapproprié</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                    <label>Message</label>
+                    <textarea name="message" required></textarea>
+                    <button type="submit" class="btn btn-primary">Envoyer</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
 {% endblock %}
 
 {% block javascripts %}

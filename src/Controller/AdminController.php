@@ -26,6 +26,7 @@ use App\Entity\Book;
 use App\Entity\Author;
 use App\Repository\UtilisateurRepository;
 use App\Repository\BookRepository;
+use App\Repository\ReportRepository;
 use App\Repository\ClubRepository;
 
 #[IsGranted('ROLE_ADMIN')]
@@ -334,22 +335,20 @@ class AdminController extends AbstractController
     }
 
     #[Route('/utilisateurs', name: 'admin_gestion_utilisateurs')]
-    public function gestionUtilisateurs(EntityManagerInterface $em, UtilisateurRepository $userRepository): Response {
+    #[IsGranted('ROLE_ADMIN')]
+    public function gestionUtilisateurs(EntityManagerInterface $em, UtilisateurRepository $userRepository): Response
+    {
         $users = $userRepository->findByRoleLibelle('USER');
 
-        $reports = $em->getRepository(Report::class)->findAll();
+        // On récupère uniquement les signalements utilisateurs transmis à l’admin
+        $reportsByUser = $em->getRepository(Report::class)->findBy([
+            'status'   => Report::STATUS_ADMIN,
+        ]);
 
-        $reportsByUser = [];
-        foreach ($reports as $report) {
-            $reportedBy = $report->getAuthor();
-            $reportedUser = $report->getReported();
-
-            if (!$reportedBy || !$reportedUser) continue;
-            if ($reportedBy->getRole()->getLabel() !== 'EMPLOYE') continue;
-
-            $userId = $reportedUser->getId();
-            $reportsByUser[$userId][] = $report;
-        }
+        // On garde seulement ceux qui concernent un utilisateur
+        $reportsByUser = array_filter($reportsByUser, function (Report $report) {
+            return $report->getReported() !== null;
+        });
 
         return $this->render('admin/gestion_utilisateurs.html.twig', [
             'users' => $users,
@@ -357,65 +356,156 @@ class AdminController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/signalement/{id}/mail-utilisateur', name: 'admin_signalement_mail_utilisateur', methods: ['POST'])]
+    public function mailUtilisateurSignale(
+        Report $report,
+        Request $request,
+        MailerInterface $mailer
+    ): Response {
+        if (!$this->isCsrfTokenValid('mail_user'.$report->getId(), $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $user = $report->getReported();
+        if (!$user) {
+            $this->addFlash('danger', 'Aucun utilisateur signalé.');
+            return $this->redirectToRoute('admin_gestion_utilisateurs');
+        }
+
+        $subject = $request->request->get('subject');
+        $reason  = $request->request->get('reason');
+        $message = $request->request->get('message');
+
+        $email = (new TemplatedEmail())
+            ->from('moderation@storylia.com')
+            ->to($user->getEmail())
+            ->subject($subject)
+            ->htmlTemplate('email/signalement_utilisateur.html.twig')
+            ->context([
+                'user'    => $user,
+                'report'  => $report,
+                'subject' => $subject,
+                'reason'  => $reason,
+                'message' => $message,
+            ]);
+
+        $mailer->send($email);
+
+        $this->addFlash('success', 'Mail envoyé à l’utilisateur signalé.');
+        return $this->redirectToRoute('admin_gestion_utilisateurs');
+    }
+
+    #[Route('/admin/signalement/{id}/mail-auteur', name: 'admin_signalement_mail_auteur', methods: ['POST'])]
+    public function mailAuteurSignalement(
+        Report $report,
+        Request $request,
+        MailerInterface $mailer
+    ): Response {
+        if (!$this->isCsrfTokenValid('mail_author'.$report->getId(), $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $author = $report->getAuthor();
+
+        $subject = $request->request->get('subject');
+        $reason  = $request->request->get('reason');
+        $message = $request->request->get('message');
+
+        $email = (new TemplatedEmail())
+            ->from('moderation@storylia.com')
+            ->to($author->getEmail())
+            ->subject($subject)
+            ->htmlTemplate('email/signalement_auteur.html.twig')
+            ->context([
+                'user'    => $author,
+                'report'  => $report,
+                'subject' => $subject,
+                'reason'  => $reason,
+                'message' => $message,
+            ]);
+
+        $mailer->send($email);
+
+        $this->addFlash('success', 'Mail envoyé à l’auteur du signalement.');
+        return $this->redirectToRoute('admin_gestion_utilisateurs');
+    }
+
     #[Route('/utilisateur/suspendre/{id}', name: 'admin_suspendre_utilisateur', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
-    public function suspendreUtilisateur(int $id, Request $request, UtilisateurRepository $userRepository, EntityManagerInterface $em, MailerInterface $mailer): JsonResponse
-    {
+    public function suspendreUtilisateur(int $id, Request $request, UtilisateurRepository $userRepository, ReportRepository $reportRepository, EntityManagerInterface $em, MailerInterface $mailer): JsonResponse {
         $user = $userRepository->find($id);
         if (!$user) {
             return $this->json(['success' => false, 'error' => 'Utilisateur non trouvé'], 404);
         }
 
-        $data = json_decode($request->getContent(), true) ?? [];
-        $csrfToken = $data['_token'] ?? null;
-
+        // --- CSRF ---
+        $csrfToken = $request->request->get('_token');
         if (!$csrfToken || !$this->isCsrfTokenValid('suspend_user_' . $user->getId(), $csrfToken)) {
             return $this->json(['success' => false, 'error' => 'Token CSRF invalide'], 400);
         }
 
-        $reason = $data['reason'] ?? '';
-        if ($reason === 'autres') $reason = $data['otherReason'] ?? '';
+        // --- Raison ---
+        $reason = $request->request->get('reason', '');
+        $otherReason = $request->request->get('otherReason', '');
+        if ($reason === 'autres') {
+            $reason = $otherReason;
+        }
 
+        // --- Suspendre utilisateur ---
         $user->setStatus(Utilisateur::STATUS_SUSPENDU);
         $user->setSuspendReason($reason);
+
+        // --- Marquer tous ses reports comme TRAITÉS ---
+        $reports = $reportRepository->findBy([
+            'reported' => $user,
+            'status'   => Report::STATUS_ADMIN
+        ]);
+
+        foreach ($reports as $report) {
+            $report->setStatus(Report::STATUS_TRAITE);
+        }
+
         $em->flush();
 
+        // --- Envoyer mail ---
         if ($user->getEmail()) {
             $email = (new TemplatedEmail())
                 ->from('storylia@gmail.com')
                 ->to($user->getEmail())
                 ->subject('Votre compte a été suspendu')
-                ->htmlTemplate('emails/suspension_utilisateur.html.twig')
-                ->context(['user' => $user, 'reason' => $reason]);
+                ->htmlTemplate('email/suspension_utilisateur.html.twig')
+                ->context([
+                    'user' => $user,
+                    'reason' => $reason
+                ]);
+
             $mailer->send($email);
         }
 
-        $unsuspendToken = $this->container->get('security.csrf.token_manager')
-            ->getToken('unsuspend_user_' . $user->getId())
-            ->getValue();
-
         return $this->json([
             'success' => true,
-            'userId' => $user->getId(),
-            'unsuspendToken' => $unsuspendToken
+            'userId' => $user->getId()
         ]);
     }
 
     #[Route('/utilisateur/unsuspendre/{id}', name: 'admin_unsuspendre_utilisateur', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
-    public function unsuspendUser(int $id, Request $request, UtilisateurRepository $userRepository, EntityManagerInterface $em, MailerInterface $mailer, CsrfTokenManagerInterface $csrfTokenManager
-    ): JsonResponse
-    {
+    public function unsuspendUser(
+        int $id,
+        Request $request,
+        UtilisateurRepository $userRepository,
+        EntityManagerInterface $em,
+        MailerInterface $mailer
+    ): Response {
         $user = $userRepository->find($id);
         if (!$user) {
-            return $this->json(['success' => false, 'error' => 'Utilisateur non trouvé'], 404);
+            throw $this->createNotFoundException('Utilisateur non trouvé');
         }
 
-        $data = json_decode($request->getContent(), true) ?? [];
-        $csrfToken = $data['_token'] ?? null;
+        $csrfToken = $request->request->get('_token');
 
         if (!$csrfToken || !$this->isCsrfTokenValid('unsuspend_user_' . $user->getId(), $csrfToken)) {
-            return $this->json(['success' => false, 'error' => 'Token CSRF invalide'], 400);
+            throw $this->createAccessDeniedException('Token CSRF invalide');
         }
 
         $user->setStatus(Utilisateur::STATUS_ACTIF);
@@ -427,17 +517,93 @@ class AdminController extends AbstractController
                 ->from('storylia@gmail.com')
                 ->to($user->getEmail())
                 ->subject('Votre compte a été réactivé')
-                ->htmlTemplate('emails/reactivation_utilisateur.html.twig')
+                ->htmlTemplate('email/reactivation_utilisateur.html.twig')
                 ->context(['user' => $user]);
             $mailer->send($email);
         }
 
-        $suspendToken = $csrfTokenManager->getToken('suspend_user_' . $user->getId())->getValue();
+        $this->addFlash('success', 'Utilisateur réactivé.');
 
-        return $this->json([
-            'success' => true,
-            'userId' => $user->getId(),
-            'suspendToken' => $suspendToken
+        return $this->redirectToRoute('admin_gestion_utilisateurs');
+    }
+
+    #[Route('/admin/utilisateur-signalement/{id}/ignorer', name: 'admin_ignorer_signalement', methods: ['POST'])]
+    public function ignorerSignalementAdmin(Report $report, EntityManagerInterface $em, Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('ignorer_report' . $report->getId(), $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $report->setStatus(Report::STATUS_REFUSE);
+        $em->flush();
+
+        $this->addFlash('info', 'Signalement ignoré.');
+        return $this->redirectToRoute('admin_utilisateur_gestion'); // adapte ici vers ta page admin
+    }
+
+    #[Route('/utilisateurs/historique', name: 'admin_utilisateur_historique')]
+    #[IsGranted('ROLE_ADMIN')]
+    public function historiqueUtilisateurs(
+        Request $request,
+        EntityManagerInterface $em
+    ): Response {
+        // Récupération des filtres
+        $userName     = trim($request->query->get('userName', ''));
+        $statusFilter = $request->query->get('statusFilter', '');
+        $orderFilter  = $request->query->get('orderFilter', 'date_desc');
+
+        // QueryBuilder de base
+        $qb = $em->getRepository(Report::class)->createQueryBuilder('r')
+            ->leftJoin('r.reported', 'u')
+            ->leftJoin('r.author', 'a')
+            ->leftJoin('r.transmittedBy', 't')
+            ->addSelect('u', 'a', 't')
+            ->where('r.reported IS NOT NULL');
+
+        // Filtre statut
+        if ($statusFilter === 'traite') {
+            $qb->andWhere('r.status = :status')
+            ->setParameter('status', Report::STATUS_TRAITE);
+        } elseif ($statusFilter === 'refuse') {
+            $qb->andWhere('r.status = :status')
+            ->setParameter('status', Report::STATUS_REFUSE);
+        }
+
+        // Filtre pseudo utilisateur signalé
+        if ($userName !== '') {
+            $qb->andWhere('LOWER(u.pseudo) LIKE LOWER(:pseudo)')
+            ->setParameter('pseudo', '%' . $userName . '%');
+        }
+
+        // Tri
+        switch ($orderFilter) {
+            case 'date_asc':
+                $qb->orderBy('r.date', 'ASC');
+                break;
+
+            case 'alpha_asc':
+                $qb->orderBy('u.pseudo', 'ASC');
+                break;
+
+            case 'alpha_desc':
+                $qb->orderBy('u.pseudo', 'DESC');
+                break;
+
+            case 'date_desc':
+            default:
+                $qb->orderBy('r.date', 'DESC');
+                break;
+        }
+
+        // Exécution
+        $reports = $qb->getQuery()->getResult();
+
+        // Render
+        return $this->render('admin/historique_utilisateurs.html.twig', [
+            'reports'       => $reports,
+            'userName'      => $userName,
+            'statusFilter'  => $statusFilter,
+            'orderFilter'   => $orderFilter,
         ]);
     }
 
