@@ -36,6 +36,15 @@
                 <div class="summary-title">Livres créés par utilisateurs</div>
                 <div class="summary-value">{{ totalUserBooks }}</div>
             </div>
+            <div class="summary-card">
+                <div class="summary-title">
+                    Activité utilisateurs
+                    <small>(MongoDB)</small>
+                </div>
+                <div class="summary-value">
+                    {{ totalLogs ?? '—' }}
+                </div>
+            </div>
         </div>
 
         {# === Gestion des livres === #}
@@ -44,6 +53,7 @@
             <div class="admin-actions">
                 <a href="{{ path('import_books') }}" class="btn-import">Importer des livres</a>
                 <a href="{{ path('update_books') }}" class="btn-ajout">Mettre à jour les livres</a>
+                <a href="{{ path('admin_livres_signales') }}" class="btn-warning">Gestion des livres signalés</a>
                 <a href="{{ path('app_recherche_livre') }}" class="btn-livres">Gestion des livres du site</a>
             </div>
         </div>

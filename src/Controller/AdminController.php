@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Service\BookApiService;
 use App\Service\BookCreationService;
+use App\Service\StatsMongoService;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +18,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use App\Form\EmployeType;
+use App\Form\BookType;
 use App\Entity\Role;
 use App\Entity\Club;
 use App\Entity\Utilisateur;
@@ -34,7 +36,16 @@ use App\Repository\ClubRepository;
 class AdminController extends AbstractController
 {
     #[Route('/dashboard', name: 'admin_dashboard')]
-    public function index(BookRepository $bookRepository, ClubRepository $clubRepository, UtilisateurRepository $userRepository): Response {
+    public function index(BookRepository $bookRepository, ClubRepository $clubRepository, UtilisateurRepository $userRepository, StatsMongoService $statsMongoService): Response {
+
+        // Récupérer le nombre total de logs MongoDB
+        $totalLogs = $statsMongoService->countLogs();
+
+        // Récupérer les logs par utilisateur (facultatif)
+        $logsByUser = $statsMongoService->logsPerUser();
+
+        // Récupérer les logs par jour (facultatif)
+        $logsByDay = $statsMongoService->logsPerDay();
         // Livres totaux
         $totalBooks = $bookRepository->count([]);
 
@@ -73,6 +84,9 @@ class AdminController extends AbstractController
             'totalUsers' => $totalUsers,
             'totalParticipants' => $totalParticipants,
             'totalUserBooks' => $totalUserBooks,
+            'totalLogs' => $totalLogs,
+            'logsByUser' => $logsByUser,
+            'logsByDay' => $logsByDay,
         ]);
     }
 
@@ -852,6 +866,75 @@ class AdminController extends AbstractController
                 'sort' => $sort,
                 'status' => $status,
             ],
+        ]);
+    }
+
+    #[Route('/livres-signales', name: 'admin_livres_signales')]
+    #[IsGranted('ROLE_ADMIN')]
+    public function livresSignales(ReportRepository $reportRepository): Response
+    {
+        $reports = $reportRepository->findBy(['status' => 'en_cours']);
+
+        return $this->render('admin/livres_signales.html.twig', [
+            'reports' => $reports,
+        ]);
+    }
+
+    #[Route('/admin/livres-signales/valider/{id}', name: 'admin_livre_valider', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function validerLivre(int $id, ReportRepository $reportRepository, EntityManagerInterface $em): Response
+    {
+        $report = $reportRepository->find($id);
+
+        if (!$report) {
+            return $this->json(['success' => false, 'message' => 'Report introuvable.']);
+        }
+
+        $em->remove($report);
+        $em->flush();
+
+        return $this->json(['success' => true]);
+    }
+
+    #[Route('/livres-signales/supprimer/{id}', name: 'admin_livre_supprimer', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function supprimerLivre(Book $book, EntityManagerInterface $em): Response
+    {
+        $em->remove($book);
+        $em->flush();
+
+        return $this->json(['success' => true, 'message' => 'Livre supprimé avec succès']);
+    }
+
+    #[Route('/livre/{id}/edit', name: 'admin_livre_edit')]
+    #[IsGranted('ROLE_ADMIN')]
+    public function editLivre(Book $book, Request $request, EntityManagerInterface $em): Response
+    {
+        $report = $em->getRepository(Report::class)->findOneBy(
+            ['reportedBook' => $book],
+            ['date' => 'DESC']
+        );
+
+        $form = $this->createForm(BookType::class, $book);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $file = $form->get('cover')->getData();
+            if ($file) {
+                $filename = uniqid().'.'.$file->guessExtension();
+                $file->move($this->getParameter('covers_directory'), $filename);
+                $book->setCover('uploads/covers/'.$filename);
+            }
+
+            $em->flush();
+            $this->addFlash('success', 'Livre modifié !');
+            return $this->redirectToRoute('admin_livres_signales');
+        }
+
+        return $this->render('admin/livre_edit.html.twig', [
+            'form' => $form->createView(),
+            'book' => $book,
+            'report' => $report,
         ]);
     }
 }

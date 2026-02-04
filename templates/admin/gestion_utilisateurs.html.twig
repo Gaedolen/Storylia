@@ -31,6 +31,14 @@
             </thead>
             <tbody>
                 {% for report in reportsByUser %}
+                    {% set reasons = {
+                        'comportement_inapproprie': 'Comportement inapproprié',
+                        'harcelement': 'Harcèlement / comportement toxique',
+                        'usurpation': 'Usurpation d\'identité',
+                        'spam': 'Spam',
+                        'contenu_inapproprie': 'Contenu inapproprié'
+                    } %}
+
                     {% set userReported = report.reported %}
 
                     <tr>
@@ -77,7 +85,7 @@
                                 -
                             {% endif %}
                         </td>
-                        <td>{{ report.reason }}</td>
+                        <td>{{ reasons[report.reason]|default(report.reason) }}</td>
                         <td class="message-employe">
                             {% if report.employeMessage %}
                                 {{ report.employeMessage }}

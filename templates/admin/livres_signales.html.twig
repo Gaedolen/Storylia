@@ -1,0 +1,111 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Livres signalés - Admin{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('css/employe/livres_signales.css') }}">
+{% endblock %}
+
+{% block body %}
+<h1>Livres signalés</h1>
+
+<table class="table-reports">
+    <thead>
+        <tr>
+            <th>ID Report</th>
+            <th>Livre</th>
+            <th>Auteur</th>
+            <th>Motif</th>
+            <th>Message</th>
+            <th>Signalé par</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in reports %}
+            {% if report.reportedBook %}
+            <tr data-report-id="{{ report.id }}">
+                <td>{{ report.id }}</td>
+                <td>{{ report.reportedBook.title }}</td>
+                <td>{{ report.reportedBook.author.name }}</td>
+                <td>{{ report.reason }}</td>
+                <td>{{ report.message|default('—') }}</td>
+                <td>{{ report.author.pseudo }}</td>
+                <td>{{ report.date|date('d/m/Y') }}</td>
+                <td>
+                    <a href="{{ path('admin_livre_edit', {'id': report.reportedBook.id}) }}" class="btn-edit">Modifier</a>
+                    <button class="btn-validate" data-report-id="{{ report.id }}">Valider report</button>
+                    <button class="btn-delete" data-book-id="{{ report.reportedBook.id }}">Supprimer livre</button>
+                </td>
+            </tr>
+            {% endif %}
+        {% else %}
+            <tr><td colspan="8">Aucun livre signalé pour le moment.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Modal détails livre -->
+<div class="modal" id="book-detail-modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>Détails du livre</h3>
+        <div id="book-detail-content"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const detailModal = document.getElementById('book-detail-modal');
+    const detailContent = document.getElementById('book-detail-content');
+    const openModal = modal => modal.style.display = 'flex';
+    const closeModal = modal => modal.style.display = 'none';
+    const setupCloseOutside = modal => {
+        window.addEventListener('click', e => { if(e.target === modal) closeModal(modal); });
+    };
+    setupCloseOutside(detailModal);
+    detailModal.querySelector('.close')?.addEventListener('click', () => closeModal(detailModal));
+
+    // Valider report
+    document.querySelectorAll('.btn-validate').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const reportId = btn.dataset.reportId;
+            if (!confirm('Valider le report et le supprimer ?')) return;
+            const resp = await fetch(`/admin/livres-signales/valider/${reportId}`, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const result = await resp.json();
+            if (result.success) {
+                alert('Report validé.');
+                btn.closest('tr').remove();
+            } else {
+                alert(result.message || 'Erreur serveur.');
+            }
+        });
+    });
+
+    // Supprimer livre
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const bookId = btn.dataset.bookId;
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce livre ?')) return;
+            const resp = await fetch(`/admin/livres-signales/supprimer/${bookId}`, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const result = await resp.json();
+            if (result.success) {
+                alert(result.message);
+                btn.closest('tr').remove();
+            } else {
+                alert(result.message || 'Erreur serveur.');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
