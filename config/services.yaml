@@ -18,10 +18,10 @@ services:
         arguments:
             $googleBooksApiKey: '%env(resolve:GOOGLE_BOOKS_API)%'
 
-    # Injection de MongoService avec les variables d'environnement
-    App\Service\MongoService:
-        arguments:
-            $mongoUrl: '%env(resolve:MONGODB_URL)%'
-            $mongoDb: '%env(resolve:MONGODB_DB)%'
+    # # Injection de MongoService avec les variables d'environnement
+    # App\Service\MongoService:
+    #     arguments:
+    #         $mongoUrl: '%env(resolve:MONGODB_URL)%'
+    #         $mongoDb: '%env(resolve:MONGODB_DB)%'
 
-    App\Service\StatsMongoService: ~
+    # App\Service\StatsMongoService: ~

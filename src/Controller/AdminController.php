@@ -9,7 +9,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Service\BookApiService;
 use App\Service\BookCreationService;
-use App\Service\StatsMongoService;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,16 +35,8 @@ use App\Repository\ClubRepository;
 class AdminController extends AbstractController
 {
     #[Route('/dashboard', name: 'admin_dashboard')]
-    public function index(BookRepository $bookRepository, ClubRepository $clubRepository, UtilisateurRepository $userRepository, StatsMongoService $statsMongoService): Response {
-
-        // Récupérer le nombre total de logs MongoDB
-        $totalLogs = $statsMongoService->countLogs();
-
-        // Récupérer les logs par utilisateur (facultatif)
-        $logsByUser = $statsMongoService->logsPerUser();
-
-        // Récupérer les logs par jour (facultatif)
-        $logsByDay = $statsMongoService->logsPerDay();
+    public function index(BookRepository $bookRepository, ClubRepository $clubRepository, UtilisateurRepository $userRepository): Response 
+    {
         // Livres totaux
         $totalBooks = $bookRepository->count([]);
 
@@ -84,9 +75,6 @@ class AdminController extends AbstractController
             'totalUsers' => $totalUsers,
             'totalParticipants' => $totalParticipants,
             'totalUserBooks' => $totalUserBooks,
-            'totalLogs' => $totalLogs,
-            'logsByUser' => $logsByUser,
-            'logsByDay' => $logsByDay,
         ]);
     }
 

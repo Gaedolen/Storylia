@@ -75,7 +75,10 @@
             </div>
 
             {# Bouton avis / modification #}
-            {% if isInLibrary %}
+            <div 
+                class="bookshelf-extra-actions {{ isInLibrary ? '' : 'hidden' }}"
+                data-bookshelf-actions="{{ book.id }}"
+            >
                 {% if avisExiste %}
                     <button class="btn-main" disabled>Avis laissé ✓</button>
                 {% else %}
@@ -86,20 +89,22 @@
                     </button>
                 {% endif %}
 
-                {# Bouton Date de lecture / modification #}
                 {% if dateLectureExiste %}
                     <button class="btn-main" disabled>Date laissée ✓</button>
                 {% else %}
                     <button class="btn-main" id="add-reading-date-btn">Date de lecture</button>
                 {% endif %}
 
-                {# Bouton Note / Modification #}
                 {% if reviewNote is not null %}
-                    <button class="btn-main" id="leave-rating-btn" disabled>Note laissée ✓</button>
+                    <button class="btn-main" disabled>Note laissée ✓</button>
                 {% else %}
-                    <button class="btn-main" id="leave-rating-btn"  data-rate-url="{{ path('app_review_submit', {'id': book.id}) }}">Laisser une note</button>
+                    <button class="btn-main" 
+                            id="leave-rating-btn"
+                            data-rate-url="{{ path('app_review_submit', {'id': book.id}) }}">
+                        Laisser une note
+                    </button>
                 {% endif %}
-            {% endif %}
+            </div>
         </div>
 
         <!-- Couverture + Infos Livre -->
@@ -277,88 +282,100 @@
     <div class="book-reviews-block">
         <div class="book-rating">
             <h3>Note globale</h3>
-            <p>{{ book.averageRating|default('Pas encore noté') }}</p>
+
+            {% set rating = book.averageRating is not null ? book.averageRating : 0 %}
+            {% set percentage = (rating / 5) * 100 %}
+
+            <div class="rating-circle">
+                <svg viewBox="0 0 36 36">
+                    <!-- Cercle de fond -->
+                    <circle class="circle-bg" cx="18" cy="18" r="15.9155"/>
+                    <!-- Cercle rempli -->
+                    <circle class="circle-fill" cx="18" cy="18" r="15.9155"
+                        stroke-dasharray="{{ percentage }}, 100"/>
+                    <!-- Texte centré -->
+                    <text x="18" y="18" class="percentage" text-anchor="middle" alignment-baseline="middle">
+                        {{ rating|round(1) }}/5
+                    </text>
+                </svg>
+            </div>
         </div>
 
         <div class="book-reviews">
             <h3>Avis</h3>
 
-            {% for review in reviews %}
-                <div class="review-bubble">
+            <div class="reviews-container">
+                {% for review in reviews %}
+                    <div class="review-bubble">
 
-                    <!-- COLONNE UTILISATEUR -->
-                    <div class="review-user">
-                        <a href="{{ path('app_utilisateur_profil', {'id': user.id}) }}" class="user-card">
-                            <img
-                                src="{{ asset('uploads/profiles/' ~ review.utilisateur.profilePicture) }}"
-                                alt="Photo {{ review.utilisateur.pseudo }}"
-                            >
-                            <span class="review-username">
-                                {{ review.utilisateur.pseudo }}
-                            </span>
-                        </a>
-                    </div>
-
-                    <!-- SÉPARATEUR -->
-                    <div class="review-separator"></div>
-
-                    <!-- CONTENU AVIS -->
-                    <div class="review-content">
-
-                        <!-- HEADER -->
-                        <div class="review-header">
-
-                            <div class="review-header-left">
-                                <span class="review-date">
-                                    {{ review.date|date('d/m/Y') }}
+                        <!-- COLONNE UTILISATEUR -->
+                        <div class="review-user">
+                            <a href="{{ path('app_utilisateur_profil', {'id': review.utilisateur.id}) }}" class="user-card">
+                                <img
+                                    src="{{ asset('uploads/profiles/' ~ review.utilisateur.profilePicture) }}"
+                                    alt="Photo {{ review.utilisateur.pseudo }}"
+                                >
+                                <span class="review-username">
+                                    {{ review.utilisateur.pseudo }}
                                 </span>
+                            </a>
+                        </div>
 
-                                {% set shelf = bookshelvesByUser[review.utilisateur.id] ?? null %}
-                                <span class="review-category-badge">
-                                    {% if shelf and shelf.readingStatus %}
-                                        {{ prettyStatuses[shelf.readingStatus.label]
-                                            ?? shelf.readingStatus.label|replace({'_': ' '})|capitalize
-                                        }}
-                                    {% else %}
-                                        Non classé
+                        <!-- SÉPARATEUR -->
+                        <div class="review-separator"></div>
+
+                        <!-- CONTENU AVIS -->
+                        <div class="review-content">
+
+                            <!-- HEADER -->
+                            <div class="review-header">
+
+                                <div class="review-header-left">
+                                    <span class="review-date">
+                                        {{ review.date|date('d/m/Y') }}
+                                    </span>
+
+                                    {% set shelf = bookshelvesByUser[review.utilisateur.id] ?? null %}
+                                    <span class="review-category-badge">
+                                        {% if shelf and shelf.readingStatus %}
+                                            {{ prettyStatuses[shelf.readingStatus.label] ?? shelf.readingStatus.label|replace({'_': ' '})|capitalize }}
+                                        {% else %}
+                                            Non classé
+                                        {% endif %}
+                                    </span>
+                                </div>
+
+                                <!-- BOUTON SIGNALER -->
+                                {% if review.reports|length > 0 %}
+                                    <span class="reported-badge" title="Cet avis a déjà été signalé">⚠️ Signalé</span>
+                                {% else %}
+                                    {% if app.user and app.user.id != review.utilisateur.id %}
+                                        <button
+                                            type="button"
+                                            class="review-report-btn"
+                                            data-modal="report-modal"
+                                            data-review-id="{{ review.id }}"
+                                            title="Signaler cet avis"
+                                        >
+                                            <svg class="report-icon" viewBox="0 0 24 24">
+                                                <circle cx="12" cy="12" r="10"/>
+                                                <rect x="6" y="11" width="12" height="2"/>
+                                            </svg>
+                                        </button>
                                     {% endif %}
-                                </span>
+                                {% endif %}
+
                             </div>
 
-                            <!-- BOUTON SIGNALER -->
-                            {% if review.reports|length > 0 %}
-                                <span class="reported-badge" title="Cet avis a déjà été signalé">⚠️ Signalé</span>
-                            {% else %}
-                                {% if app.user and app.user.id != review.utilisateur.id %}
-                                    <button
-                                        type="button"
-                                        class="review-report-btn"
-                                        data-modal="report-modal"
-                                        data-review-id="{{ review.id }}"
-                                        title="Signaler cet avis"
-                                    >
-                                        <svg class="report-icon" viewBox="0 0 24 24">
-                                            <circle cx="12" cy="12" r="10"/>
-                                            <rect x="6" y="11" width="12" height="2"/>
-                                        </svg>
-                                    </button>
-                                {% endif %}
-                            {% endif %}
+                            <!-- TEXTE -->
+                            <div class="review-text">
+                                <p>{{ review.comment }}</p>
+                            </div>
 
                         </div>
-
-                        <!-- TEXTE -->
-                        <div class="review-text">
-                            <p>{{ review.comment }}</p>
-                        </div>
-
                     </div>
-                </div>
-
-                </div>
-            {% else %}
-                <p>Aucun avis pour le moment.</p>
-            {% endfor %}
+                {% endfor %}
+            </div>
 
             {% if totalPages > 1 %}
                 <div class="pagination">

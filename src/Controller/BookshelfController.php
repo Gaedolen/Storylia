@@ -54,7 +54,11 @@ class BookshelfController extends AbstractController
         $em->persist($bookshelf);
         $em->flush();
 
-        return $this->json(['success' => true, 'message' => 'Livre ajouté ou mis à jour avec succès !']);
+        return $this->json([
+            'success' => true,
+            'bookshelfId' => $bookshelf->getId(),
+            'readingStatusLabel' => $status->getLabel(),
+        ]);
     }
 
     #[Route('/supprimer', name: 'bookshelf_remove', methods: ['POST'])]

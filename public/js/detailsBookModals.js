@@ -253,13 +253,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const result = await resp.json();
 
                 if (result.success) {
-
                     // Mettre à jour le bouton principal côté DOM
                     const btn = document.querySelector(`[data-book-id="${bookId}"]`);
                     if (btn) {
                         btn.textContent = 'Déplacer';
                         btn.dataset.bookshelfId = result.bookshelfId;
-                        btn.dataset.currentStatusLabel = result.readingStatusLabel; // pour la prochaine ouverture
+                        btn.dataset.currentStatusLabel = result.readingStatusLabel;
+                        btn.dataset.hasBookshelf = "1";
                     }
 
                     // Mettre à jour le badge statut actuel dans la modal
@@ -270,6 +270,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // Mettre à jour la data-bookshelf-id dans la modal
                     bookshelfModal.dataset.bookshelfId = result.bookshelfId;
+
+                    // Afficher les boutons avis / date / note
+                    const extraActions = document.querySelector(
+                        `[data-bookshelf-actions="${bookId}"]`
+                    );
+
+                    if (extraActions) {
+                        extraActions.classList.remove('hidden');
+                    }
 
                     // Fermer modal
                     closeModal(bookshelfModal);
@@ -332,26 +341,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 const result = await resp.json();
 
                 if (result.success) {
-                    const submitBtn = reviewForm.querySelector('button[type="submit"]');
-
-                    submitBtn.textContent = 'Avis laissé ✔';
-                    submitBtn.disabled = true;
-
-                    textarea.value = '';
-                    if (counter) counter.textContent = '0 / 1000';
-
                     closeModal(reviewModal);
 
-                    // Cherche le bouton extérieur
+                    // Mettre à jour le bouton principal
                     const externalBtn = document.querySelector('[data-modal="leave-review-modal"]');
-
                     if (externalBtn) {
                         externalBtn.textContent = 'Avis laissé ✓';
                         externalBtn.classList.add('disabled-review-btn');
                         externalBtn.disabled = true;
                     }
-                } else {
-                    alert(result.message || "Erreur lors de l'enregistrement.");
+
+                    // AJOUTER LE NOUVEL AVIS EN HAUT
+                    const reviewsContainer = document.querySelector('.reviews-container');
+                    if (reviewsContainer) {
+                        const newReviewHTML = `
+                            <div class="review-bubble">
+                                <div class="review-user">
+                                    <a href="/profil/${result.userId}" class="user-card">
+                                        <img src="${result.userProfilePicture}" alt="Photo ${result.userPseudo}">
+                                        <span class="review-username">${result.userPseudo}</span>
+                                    </a>
+                                </div>
+                                <div class="review-separator"></div>
+                                <div class="review-content">
+                                    <div class="review-header">
+                                        <div class="review-header-left">
+                                            <span class="review-date">${result.date}</span>
+                                            <span class="review-category-badge">${result.statusLabel}</span>
+                                        </div>
+                                    </div>
+                                    <div class="review-text">
+                                        <p>${result.review}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        reviewsContainer.insertAdjacentHTML('afterbegin', newReviewHTML);
+                    }
                 }
             } catch (error) {
                 console.error(error);
@@ -360,16 +386,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Modal date de lecture
+    // ==========================
+    // MODAL DATE DE LECTURE
+    // ==========================
     const readingModal = document.getElementById('reading-date-modal');
     const readingForm = document.getElementById('reading-date-form');
 
     if (readingModal && readingForm) {
 
+        // Bouton qui ouvre la modal
+        const addReadingDateBtn = document.getElementById('add-reading-date-btn');
+        if (addReadingDateBtn) {
+            addReadingDateBtn.addEventListener('click', () => openModal(readingModal));
+        }
+
         const checkboxToday = document.getElementById('reading-today');
         const datePicker = document.getElementById('reading-date-picker');
 
-        // Empêche d'utiliser les deux options
         checkboxToday.addEventListener('change', () => {
             if (checkboxToday.checked) {
                 datePicker.value = "";
@@ -380,11 +413,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         datePicker.addEventListener('input', () => {
-            if (datePicker.value) {
-                checkboxToday.checked = false;
-            }
+            if (datePicker.value) checkboxToday.checked = false;
         });
 
+        // Soumission du formulaire
         readingForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -393,11 +425,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (checkboxToday.checked) {
                 chosenDate = new Date().toISOString().split('T')[0];
-            } 
-            else if (datePicker.value) {
+            } else if (datePicker.value) {
                 chosenDate = datePicker.value;
-            } 
-            else {
+            } else {
                 alert("Veuillez choisir une date.");
                 return;
             }
@@ -420,9 +450,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (result.success) {
                     closeModal(readingModal);
                     alert("Date de lecture enregistrée !");
+
+                    // === Mettre à jour le bouton immédiatement ===
+                    if (addReadingDateBtn) {
+                        addReadingDateBtn.textContent = "Date laissée ✓";
+                        addReadingDateBtn.disabled = true;
+                        addReadingDateBtn.classList.add('disabled-review-btn'); // style identique au bouton avis
+                    }
+
                 } else {
-                    alert(result.message || "Erreur.");
+                    alert(result.message || "Erreur côté serveur.");
                 }
+
             } catch (err) {
                 console.error(err);
                 alert("Erreur réseau.");

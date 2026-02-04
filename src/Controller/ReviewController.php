@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Review;
 use App\Entity\Book;
+use App\Entity\Utilisateur;
 use App\Repository\BookRepository;
 use App\Repository\ReviewRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,6 +28,7 @@ class ReviewController extends AbstractController
     #[Route('/laisser-avis', name: 'leave_review', methods: ['POST'])]
     public function leaveReview(Request $request, BookRepository $bookRepository): JsonResponse
     {
+        /** @var Utilisateur $user */
         $user = $this->security->getUser();
         if (!$user) {
             return new JsonResponse(['success' => false, 'message' => 'Vous devez être connecté.'], 401);
@@ -56,7 +58,17 @@ class ReviewController extends AbstractController
         $this->em->persist($review);
         $this->em->flush();
 
-        return new JsonResponse(['success' => true, 'message' => 'Avis enregistré !']);
+        $responseData = [
+            'success' => true,
+            'userId' => $user->getId(),
+            'userPseudo' => $user->getPseudo(),
+            'userProfilePicture' => '/uploads/profiles/' . $user->getProfilePicture(),
+            'review' => $comment,
+            'date' => $review->getDate()->format('d/m/Y'),
+            'statusLabel' => 'Lu', // ou le statut réel si tu gères le bookshelf
+        ];
+
+        return new JsonResponse($responseData);
     }
 
     #[Route('/book/{id}/review', name: 'app_review_submit', methods: ['POST'])]

@@ -45,6 +45,18 @@ body {
     transform: translateY(-2px);
 }
 
+.hidden {
+    display: none;
+}
+
+.bookshelf-extra-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+
 /* Bloc central = livre */
 .livre-container {
     flex: 1;
@@ -207,24 +219,62 @@ body {
     max-width: 1200px;
 }
 
+.book-reviews-block {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+/* Bloc note  */
 .book-rating {
     background-color: #f3e3c3;
     border: 2px solid #e0c69e;
     border-radius: 15px;
     padding: 20px;
     text-align: center;
+    width: 180px; 
     box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    margin: 0 auto;
 }
 
 .book-rating h3 {
-    color: #4b2e05;
-    font-size: 1.4rem;
     margin-bottom: 10px;
+    font-size: 1.2rem;
 }
 
-.book-rating p {
-    font-size: 1.2rem;
-    font-weight: bold;
+.rating-circle {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+}
+
+.rating-circle svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.circle-bg {
+    fill: none;
+    stroke: #eee;
+    stroke-width: 3.5;
+}
+
+.circle-fill {
+    fill: none;
+    stroke: #5F7F5F;
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.5s ease;
+}
+
+.rating-circle text.percentage {
+    fill: #3B2F2F;
+    font-size: 0.5em;
+    text-anchor: middle;
+    alignment-baseline: middle;
+    transform: rotate(90deg);
+    transform-origin: 50% 50%;
 }
 
 .book-reviews {
@@ -232,6 +282,7 @@ body {
     border: 1px solid #e6cfa5;
     border-radius: 15px;
     padding: 20px;
+    flex: 1;
     box-shadow: 0 3px 8px rgba(0,0,0,0.1);
 }
 
