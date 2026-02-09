@@ -155,6 +155,15 @@
 
         <!-- Colonne centrale : résultats -->
         <main class="resultats">
+
+            {# Formulaire de recherche #}
+            <form class="search-bar" action="{{ path('app_recherche_livre') }}" method="get">
+                <input type="text" name="q" placeholder="Rechercher un livre, un auteur..." required>
+                <button type="submit">
+                <i class="bi bi-search"></i>
+                </button>
+            </form>
+
             <h2>Résultats pour “{{ app.request.get('q') }}”</h2>
 
             {% if livres is empty %}
@@ -227,7 +236,25 @@
                     {% endfor %}
                 </div>
             {% endif %}
+
+            <h3 style="margin-top: 25px;">Utilisateurs</h3>
+
+            {% if utilisateurs is empty %}
+                <p>Aucun utilisateur correspondant.</p>
+            {% else %}
+                <div class="auteurs-list">
+                    {% for user in utilisateurs %}
+                        <a href="{{ path('app_utilisateur_profil', { id: user.id }) }}" class="auteur-card user-card">
+                            <img src="{{ asset('uploads/profiles/' ~ user.profilePicture) }}" alt="Photo de profil" class='utilisateur-avatar'>
+                            <div class="auteur-info">
+                                <h4>{{ user.pseudo }}</h4>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </aside>
+
     </div>
 
     {% block javascripts %}
