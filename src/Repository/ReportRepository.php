@@ -26,15 +26,54 @@ class ReportRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findHistorique(?string $status = null, ?string $pseudo = null)
+        public function findUserReportsEnCours(int $limit, int $offset): array
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.status = :status')
+            ->andWhere('r.reported IS NOT NULL')
+            ->andWhere('r.review IS NULL')
+            ->andWhere('r.reportedClub IS NULL')
+            ->andWhere('r.reportedBook IS NULL')
+            ->setParameter('status', Report::STATUS_EN_COURS)
+            ->orderBy('r.date', 'DESC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function countUserReportsEnCours(): int
+    {
+        return (int) $this->createQueryBuilder('r')
+            ->select('COUNT(r.id)')
+            ->andWhere('r.status = :status')
+            ->andWhere('r.reported IS NOT NULL')
+            ->andWhere('r.review IS NULL')
+            ->andWhere('r.reportedClub IS NULL')
+            ->andWhere('r.reportedBook IS NULL')
+            ->setParameter('status', Report::STATUS_EN_COURS)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function findHistorique(?string $status = null, ?string $pseudo = null): array
     {
         $qb = $this->createQueryBuilder('r')
-            ->leftJoin('r.reported', 'reportedUser') // jointure avec l'utilisateur signalé
+            ->leftJoin('r.reported', 'reportedUser')
             ->addSelect('reportedUser')
-            ->leftJoin('r.author', 'authorUser')    // jointure avec l'auteur
+            ->leftJoin('r.author', 'authorUser')
             ->addSelect('authorUser')
-            ->where('r.status != :enCours')
-            ->setParameter('enCours', 'en_cours')
+
+            // uniquement signalements utilisateurs
+            ->andWhere('r.reported IS NOT NULL')
+            ->andWhere('r.review IS NULL')
+            ->andWhere('r.reportedClub IS NULL')
+            ->andWhere('r.reportedBook IS NULL')
+
+            // historique = pas en cours
+            ->andWhere('r.status != :enCours')
+            ->setParameter('enCours', Report::STATUS_EN_COURS)
+
             ->orderBy('r.date', 'DESC');
 
         if ($status) {
@@ -42,12 +81,37 @@ class ReportRepository extends ServiceEntityRepository
             ->setParameter('status', $status);
         }
 
-        if ($pseudo) {
-            $qb->andWhere('reportedUser.pseudo LIKE :pseudo OR authorUser.pseudo LIKE :pseudo')
-            ->setParameter('pseudo', '%' . $pseudo . '%');
+        $reports = $qb->getQuery()->getResult();
+
+        // Filtrage intelligent (Levenstein)
+        if ($pseudo && mb_strlen($pseudo) >= 3) {
+            $search = mb_strtolower($pseudo);
+
+            $reports = array_filter($reports, function (Report $report) use ($search) {
+                $names = [
+                    $report->getReported()?->getPseudo(),
+                    $report->getAuthor()?->getPseudo(),
+                ];
+
+                foreach ($names as $name) {
+                    if (!$name) continue;
+
+                    $name = mb_strtolower($name);
+
+                    // correspondance approximative
+                    if (
+                        str_contains($name, $search) ||
+                        levenshtein($name, $search) <= 3
+                    ) {
+                        return true;
+                    }
+                }
+
+                return false;
+            });
         }
 
-        return $qb->getQuery()->getResult();
+        return $reports;
     }
 
     public function findHistoriqueClubs(?string $status, ?string $searchClub): array

@@ -179,12 +179,10 @@ class EmployeController extends AbstractController
         // Pagination
         $page = max(1, $request->query->getInt('page', 1));
         $limit = 10;
-        $totalReports = $reportRepository->count(['status' => Report::STATUS_EN_COURS]);
+        $totalReports = $reportRepository->countUserReportsEnCours();
         $totalPages = ceil($totalReports / $limit);
 
-        $reports = $reportRepository->findBy(
-            ['status' => Report::STATUS_EN_COURS],
-            ['date' => 'DESC'],
+        $reports = $reportRepository->findUserReportsEnCours(
             $limit,
             ($page - 1) * $limit
         );
@@ -346,15 +344,15 @@ class EmployeController extends AbstractController
     }
 
     #[Route('/utilisateurs-signales/historique', name: 'employe_historique_signalements')]
-    public function historiqueSignalements(
-        ReportRepository $reportRepository,
-        Request $request
-    ): Response {
+    public function historiqueSignalements(ReportRepository $reportRepository, Request $request): Response 
+    {
         $statusFilter = $request->query->get('status');
-        $searchUser   = $request->query->get('user');
+        $searchUser   = trim((string) $request->query->get('user'));
 
-        // Appel de ta méthode repository
-        $reports = $reportRepository->findHistorique($statusFilter, $searchUser);
+        $reports = $reportRepository->findHistorique(
+            $statusFilter ?: null,
+            $searchUser ?: null
+        );
 
         return $this->render('employe/historique_signalements.html.twig', [
             'reports' => $reports,
