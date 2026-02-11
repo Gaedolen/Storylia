@@ -26,12 +26,24 @@
 
                         {% if isParticipant and not isCreator %}
                             {% if hasReportedClub %}
-                                <button class="btn-warning"
-                                        disabled
-                                        style="opacity:0.6; cursor:not-allowed;">
-                                    Signalement envoyé ✓
-                                </button>
+                                {% if hasReportedClub.status == 'en_cours' %}
+                                    {# Signalement en attente : bouton désactivé #}
+                                    <button class="btn-warning"
+                                            disabled
+                                            style="opacity:0.6; cursor:not-allowed;">
+                                        Signalement envoyé ✓
+                                    </button>
+                                {% else %}
+                                    {# Signalement traité ou refusé : bouton réactivé #}
+                                    <a class="btn-warning"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#reportClubModal"
+                                    id="openReportClubBtn">
+                                        Signaler un problème
+                                    </a>
+                                {% endif %}
                             {% else %}
+                                {# Pas encore de signalement : bouton actif #}
                                 <a class="btn-warning"
                                 data-bs-toggle="modal"
                                 data-bs-target="#reportClubModal"
@@ -261,7 +273,7 @@
                             <div class="book-card">
                                 <div class="book-cover-wrapper">
                                     <label for="proposal-{{ proposal.id }}">
-                                        <img src="{{ asset(book.cover) }}" alt="{{ book.title }}" class="book-cover">
+                                        <img src="{{ book.cover }}" alt="{{ book.title }}" class="book-cover">
                                     </label>
 
                                     <input 

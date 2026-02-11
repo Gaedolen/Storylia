@@ -191,3 +191,57 @@ h1 {
     right: 5px;
     z-index: 10;
 }
+
+.btn-back {
+    display: inline-block;
+    padding: 8px 14px; 
+    font-size: 1.2rem;
+    background-color: #5F7F5F;
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.25),
+        inset 0 3px 4px rgba(0, 0, 0, 0.15);
+}
+
+.btn-back:hover {
+    background-color: #799779;
+    transform: translateY(-2px);
+}
+
+.propositions-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto; /* bouton retour / titre / bouton proposer */
+    align-items: center;
+    margin: 15px;
+    gap: 15px; /* espace entre les éléments */
+}
+
+.propositions-header h1 {
+    margin: 0;
+    text-align: left; /* le titre commence exactement là où les month-blocks commencent */
+}
+
+button.btn-primary {
+    padding: 8px 14px;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    background-color: #C97C5D;
+    color: white;
+    border: none;
+    box-shadow:
+        0 6px 10px rgba(0, 0, 0, 0.3),
+        inset 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+button.btn-primary:hover:not(:disabled) {
+    background-color: #B46749;
+    transform: translateY(-2px);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

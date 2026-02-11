@@ -168,17 +168,11 @@ class ClubController extends AbstractController
             ? ucfirst($formatter->format(new DateTime($bookOfNextNextMonthReading->getMonth() . '-01')))
             : '';
 
-        $hasReportedClub = false;
-
-        if ($this->getUser()) {
-            $hasReportedClub = (bool) $reportRepository->findOneBy([
-                'author' => $this->getUser(),
-                'reportedClub' => $club,
-            ]);
-        }
-
         // Avis 
-        $lastReviews = $clubReviewRepository->findLastReviewsByClub($club, 3);
+        $lastReviews = [];
+            if ($bookOfMonthReading instanceof ClubReadingMonth) {
+            $lastReviews = $clubReviewRepository->findLastReviewsByMonth($bookOfMonthReading, 3);
+        }
 
         // Bloque le btn d'avis si l'utilisateur en a déjà laissé un
         $userHasReviewedMonth = false;
@@ -255,6 +249,15 @@ class ClubController extends AbstractController
             $userCanVote = $userHasProposed && !$userHasVoted;
         }
 
+        /** @var \App\Entity\Report|null $hasReportedClub */
+        $hasReportedClub = null;
+
+        if ($this->getUser()) {
+            $hasReportedClub = $reportRepository->findOneBy([
+                'author' => $this->getUser(),
+                'reportedClub' => $club,
+            ]);
+        }
 
         return $this->render('club/club_show.html.twig', [
             'club' => $club,

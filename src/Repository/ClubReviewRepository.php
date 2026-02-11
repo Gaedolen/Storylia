@@ -89,4 +89,15 @@ class ClubReviewRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+        public function findLastReviewsByMonth(ClubReadingMonth $readingMonth, int $limit = 3)
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere('r.readingMonth = :month')
+            ->setParameter('month', $readingMonth)
+            ->orderBy('r.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }
