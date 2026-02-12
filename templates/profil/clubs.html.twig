@@ -88,21 +88,13 @@
     } %}
 
         {# ===== CLUBS CRÉÉS ===== #}
-        <div class="clubs-header">
-            <h2>
-                {{ isSelf ? 'Clubs que j’ai créés' : 'Clubs créés par ' ~ utilisateur.pseudo }}
-            </h2>
-
-            {% if isSelf %}
-                <a href="{{ path('club_create') }}" class="btn-create-club">
-                    Créer un club
-                </a>
-            {% endif %}
-        </div>
-
         <section class="clubs-list">
             {% for club in clubsCrees %}
-                <a href="{{ path('club_show', {'id': club.id}) }}" class="club-card">
+                {% set isInactive = club.status != 'actif' %}
+                <a 
+                    {% if not isInactive %}href="{{ path('club_show', {'id': club.id}) }}"{% endif %} 
+                    class="club-card {% if isInactive %}club-inactif{% endif %}"
+                >
 
                     <div class="club-card-left">
                         {% if club.photo %}
@@ -135,7 +127,12 @@
                                 </span>
                             {% endfor %}
                         </div>
+
                     </div>
+
+                    {% if isInactive %}
+                        <span class="inactive-label">Inactif</span>
+                    {% endif %}
 
                 </a>
             {% else %}
@@ -151,49 +148,58 @@
         </h2>
 
         <section class="clubs-list">
-            {% for club in clubsMembre %}
-                <a href="{{ path('club_show', {'id': club.id}) }}" class="club-card">
+        {% for club in clubsMembre %}
+            {% set isInactive = club.status != 'actif' %}
+            <a 
+                {% if not isInactive %}href="{{ path('club_show', {'id': club.id}) }}"{% endif %} 
+                class="club-card {% if isInactive %}club-inactif{% endif %}"
+            >
 
-                    <div class="club-card-left">
-                        {% if club.photo %}
-                            <img src="{{ asset('uploads/clubs/' ~ club.photo) }}" alt="{{ club.name }}">
-                        {% else %}
-                            <div class="club-photo-placeholder">Aucune photo</div>
-                        {% endif %}
+                <div class="club-card-left">
+                    {% if club.photo %}
+                        <img src="{{ asset('uploads/clubs/' ~ club.photo) }}" alt="{{ club.name }}">
+                    {% else %}
+                        <div class="club-photo-placeholder">Aucune photo</div>
+                    {% endif %}
 
-                        <div class="club-card-meta">
-                            <span class="club-participants">
-                                {{ club.membres|length }} participants
-                            </span>
-                            <span class="creation-date">
-                                Créé le {{ club.creationDate|date('d/m/Y') }}
-                            </span>
-                        </div>
+                    <div class="club-card-meta">
+                        <span class="club-participants">
+                            {{ club.membres|length }} participants
+                        </span>
+                        <span class="creation-date">
+                            Créé le {{ club.creationDate|date('d/m/Y') }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="club-card-right">
+                    <h3>{{ club.name }}</h3>
+
+                    <div class="club-description">
+                        {{ club.description }}
                     </div>
 
-                    <div class="club-card-right">
-                        <h3>{{ club.name }}</h3>
-
-                        <div class="club-description">
-                            {{ club.description }}
-                        </div>
-
-                        <div class="club-preferences">
-                            {% for code in club.preferences %}
-                                <span class="pref-badge">
-                                    {{ preferencesLabels[code] }}
-                                </span>
-                            {% endfor %}
-                        </div>
+                    <div class="club-preferences">
+                        {% for code in club.preferences %}
+                            <span class="pref-badge">
+                                {{ preferencesLabels[code] }}
+                            </span>
+                        {% endfor %}
                     </div>
 
-                </a>
-            {% else %}
-                <p class="empty">
-                    {{ isSelf ? 'Vous n’êtes membre d’aucun club.' : 'Aucun club rejoint.' }}
-                </p>
-            {% endfor %}
-        </section>
+                </div>
+
+                {% if isInactive %}
+                    <span class="inactive-label">Inactif</span>
+                {% endif %}
+
+            </a>
+        {% else %}
+            <p class="empty">
+                {{ isSelf ? 'Vous n’êtes membre d’aucun club.' : 'Aucun club rejoint.' }}
+            </p>
+        {% endfor %}
+    </section>
 
     </div>
 

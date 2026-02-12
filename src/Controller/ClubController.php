@@ -23,6 +23,8 @@ use App\Repository\ClubRepository;
 use App\Repository\ReportRepository;
 use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use DateTime;
 use DateInterval;
@@ -46,13 +48,14 @@ class ClubController extends AbstractController
         // --- Clubs ---
         $qb = $clubRepository->createQueryBuilder('c');
 
+        // On filtre les clubs actifs uniquement
+        $qb->andWhere('c.status = :status')
+        ->setParameter('status', 'actif');
+
         if ($search) {
             $qb->leftJoin('c.creator', 'u')
             ->andWhere('LOWER(c.name) LIKE :search')
             ->setParameter('search', '%' . strtolower($search) . '%');
-
-            // Note : on ne filtre pas les clubs par utilisateur ici,
-            // les utilisateurs seront récupérés séparément pour la colonne de droite
         }
 
         // Filtre préférences
@@ -99,7 +102,6 @@ class ClubController extends AbstractController
             'selectedSort' => $sort,
         ]);
     }
-
 
     #[Route('/create', name: 'club_create')]
     public function create(Request $request, EntityManagerInterface $em): Response
@@ -259,6 +261,26 @@ class ClubController extends AbstractController
             ]);
         }
 
+        $isCreator = false;
+        $isParticipant = false;
+
+        if ($user instanceof Utilisateur) {
+
+            $creator = $club->getCreator();
+
+            if ($creator && $creator->getId() === $user->getId()) {
+                $isCreator = true;
+                $isParticipant = true; // le créateur est automatiquement participant
+            } else {
+                foreach ($club->getMembres() as $member) {
+                    if ($member->getId() === $user->getId()) {
+                        $isParticipant = true;
+                        break;
+                    }
+                }
+            }
+        }
+
         return $this->render('club/club_show.html.twig', [
             'club' => $club,
             'bookOfMonth' => $bookOfMonth,
@@ -275,7 +297,9 @@ class ClubController extends AbstractController
             'userHasVoted' => $userHasVoted,
             'userCanVote' => $userCanVote,
             'leadingProposals' => $leadingProposals,
-            'hasReportedClub' => $hasReportedClub
+            'hasReportedClub' => $hasReportedClub,
+            'isCreator' => $isCreator,
+            'isParticipant' => $isParticipant,
         ]);
     }
 
@@ -714,6 +738,94 @@ class ClubController extends AbstractController
             'readingMonth'    => $readingMonth,
             'currentMonthName'=> $currentMonthName,
             'reviews'         => $reviews,
+        ]);
+    }
+
+    #[Route('/quitter/{id}', name: 'club_quitter', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function quitterClub(int $id, Request $request, EntityManagerInterface $em): Response 
+    {
+        $user = $this->getUser();
+
+        $club = $em->getRepository(Club::class)->find($id);
+
+        if (!$club) {
+            throw $this->createNotFoundException('Club non trouvé');
+        }
+
+        if (!$this->isCsrfTokenValid('quit_club_' . $club->getId(), $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Token CSRF invalide');
+        }
+
+        if ($club->getCreator() === $user) {
+            $this->addFlash('danger', 'Le créateur ne peut pas quitter son club.');
+            return $this->redirectToRoute('club_show', ['id' => $club->getId()]);
+        }
+
+        $club->removeMembre($user);
+        $em->flush();
+
+        $this->addFlash('success', 'Vous avez quitté le club.');
+
+        return $this->redirectToRoute('app_profil_clubs', ['id' => $club->getId()]);
+    }
+
+    #[Route('/club/supprimer/{id}', name: 'club_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function deleteClub(
+        int $id,
+        Request $request,
+        EntityManagerInterface $em,
+        MailerInterface $mailer
+    ): JsonResponse {
+        $club = $em->getRepository(Club::class)->find($id);
+
+        if (!$club) {
+            return $this->json(['success' => false, 'error' => 'Club non trouvé'], 404);
+        }
+
+        // Vérifier que c'est le créateur qui supprime
+        $user = $this->getUser();
+        if ($club->getCreator() !== $user) {
+            return $this->json(['success' => false, 'error' => 'Vous n’êtes pas autorisé à supprimer ce club'], 403);
+        }
+
+        // CSRF
+        $csrfToken = $request->request->get('_token');
+        if (!$csrfToken || !$this->isCsrfTokenValid('delete_club_' . $club->getId(), $csrfToken)) {
+            return $this->json(['success' => false, 'error' => 'Token CSRF invalide'], 400);
+        }
+
+        // --- Envoi du mail aux membres avant suppression ---
+        $recipients = $club->getMembres()->toArray();
+        if ($club->getCreator() && $club->getCreator()->getEmail()) {
+            $recipients[] = $club->getCreator(); // inclure le créateur
+        }
+
+        foreach ($recipients as $recipient) {
+            if (!$recipient->getEmail()) {
+                continue;
+            }
+            $email = (new TemplatedEmail())
+                ->from('noreply@storylia.com')
+                ->to($recipient->getEmail())
+                ->subject('Le club "' . $club->getName() . '" a été supprimé')
+                ->htmlTemplate('email/club_supprime.html.twig')
+                ->context([
+                    'club' => $club,
+                    'user' => $recipient,
+                ]);
+
+            $mailer->send($email);
+        }
+
+        // --- Supprimer le club ---
+        $em->remove($club);
+        $em->flush();
+
+        return $this->json([
+            'success' => true,
+            'clubId' => $club->getId(),
         ]);
     }
 }

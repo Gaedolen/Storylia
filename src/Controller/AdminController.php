@@ -484,6 +484,38 @@ class AdminController extends AbstractController
             $mailer->send($email);
         }
 
+        // --- Suspendre les clubs créés par l'utilisateur ---
+        foreach ($user->getCreatedClubs() as $club) {
+            $club->setStatus(Club::STATUS_INACTIF);
+            $club->setSuspendReason('Créateur suspendu : ' . $reason);
+
+            // Optionnel : envoyer un mail aux membres pour prévenir
+            $recipients = [];
+            if ($club->getCreator() && $club->getCreator()->getEmail()) {
+                $recipients[] = $club->getCreator();
+            }
+            foreach ($club->getMembres() as $member) {
+                if ($member->getEmail()) {
+                    $recipients[] = $member;
+                }
+            }
+
+            foreach ($recipients as $recipient) {
+                $email = (new TemplatedEmail())
+                    ->from('noreply@storylia.com')
+                    ->to($recipient->getEmail())
+                    ->subject('Le club "' . $club->getName() . '" est désormais inactif')
+                    ->htmlTemplate('email/club_suspendu.html.twig')
+                    ->context([
+                        'club' => $club,
+                        'user' => $recipient,
+                        'reason' => $reason
+                    ]);
+
+                $mailer->send($email);
+            }
+        }
+
         return $this->json([
             'success' => true,
             'userId' => $user->getId()
@@ -787,7 +819,7 @@ class AdminController extends AbstractController
         ]);
     }
 
-        #[Route('/report/ignore/{id}', name: 'report_ignore', methods: ['POST'])]
+    #[Route('/report/ignore/{id}', name: 'report_ignore', methods: ['POST'])]
     public function ignoreReport(int $id, EntityManagerInterface $em): JsonResponse {
         $report = $em->getRepository(Report::class)->find($id);
         if (!$report) return $this->json(['success' => false, 'error' => 'Report non trouvé'], 404);

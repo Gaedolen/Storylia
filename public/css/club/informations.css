@@ -56,6 +56,18 @@ h3 {
     margin-bottom: 30px;
 }
 
+/* Membres suspendus */
+.member-card-link.suspended {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.member-card-link.suspended .member-card {
+    background-color: #f0f0f0;
+}
+
+
 /* Infos club */
 .club-details-section .club-info-card {
     display: flex;

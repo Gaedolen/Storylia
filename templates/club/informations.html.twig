@@ -25,9 +25,13 @@
             <h3>Membres ({{ club.membres|length }})</h3>
             <div class="members-grid">
                 {% for membre in club.membres %}
-                    <a href="{{ path('app_utilisateur_profil', {'id': membre.id}) }}" class="member-card-link">
+                    {% set isSuspended = membre.status == 'suspendu' %}
+                    <a href="{{ isSuspended ? '#' : path('app_utilisateur_profil', {'id': membre.id}) }}"
+                    class="member-card-link {{ isSuspended ? 'suspended' : '' }}">
                         <div class="member-card">
-                            <img src="{{ asset('uploads/profiles/' ~ membre.profilePicture) }}" alt="{{ membre.pseudo }}" class="member-photo">
+                            <img src="{{ asset('uploads/profiles/' ~ membre.profilePicture) }}"
+                                alt="{{ membre.pseudo }}"
+                                class="member-photo">
                             <span class="member-pseudo">{{ membre.pseudo }}</span>
                         </div>
                     </a>

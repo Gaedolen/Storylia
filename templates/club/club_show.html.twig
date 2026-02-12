@@ -18,23 +18,23 @@
 
                     {% if app.user and app.user == club.creator %}
                         <a href="{{ path('club_edit', {'id': club.id}) }}" class="btn-edit">Modifier</a>
+                        {# Ici tu pourrais mettre le bouton de suppression pour le créateur #}
                     {% endif %}
 
                     {% if app.user %}
                         {% set isParticipant = club.membres|filter(p => p.id == app.user.id)|length > 0 %}
                         {% set isCreator = club.creator.id == app.user.id %}
 
+                        {# --- Bouton signalement --- #}
                         {% if isParticipant and not isCreator %}
                             {% if hasReportedClub %}
                                 {% if hasReportedClub.status == 'en_cours' %}
-                                    {# Signalement en attente : bouton désactivé #}
                                     <button class="btn-warning"
                                             disabled
                                             style="opacity:0.6; cursor:not-allowed;">
                                         Signalement envoyé ✓
                                     </button>
                                 {% else %}
-                                    {# Signalement traité ou refusé : bouton réactivé #}
                                     <a class="btn-warning"
                                     data-bs-toggle="modal"
                                     data-bs-target="#reportClubModal"
@@ -43,7 +43,6 @@
                                     </a>
                                 {% endif %}
                             {% else %}
-                                {# Pas encore de signalement : bouton actif #}
                                 <a class="btn-warning"
                                 data-bs-toggle="modal"
                                 data-bs-target="#reportClubModal"
@@ -52,6 +51,36 @@
                                 </a>
                             {% endif %}
                         {% endif %}
+
+                        {# --- Bouton quitter ou supprimer club --- #}
+                        {% if app.user %}
+
+                            {# --- Si c'est le créateur --- #}
+                            {% if club.creator and club.creator.id == app.user.id %}
+
+                                <form method="post" action="{{ path('club_delete', {'id': club.id}) }}" style="display:inline;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_club_' ~ club.id) }}">
+                                    <button type="submit" class="btn-danger"
+                                            onclick="return confirm('Voulez-vous vraiment supprimer ce club ?');">
+                                        Supprimer le club
+                                    </button>
+                                </form>
+
+                            {# --- Sinon si c'est un membre --- #}
+                            {% elseif club.membres|filter(m => m.id == app.user.id)|length > 0 %}
+
+                                <form method="post" action="{{ path('club_quitter', {'id': club.id}) }}" style="display:inline;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('quit_club_' ~ club.id) }}">
+                                    <button type="submit" class="btn-danger"
+                                            onclick="return confirm('Voulez-vous vraiment quitter ce club ?');">
+                                        Quitter le club
+                                    </button>
+                                </form>
+
+                            {% endif %}
+
+                        {% endif %}
+
                     {% endif %}
 
                     <!-- Modal de signalement du club -->

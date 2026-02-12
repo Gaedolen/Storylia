@@ -231,6 +231,25 @@ h2 {
     font-size: 13px;
 }
 
+/* Clubs inactifs */
+.club-inactif {
+    opacity: 0.5;
+    pointer-events: none; /* rend le bloc non cliquable */
+    cursor: default;
+    position: relative;
+}
+.inactive-label {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ff4d4f;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+
 /* === Responsive === */
 @media (max-width: 1024px) {
     .clubs-list {

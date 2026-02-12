@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Club supprimé</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
+    <h2 style="color: #c00;">Le club "{{ club.name }}" a été supprimé</h2>
+
+    <p>Bonjour {{ user.pseudo }},</p>
+
+    <p>
+        Nous vous informons que le club <strong>"{{ club.name }}"</strong> a été supprimé par son créateur.
+    </p>
+
+    {% if reason is defined and reason %}
+        <p><strong>Raison :</strong> {{ reason }}</p>
+    {% endif %}
+
+    <p>Vous ne pourrez plus accéder à ce club ni participer à ses activités.</p>
+
+    <p>
+        Merci pour votre compréhension,<br>
+        L'équipe Storylia
+    </p>
+
+    <hr>
+    <p style="font-size: 0.85em; color: #999;">
+        Ceci est un email automatique, merci de ne pas y répondre.
+    </p>
+</body>
+</html>

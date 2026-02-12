@@ -14,19 +14,29 @@
 /* -------------------
    Infos du club
 ------------------- */
-.club-info {
-    flex: 1;
-}
-
 .club-title-actions {
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
 }
 
 .club-title-actions h1 {
-    font-size: 2.5rem; /* un peu plus grand pour le nom du club */
+    font-size: 2.5rem;
+    margin: 0;
+    flex: 0 1 auto;      /* le titre prend la place qu'il veut */
+    min-width: 0;
+    word-break: break-word;
+}
+
+.club-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;      /* les boutons gardent leur taille */
+}
+
+.club-actions form {
     margin: 0;
 }
 
@@ -52,14 +62,47 @@
     transform: translateY(-2px);
 }
 
-.club-actions a + a {
-    margin-left: 0.5rem; /* espace entre les boutons */
+.club-actions > * {
+    margin-right: 10px; /* espace de 10px entre chaque bouton */
+}
+
+.club-actions > *:last-child {
+    margin-right: 0; /* pas d'espace après le dernier bouton */
 }
 
 .club-description {
     font-size: 1.1rem; /* légèrement plus grand */
     line-height: 1.6;
     margin-top: 1rem;
+}
+
+/* Bouton quitter le club */
+.btn-danger {
+    display: inline-block;
+    padding: 8px 14px;
+    background-color: #e74c3c;
+    color: #fff;
+    border-radius: 25px;
+    border: none;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow:
+        0 6px 10px rgba(0, 0, 0, 0.3),
+        inset 0 4px 6px rgba(0, 0, 0, 0.2);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+}
+
+.btn-danger:disabled {
+    background-color: #e0a0a0;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 /* Bouton signaler*/
@@ -122,6 +165,7 @@
 }
 
 .book-title {
+    color: #3B2F2F;
     font-weight: bold;
     font-size: 1.1rem;
     margin: 0;
