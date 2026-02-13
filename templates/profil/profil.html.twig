@@ -173,9 +173,9 @@
                     </div>
                 </div>
 
-                <div class="space-between">
+                <div class="space-between">    
+                    <h3>Mes coups de coeur</h3>
                     <div id="coupsDeCoeurCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
-                        <h3>Mes coups de coeur</h3>
                         <div class="carousel-wrapper">
                             <div class="carousel-inner">
                                 {% for chunk in coupsDeCoeur|batch(5) %}
@@ -210,118 +210,119 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="reading-row">
-                <!-- Lecture du moment -->
-                <div class="card current-reading">
-                    <h3>Lecture du moment</h3>
+        <div class="reading-row">
+            <!-- Lecture du moment -->
+            <div class="card current-reading">
+                <h3>Lecture du moment</h3>
 
-                    {% if lectureEnCours %}
-                        <div class="lecture-container">
-                            <div class="lecture-cover">
+                {% if lectureEnCours %}
+                    <div class="lecture-container">
+                        <div class="lecture-cover">
+                            <a href="{{ path('app_livre_detail', {id: lectureEnCours.book.id}) }}">
+                                <img src="{{ lectureEnCours.book.cover|default(asset('images/default_cover.jpg')) }}" 
+                                    alt="{{ lectureEnCours.book.title }}">
+                            </a>
+                        </div>
+
+                        <div class="lecture-info">
+                            <h4>
                                 <a href="{{ path('app_livre_detail', {id: lectureEnCours.book.id}) }}">
-                                    <img src="{{ lectureEnCours.book.cover|default(asset('images/default_cover.jpg')) }}" 
-                                        alt="{{ lectureEnCours.book.title }}">
+                                    {{ lectureEnCours.book.title }}
                                 </a>
-                            </div>
+                            </h4>
+                            <p>
+                                <a href="#">{{ lectureEnCours.book.author.name|default('Auteur inconnu') }}</a>
+                            </p>
+                        </div>
 
-                            <div class="lecture-info">
-                                <h4>
-                                    <a href="{{ path('app_livre_detail', {id: lectureEnCours.book.id}) }}">
-                                        {{ lectureEnCours.book.title }}
-                                    </a>
-                                </h4>
-                                <p>
-                                    <a href="#">{{ lectureEnCours.book.author.name|default('Auteur inconnu') }}</a>
-                                </p>
-                            </div>
+                        {% if isSelf %}
+                            <div class="lecture-progress">
+                                {% set totalPages = lectureEnCours.book.pages ?? 0 %}
+                                {% set pagesRead = lectureEnCours.pagesRead ?? 0 %}
+                                {% set percent = totalPages > 0 ? (pagesRead / totalPages * 100) : 0 %}
 
-                            {% if isSelf %}
-                                <div class="lecture-progress">
-                                    {% set totalPages = lectureEnCours.book.pages ?? 0 %}
-                                    {% set pagesRead = lectureEnCours.pagesRead ?? 0 %}
-                                    {% set percent = totalPages > 0 ? (pagesRead / totalPages * 100) : 0 %}
+                                <div class="reading-progress-wrapper">
+                                    <div id="progressContainer" class="circle-wrapper">
+                                        <svg class="progress-ring" width="160" height="160">
+                                            <circle class="progress-ring-bg" cx="80" cy="80" r="70" stroke="#ddd" stroke-width="12" fill="transparent"/>
+                                            <circle id="progressCircle" class="progress-ring-progress" cx="80" cy="80" r="70" stroke="#C97C5D" stroke-width="12" fill="transparent"
+                                                data-total-pages="{{ totalPages }}" data-progress="{{ percent }}" stroke-dasharray="439.82" stroke-dashoffset="{{ 439.82 - (439.82 * percent / 100) }}"/>
+                                        </svg>
 
-                                    <div class="reading-progress-wrapper">
-                                        <div id="progressContainer" class="circle-wrapper">
-                                            <svg class="progress-ring" width="160" height="160">
-                                                <circle class="progress-ring-bg" cx="80" cy="80" r="70" stroke="#ddd" stroke-width="12" fill="transparent"/>
-                                                <circle id="progressCircle" class="progress-ring-progress" cx="80" cy="80" r="70" stroke="#C97C5D" stroke-width="12" fill="transparent"
-                                                    data-total-pages="{{ totalPages }}" data-progress="{{ percent }}" stroke-dasharray="439.82" stroke-dashoffset="{{ 439.82 - (439.82 * percent / 100) }}"/>
-                                            </svg>
-
-                                            <div class="progress-center">
-                                                {% if totalPages == 0 %}
-                                                    <input id="pagesReadInput" type="number" min="0" value="{{ pagesRead }}" class="progress-input">
-                                                    <input id="totalPagesInput" type="number" min="1" placeholder="Total" class="progress-input">
-                                                {% else %}
-                                                    <input id="pagesReadInput" type="number" min="0" value="{{ pagesRead }}" class="progress-input">
-                                                    <span class="total-pages-text">sur {{ totalPages }}</span>
-                                                {% endif %}
-                                            </div>
+                                        <div class="progress-center">
+                                            {% if totalPages == 0 %}
+                                                <input id="pagesReadInput" type="number" min="0" value="{{ pagesRead }}" class="progress-input">
+                                                <input id="totalPagesInput" type="number" min="1" placeholder="Total" class="progress-input">
+                                            {% else %}
+                                                <input id="pagesReadInput" type="number" min="0" value="{{ pagesRead }}" class="progress-input">
+                                                <span class="total-pages-text">sur {{ totalPages }}</span>
+                                            {% endif %}
                                         </div>
+                                    </div>
 
-                                        <div id="percentageDisplay" class="progress-percent">
-                                            {{ percent|number_format(0) }}%
-                                        </div>
+                                    <div id="percentageDisplay" class="progress-percent">
+                                        {{ percent|number_format(0) }}%
+                                    </div>
 
-                                        <button id="updateProgressBtn" type="button" class="progress-btn">
-                                            Mettre à jour
-                                        </button>
+                                    <button id="updateProgressBtn" type="button" class="progress-btn">
+                                        Mettre à jour
+                                    </button>
 
-                                        <form id="updateProgressForm" action="{{ path('app_update_pages_read', {id: lectureEnCours.id}) }}" method="POST" style="display:none;">
-                                            <input type="hidden" name="pagesRead" id="pagesReadField">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('update_pages_read' ~ lectureEnCours.id) }}">
-                                        </form>
+                                    <form id="updateProgressForm" action="{{ path('app_update_pages_read', {id: lectureEnCours.id}) }}" method="POST" style="display:none;">
+                                        <input type="hidden" name="pagesRead" id="pagesReadField">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('update_pages_read' ~ lectureEnCours.id) }}">
+                                    </form>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div>Aucune lecture en cours</div>
+                {% endif %}
+            </div>
+
+            <!-- Carrousel dernières lectures -->
+            <div class="card last-read">
+                <h3>Dernières lectures</h3>
+
+                <!-- Flèches en dehors du carousel-wrapper mais dans la carte -->
+                <button class="carousel-control-prev" type="button" data-bs-target="#lastReadCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+
+                <div class="carousel-wrapper">
+                    <div id="lastReadCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+                        <div class="carousel-inner">
+                            {% for book in lastRead|batch(5) %}
+                                <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                    <div class="d-flex justify-content-center gap-3">
+                                        {% for shelf in book %}
+                                            <a href="{{ path('app_livre_detail', {id: shelf.book.id}) }}" class="carousel-card-link text-center">
+                                                <div class="card carousel-card">
+                                                    <img src="{{ shelf.book.cover }}" class="card-img-top" alt="{{ shelf.book.title }}">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title">{{ shelf.book.title }}</h6>
+                                                        <p class="card-text">{{ shelf.readingDate|date('d/m/Y') }}</p>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        {% endfor %}
                                     </div>
                                 </div>
-                            {% endif %}
+                            {% endfor %}
                         </div>
-                    {% else %}
-                        <div>Aucune lecture en cours</div>
-                    {% endif %}
-                </div>
-
-                <!-- Carrousel dernières lectures -->
-                <div class="card last-read">
-                    <h3>Dernières lectures</h3>
-                    <div id="lastReadCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
-                        <div class="carousel-wrapper">
-                            <div class="carousel-inner">
-                                {% for book in lastRead|batch(5) %}
-                                    <div class="carousel-item {% if loop.first %}active{% endif %}">
-                                        <div class="d-flex justify-content-center gap-3">
-                                            {% for shelf in book %}
-                                                <a href="{{ path('app_livre_detail', {id: shelf.book.id}) }}" class="carousel-card-link text-center">
-                                                    <div class="card carousel-card">
-                                                        <img src="{{ shelf.book.cover }}" class="card-img-top" alt="{{ shelf.book.title }}">
-                                                        <div class="card-body">
-                                                            <h6 class="card-title">{{ shelf.book.title }}</h6>
-                                                            <p class="card-text">{{ shelf.readingDate|date('d/m/Y') }}</p>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-
-                        <!-- Flèches -->
-                        <button class="carousel-control-prev" type="button" data-bs-target="#lastReadCarousel" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Précédent</span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#lastReadCarousel" data-bs-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Suivant</span>
-                        </button>
                     </div>
                 </div>
+
+                <button class="carousel-control-next" type="button" data-bs-target="#lastReadCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
             </div>
 
         </div>
+
     </main>
 
 </div>

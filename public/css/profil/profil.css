@@ -88,12 +88,62 @@ nav.profil-menu-horizontal .profil-links li a:active {
 }
 
 .reading-row {
-    display: flex;       /* côte à côte */
-    gap: 20px;           /* espace entre les cartes */
+    display: flex;
+    gap: 20px;
+    align-items: stretch;
+}
+
+/* Bloc lecture du moment */
+.current-reading {
+    flex: 0 0 350px;
+}
+
+/* Bloc carrousel */
+.last-read {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow: hidden;
+}
+
+.last-read .carousel-wrapper {
+    width: 760px;
+    box-shadow: 0 6px 18px rgba(113, 75, 47, 0.25); /* Shadow caramel */
+    padding: 40px 30px;
+    overflow: visible;
+    background-color: #E8CBAE;
+    border-radius: 10px;
+    margin: 0 50px;
+}
+
+/* Flèches placées à gauche et droite de la carte */
+.last-read .carousel-control-prev,
+.last-read .carousel-control-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    width: 35px;
+    height: 35px;
+    background-color: rgba(0,0,0,0.4);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.last-read .carousel-control-prev {
+    left: 10px;
+}
+
+.last-read .carousel-control-next {
+    right: 10px;
 }
 
 .reading-row .card {
-    flex: 1;             /* largeur égale pour les deux cartes */
+    flex: 1;
 }
 
 /* Cartes */
@@ -122,16 +172,16 @@ nav.profil-menu-horizontal .profil-links li a:active {
 }
 
 .info-item.bio-box {
-    background: #E8CBAE; /* même fond que les autres cartes */
+    background: #E8CBAE;
     border-radius: 12px;
     padding: 15px;
     display: flex;
-    flex-direction: column; /* icône+label en haut, texte en dessous */
+    flex-direction: column;
     gap: 10px;
     align-items: flex-start;
 }
 
-/* Header (icône + label sur la ligne du haut) */
+/* Header */
 .bio-header {
     display: flex;
     align-items: center;
@@ -172,9 +222,9 @@ nav.profil-menu-horizontal .profil-links li a:active {
 
 .preferences-badges {
     display: flex;
-    flex-wrap: wrap;    /* passe à la ligne si nécessaire */
-    gap: 5px;           /* espace entre les badges */
-    margin-top: 5px;    /* petit espace sous le titre */
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 5px;
 }
 
 .preference-badge {
@@ -207,8 +257,8 @@ nav.profil-menu-horizontal .profil-links li a:active {
     padding: 40px 30px;
     overflow: visible;
     background-color: #E8CBAE;
-    border-radius: 10px; /* optionnel pour arrondir le fond */
-    margin: 0 50px; /* laisse un espace pour que les flèches restent hors du fond */
+    border-radius: 10px;
+    margin: 0 50px;
 }
 
 /* Chaque "slide" du carrousel */
@@ -447,10 +497,9 @@ nav.profil-menu-horizontal .profil-links li a:active {
 
 /* Lecture en cours */
 .lecture-container {
-    justify-content: space-between;
     display: flex;
-    align-items: flex-start; /* aligne titre en haut */
-    gap: 30px; /* espace entre les deux blocs */
+    align-items: flex-start;
+    gap: 30px; /* espace entre infos et cercle */
 }
 
 /* Bloc carte livre */
@@ -500,12 +549,20 @@ nav.profil-menu-horizontal .profil-links li a:active {
     text-decoration: underline;
 }
 
+.current-reading {
+    flex: 0 0 auto; /* largeur basée sur son contenu uniquement */
+}
+
+.last-read {
+    width: 100%;       /* prend toute la largeur disponible */
+    max-width: none;   /* supprime toute limite Bootstrap */
+}
+
 /* Cercle de progression circulaire */
 .lecture-container {
     display: flex;
     align-items: flex-start;
-    justify-content: space-between; /* espace entre infos et cercle */
-    padding-right: 40px; /* espace pour que le cercle ne touche pas le bord */
+    padding-right: 40px;
 }
 
 .reading-progress-wrapper {
@@ -726,19 +783,6 @@ nav.profil-menu-horizontal .profil-links li a:active {
 #report-user-modal button[type="submit"]:hover {
     background-color: #a65d42;
     transform: translateY(-2px);
-}
-
-/* Responsive */
-@media (max-width: 576px) {
-    #report-user-modal .modal-content {
-        margin: 30px 15px;
-        padding: 20px 15px;
-    }
-
-    #report-user-modal button[type="submit"] {
-        padding: 8px 12px;
-        font-size: 0.9rem;
-    }
 }
 
 /* Bouton signalé */
