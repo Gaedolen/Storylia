@@ -100,6 +100,16 @@ nav.profil-menu-horizontal .profil-links li a:active {
     font-size: 1.5rem;
     font-weight: 700;
     margin: 10px 0 10px 10px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; 
+}
+
+.category h2 i {
+    margin-right: 8px;
+    color: inherit;
+    font-size: inherit;
+    vertical-align: middle;
 }
 
 .books-container {
@@ -127,8 +137,8 @@ nav.profil-menu-horizontal .profil-links li a:active {
     flex-direction: row;
     align-items: center;
     margin: 20px 20px 20px 20px;
-    width: 400px;
-    height: 280px;
+    width: 300px;
+    height: 210px;
     border-top-right-radius: 15px;
     border-bottom-right-radius: 15px;
 }
@@ -139,16 +149,17 @@ nav.profil-menu-horizontal .profil-links li a:active {
 }
 
 .cover img {
-    width: 180px;
-    height: 280px;
+    width: 130px;
+    height: 210px;
     object-fit: cover;
+    border-radius: 12px;
 }
 
 /* Conteneur infos */
 .info {
     background-color: #fff8f0;
-    height: 240px;
-    padding: 10px;
+    height: 180px;
+    padding: 8px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -161,7 +172,7 @@ nav.profil-menu-horizontal .profil-links li a:active {
 }
 
 .info h3 {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 700;
     text-align: justify;
     color: #4a2d12;
@@ -171,7 +182,7 @@ nav.profil-menu-horizontal .profil-links li a:active {
 
 .info p {
     margin: 0 0 6px 0; /* spacing régulier */
-    font-size: 15px;
+    font-size: 13px;
     line-height: 1.4;
     color: #5c4630;
 }
@@ -206,7 +217,7 @@ nav.profil-menu-horizontal .profil-links li a:active {
     border: none;
     cursor: pointer;
     color: #714B2F;
-    font-size: 1rem;
+    font-size: 0.9rem;
     transition: color 0.2s;
 }
 

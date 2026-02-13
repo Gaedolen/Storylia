@@ -45,9 +45,25 @@
         </nav>
 
         <div class="bibliotheque-categories">
+            {% set categoryIcons = {
+                'en_train_de_lire' : '<i class="fa-solid fa-book-open"></i>',
+                'coup_de_coeur'    : '<i class="fa-solid fa-heart"></i>',
+                'adore'            : '<i class="fa-solid fa-star"></i>',
+                'apprecie'         : '<i class="fa-regular fa-face-smile"></i>',
+                'mitige'           : '<i class="fa-regular fa-face-meh"></i>',
+                'pas_aime'         : '<i class="fa-solid fa-heart-crack"></i>',
+                'lu_aussi'         : '<i class="fa-solid fa-book-reader"></i>',
+                'pal'              : '<i class="fa-solid fa-layer-group"></i>',
+                'envies'           : '<i class="fa-regular fa-star"></i>'
+            } %}
+
+
             {% for status, books in categories %}
                 <div class="category" data-status-key="{{ status }}">
-                    <h2>{{ status|replace({'_':' '})|capitalize }}</h2>
+                    <h2>
+                        {{ status|replace({'_':' '})|capitalize }}
+                        {{ categoryIcons[status] | raw }}
+                    </h2>
 
                     <div class="carousel-arrows">
                         <button class="carousel-arrow left">❮</button>

@@ -246,10 +246,8 @@ nav.profil-menu-horizontal .profil-links li a:active {
 }
 
 /* Wrapper du carousel */
-.carousel-inner,
-.carousel-item,
-.d-flex.justify-content-center {
-    overflow: visible !important;
+.carousel-inner{
+    overflow: hidden;
 }
 
 .carousel-wrapper {
@@ -261,24 +259,22 @@ nav.profil-menu-horizontal .profil-links li a:active {
     margin: 0 50px;
 }
 
-/* Chaque "slide" du carrousel */
-.carousel-item {
+.carousel-books-row {
     display: flex;
-    justify-content: space-between; /* Espacement uniforme entre les cartes */
-    align-items: flex-start;
-    transition: transform 0.5s ease-in-out;
+    justify-content: center;
+    gap: 20px;
 }
 
 .carousel-card-link {
-    text-decoration: none; /* Pas de soulignement */
-    color: inherit;        /* Garde la couleur du texte */
-    display: inline-block; /* Pour que le lien prenne toute la carte */
+    text-decoration: none;
+    color: inherit;
+    display: inline-block;
 }
 
 /* Carte livre */
 .carousel-card {
-    width: 180px;          /* Largeur fixe */
-    height: 300px;         /* Hauteur fixe */
+    width: 160px;
+    height: 270px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -294,10 +290,10 @@ nav.profil-menu-horizontal .profil-links li a:active {
 
 /* Image couverture */
 .carousel-card img {
-    width: 100%;            /* Remplit la largeur de la carte */
-    height: auto;           /* Hauteur automatique pour garder proportions */
-    max-height: 200px;      /* Limite la hauteur */
-    object-fit: contain;    /* L'image garde ses proportions */
+    width: 100%;
+    height: auto;
+    max-height: 170px;
+    object-fit: contain;
     display: block;
     margin: 0 auto;
 }
@@ -305,16 +301,26 @@ nav.profil-menu-horizontal .profil-links li a:active {
 /* Contenu texte */
 .carousel-card .card-body {
     padding: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .carousel-card .card-title {
-    font-size: 0.9rem;
-    margin-bottom: 2px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; 
 }
 
 .carousel-card .card-text {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Flèches */

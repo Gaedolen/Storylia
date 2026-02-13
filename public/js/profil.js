@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const carouselElement = document.getElementById('coupsDeCoeurCarousel');
+    if (!carouselElement) return;
+
+    // Initialisation du carousel
     const carousel = new bootstrap.Carousel(carouselElement, {
         interval: 3000,
         ride: 'carousel',
@@ -20,49 +23,18 @@ document.addEventListener('DOMContentLoaded', () => {
         resetAutoSlide();
     };
 
-    // Dès qu'on clique sur une flèche
+    // Flèches
     const prevBtn = carouselElement.querySelector('.carousel-control-prev');
     const nextBtn = carouselElement.querySelector('.carousel-control-next');
+    [prevBtn, nextBtn].forEach(btn => {
+        if (btn) btn.addEventListener('click', stopAutoSlide);
+    });
 
-    if (carouselElement) {
-        const carousel = new bootstrap.Carousel(carouselElement, {
-            interval: 3000,
-            ride: 'carousel',
-            pause: false
-        });
-
-        let autoTimeout;
-
-        const resetAutoSlide = () => {
-            clearTimeout(autoTimeout);
-            autoTimeout = setTimeout(() => {
-                carousel.cycle();
-            }, 15000);
-        };
-
-        const stopAutoSlide = () => {
-            carousel.pause();
-            resetAutoSlide();
-        };
-
-        const prevBtn = carouselElement.querySelector('.carousel-control-prev');
-        const nextBtn = carouselElement.querySelector('.carousel-control-next');
-
-        [prevBtn, nextBtn].forEach(btn => {
-            if (btn) btn.addEventListener('click', stopAutoSlide);
-        });
-
-        carouselElement.addEventListener('mouseenter', stopAutoSlide);
-        carouselElement.addEventListener('mouseleave', resetAutoSlide);
-
-        resetAutoSlide();
-    }
-
-    // Redémarre auto après 15s d'inactivité
+    // Hover pour pause / reprise auto-slide
     carouselElement.addEventListener('mouseenter', stopAutoSlide);
     carouselElement.addEventListener('mouseleave', resetAutoSlide);
 
-    // Lancer le timer initial
+    // Timer initial
     resetAutoSlide();
 
     // Cercle de progression lecture en cours
@@ -74,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateForm = document.getElementById("updateProgressForm");
     const pagesReadField = document.getElementById("pagesReadField");
     const progressContainer = document.getElementById("progressContainer");
+    const totalPagesField = document.getElementById("totalPagesField");
 
     if (!progressCircle || !pagesReadInput || !percentageDisplay || !updateBtn) return;
 
@@ -118,9 +91,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateBtn.addEventListener("click", (e) => {
         e.preventDefault();
+
         updateProgressVisual(pagesReadInput.value);
+
         if (updateForm && pagesReadField) {
             pagesReadField.value = parseInt(pagesReadInput.value, 10) || 0;
+
+            if (totalPagesInput && totalPagesField) {
+                totalPagesField.value = parseInt(totalPagesInput.value, 10) || 0;
+            }
+
             updateForm.submit();
         }
     });

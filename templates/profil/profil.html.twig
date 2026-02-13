@@ -178,20 +178,22 @@
                     <div id="coupsDeCoeurCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
                         <div class="carousel-wrapper">
                             <div class="carousel-inner">
-                                {% for chunk in coupsDeCoeur|batch(5) %}
+                                {% for chunk in coupsDeCoeur|batch(4) %}
                                     <div class="carousel-item {% if loop.first %}active{% endif %}">
-                                        <div class="d-flex justify-content-center gap-3">
-                                            {% for livre in chunk %}
-                                                <a href="{{ path('app_livre_detail', {id: livre.book.id}) }}" class="carousel-card-link">
-                                                    <div class="card carousel-card">
-                                                        <img src="{{ livre.book.cover }}" class="card-img-top" alt="{{ livre.book.title }}">
-                                                        <div class="card-body text-center">
-                                                            <h6 class="card-title">{{ livre.book.title }}</h6>
-                                                            <p class="card-text">{{ livre.book.author.name }}</p>
+                                        <div class="carousel-books-row">
+                                            <div class="d-flex justify-content-center gap-3">
+                                                {% for livre in chunk %}
+                                                    <a href="{{ path('app_livre_detail', {id: livre.book.id}) }}" class="carousel-card-link">
+                                                        <div class="card carousel-card">
+                                                            <img src="{{ livre.book.cover }}" class="card-img-top" alt="{{ livre.book.title }}">
+                                                            <div class="card-body text-center">
+                                                                <h6 class="card-title">{{ livre.book.title }}</h6>
+                                                                <p class="card-text">{{ livre.book.author.name }}</p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </a>
-                                            {% endfor %}
+                                                    </a>
+                                                {% endfor %}
+                                            </div>
                                         </div>
                                     </div>
                                 {% endfor %}
@@ -270,10 +272,17 @@
                                         Mettre à jour
                                     </button>
 
-                                    <form id="updateProgressForm" action="{{ path('app_update_pages_read', {id: lectureEnCours.id}) }}" method="POST" style="display:none;">
+                                    <form id="updateProgressForm"
+                                        action="{{ path('app_update_pages_read', {id: lectureEnCours.id}) }}"
+                                        method="POST"
+                                        style="display:none;">
+
                                         <input type="hidden" name="pagesRead" id="pagesReadField">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('update_pages_read' ~ lectureEnCours.id) }}">
+                                        <input type="hidden" name="totalPages" id="totalPagesField">
+                                        <input type="hidden" name="_token"
+                                            value="{{ csrf_token('update_pages_read' ~ lectureEnCours.id) }}">
                                     </form>
+
                                 </div>
                             </div>
                         {% endif %}
@@ -295,20 +304,22 @@
                 <div class="carousel-wrapper">
                     <div id="lastReadCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
                         <div class="carousel-inner">
-                            {% for book in lastRead|batch(5) %}
+                            {% for book in lastRead|batch(4) %}
                                 <div class="carousel-item {% if loop.first %}active{% endif %}">
-                                    <div class="d-flex justify-content-center gap-3">
-                                        {% for shelf in book %}
-                                            <a href="{{ path('app_livre_detail', {id: shelf.book.id}) }}" class="carousel-card-link text-center">
-                                                <div class="card carousel-card">
-                                                    <img src="{{ shelf.book.cover }}" class="card-img-top" alt="{{ shelf.book.title }}">
-                                                    <div class="card-body">
-                                                        <h6 class="card-title">{{ shelf.book.title }}</h6>
-                                                        <p class="card-text">{{ shelf.readingDate|date('d/m/Y') }}</p>
+                                    <div class="carousel-books-row">
+                                        <div class="d-flex justify-content-center gap-3">
+                                            {% for shelf in book %}
+                                                <a href="{{ path('app_livre_detail', {id: shelf.book.id}) }}" class="carousel-card-link text-center">
+                                                    <div class="card carousel-card">
+                                                        <img src="{{ shelf.book.cover }}" class="card-img-top" alt="{{ shelf.book.title }}">
+                                                        <div class="card-body">
+                                                            <h6 class="card-title">{{ shelf.book.title }}</h6>
+                                                            <p class="card-text">{{ shelf.readingDate|date('d/m/Y') }}</p>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </a>
-                                        {% endfor %}
+                                                </a>
+                                            {% endfor %}
+                                        </div>
                                     </div>
                                 </div>
                             {% endfor %}
