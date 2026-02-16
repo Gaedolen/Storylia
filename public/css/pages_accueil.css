@@ -46,3 +46,89 @@ a {
 a:hover {
     color: #5F7F5F;
 }
+
+/* Tablette (max-width: 1024px) */
+@media (max-width: 1024px) {
+    .page-content {
+        max-width: 700px;
+        padding: 35px 25px;
+    }
+
+    .page-container h1 {
+        font-size: 2rem;
+        margin-bottom: 20px;
+    }
+
+    .page-container h2 {
+        font-size: 1.45rem;
+        margin-top: 25px;
+        margin-bottom: 12px;
+    }
+
+    .page-container p {
+        font-size: 1rem;
+        margin-bottom: 16px;
+    }
+
+    a {
+        font-size: 18px;
+    }
+}
+
+/* Mobile standard (max-width: 768px) */
+@media (max-width: 768px) {
+    .page-content {
+        max-width: 90%;
+        padding: 30px 20px;
+    }
+
+    .page-container h1 {
+        font-size: 1.8rem;
+        margin-bottom: 18px;
+    }
+
+    .page-container h2 {
+        font-size: 1.3rem;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+
+    .page-container p {
+        font-size: 0.95rem;
+        margin-bottom: 14px;
+    }
+
+    a {
+        font-size: 17px;
+    }
+}
+
+
+/* Petit mobile (max-width: 480px) */
+@media (max-width: 480px) {
+    .page-content {
+        max-width: 95%;
+        padding: 20px 15px;
+        border-radius: 20px;
+    }
+
+    .page-container h1 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+
+    .page-container h2 {
+        font-size: 1.15rem;
+        margin-top: 18px;
+        margin-bottom: 8px;
+    }
+
+    .page-container p {
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+    }
+
+    a {
+        font-size: 16px;
+    }
+}
