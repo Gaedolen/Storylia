@@ -1,0 +1,48 @@
+/* === Conteneur des pages légales / à propos / contact === */
+.page-content {
+    max-width: 900px;             /* largeur maximale */
+    width: 100%;
+    margin: 2rem auto 1rem auto;            /* centré horizontalement avec espace vertical */
+    padding: 40px 30px;
+    background-color: #E8CBAE;    /* couleur douce de fond */
+    border-radius: 25px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    color: #3B2F2F;
+    font-family: 'Comfortaa', sans-serif;
+    line-height: 1.6;
+}
+
+/* === TITRES === */
+.page-container h1 {
+    font-size: 2.2rem;
+    margin-bottom: 25px;
+    color: #714B2F;
+    text-align: center;
+    font-weight: 700;
+}
+
+.page-container h2 {
+    font-size: 1.6rem;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    color: #714B2F;
+    font-weight: 600;
+}
+
+/* === PARAGRAPHES === */
+.page-container p {
+    font-size: 1.05rem;
+    margin-bottom: 18px;
+}
+
+a {
+    color: #3B2F2F;
+    text-decoration: none;
+    font-size: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #5F7F5F;
+}

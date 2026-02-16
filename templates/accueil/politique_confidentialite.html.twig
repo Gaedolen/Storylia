@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Politique de confidentialité{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/pages_accueil.css') }}">
+{% endblock %}
+
+{% block body %}
+    <main class="page-container">
+        <div class="page-content">
+            <h1>Politique de confidentialité</h1>
+
+            <h2>Collecte des données personnelles</h2>
+            <p>Nous collectons uniquement les informations que vous nous fournissez volontairement via nos formulaires de contact, d'inscription ou lors de l'utilisation de nos services.</p>
+
+            <h2>Utilisation des données</h2>
+            <p>Les données collectées sont utilisées pour :</p>
+            <ul>
+                <li>Répondre à vos demandes et messages</li>
+                <li>Améliorer nos services et contenus</li>
+                <li>Vous envoyer des communications liées à votre compte ou à nos services (si vous y avez consenti)</li>
+            </ul>
+
+            <h2>Protection des données</h2>
+            <p>Storylia prend toutes les mesures nécessaires pour protéger vos données personnelles contre tout accès non autorisé, altération ou divulgation. Les informations sont hébergées sur les serveurs sécurisés de Heroku.</p>
+
+            <h2>Partage des données</h2>
+            <p>Nous ne partageons vos informations personnelles avec aucun tiers à des fins commerciales. Certaines données peuvent être transmises à des prestataires techniques uniquement pour le bon fonctionnement du site.</p>
+
+            <h2>Vos droits</h2>
+            <p>Conformément au RGPD, vous pouvez à tout moment :</p>
+            <ul>
+                <li>Accéder à vos données personnelles</li>
+                <li>Les corriger ou les supprimer</li>
+                <li>Retirer votre consentement pour leur utilisation</li>
+            </ul>
+            <p>Pour exercer ces droits, contactez-nous à <a href="mailto:contact@storylia.com">storylia@gmail.com</a>.</p>
+
+            <h2>Durée de conservation</h2>
+            <p>Les données personnelles sont conservées uniquement le temps nécessaire à la gestion de vos demandes et au respect des obligations légales.</p>
+
+            <h2>Modifications de la politique</h2>
+            <p>Cette politique de confidentialité peut être mise à jour régulièrement. Les utilisateurs sont invités à consulter cette page pour prendre connaissance des changements éventuels.</p>
+        </div>
+    </main>
+{% endblock %}

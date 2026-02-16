@@ -96,6 +96,12 @@ class AccueilController extends AbstractController
         ]);
     }
 
+    #[Route('/a-propos', name: 'a_propos')]
+    public function aPropos(): Response
+    {
+        return $this->render('accueil/a_propos.html.twig');
+    }
+
     #[Route('/mentions-legales', name: 'mentions_legales')]
     public function mentionsLegales(): Response
     {
@@ -106,5 +112,11 @@ class AccueilController extends AbstractController
     public function politiqueConfidentialite(): Response
     {
         return $this->render('accueil/politique_confidentialite.html.twig');
+    }
+
+    #[Route('/nous-contacter', name: 'nous_contacter')]
+    public function nousContacter(): Response
+    {
+        return $this->render('accueil/contact.html.twig');
     }
 }

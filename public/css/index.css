@@ -510,14 +510,13 @@ h1, h2, h3, h4, h5, h6 {
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
 }
 
 /* === SECTION === */
 .favorites-carousel {
     max-width: 1200px;
-    margin: 2rem auto;
+    margin: 1.5rem auto;
     background-color: #E8CBAE;
     padding: 20px;
     border-radius: 25px;

@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mentions légales{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/pages_accueil.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="page-container">
+        <div class="page-content">
+            <h1>Mentions légales</h1>
+
+            <h2>Éditeur du site</h2>
+            <p>Storylia</p>
+            <p>Responsable de la publication : Clélia Panini</p>
+
+            <h2>Hébergement</h2>
+            <p>Ce site est hébergé par :</p>
+            <p>Heroku, Inc.<br>
+            650 Castro Street, Suite 400<br>
+            Mountain View, CA 94041, États-Unis<br>
+            Site web : <a href="https://www.heroku.com" target="_blank">https://www.heroku.com</a>
+            </p>
+
+            <h2>Propriété intellectuelle</h2>
+            <p>Tout le contenu de ce site (textes, images, logo) est protégé par le droit d’auteur. Toute reproduction est interdite sans autorisation.</p>
+
+            <h2>Données personnelles</h2>
+            <p>Les données collectées sont utilisées uniquement pour l’inscription, la newsletter et les services proposés sur le site. Vous pouvez exercer vos droits d’accès, de rectification ou de suppression en contactant <a href="mailto:storylia@gmail.com">storylia@gmail.com</a>.</p>
+
+            <h2>Responsabilité</h2>
+            <p>Storylia met tout en œuvre pour garantir l’exactitude des informations publiées sur le site. Toutefois, l’éditeur ne peut être tenu responsable des erreurs ou omissions et des dommages pouvant résulter de l’utilisation du site.</p>
+
+            <h2>Litiges</h2>
+            <p>Tout litige relatif à l’utilisation du site est soumis au droit français.</p>
+        </div>
+    </div>
+{% endblock %}

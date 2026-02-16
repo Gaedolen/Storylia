@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nous contacter{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/pages_accueil.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="page-container">
+        <div class="page-content">
+            <h1>Contactez-nous</h1>
+
+            <p>
+                Pour toute question ou retour concernant la plateforme <strong>Storylia</strong>, 
+                vous pouvez nous contacter aux coordonnées suivantes :
+            </p>
+
+            <p>
+                Email : <a href="mailto:storylia.@gmail.com">storylia@gmail.com</a>
+            </p>
+
+            <p>
+                Téléphone : <a href="tel:+330123456789">+33 0 00 00 00 00 0</a>
+            </p>
+        </div>
+    </div>
+{% endblock %}

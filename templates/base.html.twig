@@ -134,22 +134,35 @@
             <footer class="nav-footer">
                 <div class="container-footer">
 
-                    <div class="navbar-footer">
-                        <a href="#">À propos</a>
-                        <a href="#">Nous contacter</a>
-                        <a href="#">Mentions légales</a>
+                    <!-- Ligne principale -->
+                    <div class="footer-top">
+
+                        <!-- Liens à gauche -->
+                        <div class="navbar-footer">
+                            <a href="{{ path('a_propos') }}">À propos</a>
+                            <a href="{{ path('nous_contacter') }}">Nous contacter</a>
+                            <a href="{{ path('mentions_legales') }}">Mentions légales</a>
+                            <a href="{{ path('politique_confidentialite') }}">Politique de confidentialité</a>
+                        </div>
+
+                        <!-- Réseaux sociaux à droite -->
+                        <div class="reseaux-sociaux">
+                            <span class="retrouvez-nous">Retrouvez-nous :</span>
+                            <a href="#" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+                            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="#" aria-label="Snapchat"><i class="fab fa-snapchat"></i></a>
+                        </div>
+
                     </div>
 
-                    <p class="copyrigth">© Storylia 2025</p>
-
-                    <div class="reseaux-sociaux">
-                        <p class="retrouvez-nous">Retrouvez-nous :</p>
-                        <a href="#" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
-                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" aria-label="Snapchat"><i class="fab fa-snapchat"></i></a>
+                    <!-- Copyright centré en bas -->
+                    <div class="footer-bottom">
+                        © Storylia 2025
                     </div>
+
                 </div>
             </footer>
+
         </div>
 
         <!-- Bootstrap JS Bundle (Popper inclus) -->
