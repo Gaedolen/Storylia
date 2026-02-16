@@ -6,99 +6,144 @@
     <link rel="stylesheet" href="{{ asset('css/index.css') }}">
 {% endblock %}
 
-
 {% block body %}
-    <!-- Section d'introduction -->
-    <section class="hero">
-        <div class="hero-container">
-            <div class="hero-img-container">
-                <img src="{{ asset('images/presentation.jpg') }}" alt="Image de fond" class="hero-image">
+<div class="home-main">
+    <!-- === COLONNE GAUCHE === -->
+    <div class="home-left">
+        <!-- Section Hero -->
+        <section class="hero">
+            <div class="hero-container">
+                <div class="hero-img-container">
+                    <img src="{{ asset('images/presentation.jpg') }}" alt="Image de fond" class="hero-image">
 
-                <div class="hero-content">
-                    <div class="hero-buttons">
-                        <button class="btn-connect">Se connecter</button>
-                        <button class="btn-login">S'inscrire</button>
+                    <div class="hero-content">
+                        <div class="hero-buttons">
+                            <button class="btn-connect">Se connecter</button>
+                            <button class="btn-login">S'inscrire</button>
+                        </div>
+                        <h1>Partagez vos lectures<br>autrement avec Storylia !</h1>
                     </div>
-                    <h1>Partagez vos lectures<br>autrement avec Storylia !</h1>
+                </div>
+
+                <div class="hero-club-lecture">
+                    <div class="club-existant">
+                        <p>Trouvez un club lecture qui vous ressemble !</p>
+                        <div class="input-btn-club">
+                            <form action="{{ path('club_index') }}" method="get" class="d-flex">
+                                <input type="text" name="q" placeholder="Taper un nom de club" class="form-control me-2" required>
+                                <button type="submit" class="btn btn-outline-primary">Rechercher</button>
+                            </form>
+                        </div>
+                        <a href="{{ path('club_index') }}" class="all-clubs-link">
+                            Voir tous les clubs lectures
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon-arrow" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <line x1="17" y1="7" x2="7" y2="17" />
+                                <polyline points="8 7 17 7 17 16" />
+                            </svg>
+                        </a>
+                    </div>
+
+                    <div class="new-club">
+                        <p>Ou créez le votre à votre image !</p>
+                        <a href="{{ path('club_create') }}" class="hero-btn">Créer un club</a>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <div class="hero-club-lecture">
-                <div class="club-existant">
-                    <p>Trouvez un club lecture qui vous ressemble !</p>
-                    <div class="input-btn-club">
-                        <form action="{{ path('club_index') }}" method="get" class="d-flex">
-                            <input type="text" name="q" placeholder="Taper un nom de club" class="form-control me-2" required>
-                            <button type="submit" class="btn btn-outline-primary">Rechercher</button>
-                        </form>
-                    </div>
-                    <a href="#" class="all-clubs-link">
-                        Voir tous les clubs lectures
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon-arrow" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                            <line x1="17" y1="7" x2="7" y2="17" />
-                            <polyline points="8 7 17 7 17 16" />
-                        </svg>
-                    </a>
-                </div>
-
-                <div class="new-club">
-                    <p>Ou créez le votre à votre image !</p>
-                    <a href="{{ path('club_create') }}" class="btn btn-primary create-club">Créer un club</a>
-                </div>
-            </div>
-        </div>
-
-    </section>
-
-    <section class="container my-5">
-        <h2 class="mb-4 text-center">Les coups de cœurs de la communauté</h2>
-        <div class="text-center mt-4">
-            <a href="#" {#"{{ path('books_favorites') }}"#} class="btn btn-outline-primary">Voir plus de coups de cœur</a>
-        </div>
-
-        {# Carrousel Bootstrap #}
-        <div id="carouselFavorites" class="carousel slide" data-bs-ride="carousel">
-            <div clas="carousel-inner">
-
-                {% for item in favorites %}
-                    <div class="carousel-item {% if loop.first %}active{% endif %}">
-                        <div class="d-flex justify-content-center">
-                            <a href="#" class="text-decoration-none text-dark">
-                                <div class="card text-center shadow-sm" style="width: 18rem;">
-
-                                    {# Image de couverture #}
+        <!-- Carousel coups de cœur -->
+        <section class="favorites-carousel">
+            <h2 class="carousel-title">Les coups de cœur de la communauté</h2>
+            <div class="carousel-container">
+                <button class="carousel-btn prev">‹</button>
+                <div class="carousel-window">
+                    <div class="carousel-track">
+                        {% for item in favorites %}
+                            <div class="carousel-card-wrapper">
+                                <div class="carousel-card">
                                     {% if item.book.cover %}
-                                        <img src="{{ item.book.cover }}" class="card-img-top" alt="{{ item.book.title }}">
+                                        <img src="{{ item.book.cover }}" alt="{{ item.book.title }}" class="card-img">
                                     {% else %}
-                                        <img src="{{ asset('images/default_cover.jpg') }}" class="card-img-top" alt="{{ item.book.title }}">
+                                        <img src="{{ asset('images/default_cover.jpg') }}" alt="{{ item.book.title }}" class="card-img">
                                     {% endif %}
-
                                     <div class="card-body">
                                         <h5 class="card-title">{{ item.book.title }}</h5>
-                                        <p class="card-text">
-                                            {{ item.book.author.name }}
-                                        </p>
-                                        <p>Note moyenne : {{ item.avgRating|number_format(1, '.', ',') }}/5</p>
+                                        <p class="card-author">{{ item.book.author.name }}</p>
+                                        <p class="card-rating">Note moyenne : {{ item.avgRating|number_format(1, '.', ',') }}/5</p>
                                     </div>
-
                                 </div>
-                            </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <button class="carousel-btn next">›</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- === COLONNE DROITE === -->
+    <div class="home-right">
+        <!-- Derniers clubs -->
+        <div class="last-clubs">
+            <h3>Derniers clubs créés</h3>
+            <div class="clubs-container">
+                {% for club in lastClubs|slice(0, 15) %}
+                    <div class="club-card">
+                        <div class="club-card-header">
+                            {% if club.photo %}
+                                <img src="{{ asset('uploads/clubs/' ~ club.photo) }}" alt="{{ club.name }}" class="club-avatar">
+                            {% else %}
+                                <div class="club-avatar">Aucune photo</div>
+                            {% endif %}
+                            <div class="club-info">
+                                <div class="club-name">{{ club.name }}</div>
+                                <div class="club-members">{{ club.membres|length }} participant{{ club.membres|length > 1 ? 's' : '' }}</div>
+                            </div>
+                        </div>
+                        {% if not app.user or not club.membres.contains(app.user) %}
+                            <form method="POST" action="{{ path('club_participer', {'id': club.id}) }}">
+                                <button type="submit" class="btn-participate">Participer</button>
+                            </form>
+                        {% else %}
+                            <button class="btn-participate" disabled>Déjà membre</button>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <p>Aucun club récent</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Derniers avis -->
+        <div class="last-reviews-container">
+            <h3>Derniers avis déposés</h3>
+            <div class="last-reviews">
+                {% for review in lastReviews|slice(0, 20) %}
+                    <div class="review-card">
+                        <div class="review-left">
+                            <img src="{{ review.book.cover }}" alt="{{ review.book.title }}" class="review-cover">
+                        </div>
+                        <div class="review-right">
+                            <div class="review-book-title">{{ review.book.title }}</div>
+                            <div class="review-bubble">
+                                <div class="bubble-header">
+                                    <span class="review-author">{{ review.utilisateur.pseudo }}</span>
+                                    <span class="review-rating">Note : {{ review.rating }}/5</span>
+                                </div>
+                                <div class="bubble-text">
+                                    {{ review.comment|slice(0, 100) }}{% if review.comment|length > 100 %}...{% endif %}
+                                </div>
+                            </div>
                         </div>
                     </div>
+                {% else %}
+                    <p>Aucun avis récent</p>
                 {% endfor %}
-
             </div>
-
-            {# Flèches de navigation #}
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselFavorites" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Précédent</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselFavorites" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Suivant</span>
-            </button>
         </div>
-    </section>
+    </div>
+</div>
+
+<script src="{{ asset('js/accueil.js') }}"></script>
 {% endblock %}

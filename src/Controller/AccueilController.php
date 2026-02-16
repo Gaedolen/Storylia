@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Repository\BookRepository;
+use App\Repository\ClubRepository;
+use App\Repository\ReviewRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,7 +14,7 @@ class AccueilController extends AbstractController
 {
     #[Route('/', name: 'homepage')]
     #[Route('/accueil', name: 'app_accueil')]
-    public function index(BookRepository $bookRepository, EntityManagerInterface $em): Response
+    public function index(BookRepository $bookRepository, EntityManagerInterface $em, ClubRepository $clubRepository, ReviewRepository $reviewRepository): Response
     {
         // Afficher les coups de coeur de la communauté avec note moyenne
         $favoritesQuery = $em->createQuery(
@@ -77,12 +79,20 @@ class AccueilController extends AbstractController
             ->getQuery()
             ->getResult();
 
+        // Derniers clubs créés
+        $lastClubs = $clubRepository->findBy([], ['creationDate' => 'DESC'], 5);
+
+        // Derniers avis déposés
+        $lastReviews = $reviewRepository->findBy([], ['date' => 'DESC'], 5);
+
         return $this->render('accueil/index.html.twig', [
             'controller_name' => 'AccueilController',
             'favorites' => $favorites,
             'lastMonthBooks' => $lastMonthBooks,
             'currentMonthBooks' => $currentMonthBooks,
             'nextMonthBooks' => $nextMonthBooks,
+            'lastClubs' => $lastClubs,
+            'lastReviews' => $lastReviews,
         ]);
     }
 
