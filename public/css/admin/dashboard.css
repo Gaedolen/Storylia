@@ -180,3 +180,239 @@ body {
     background-color: #A67856;
     color: white;
 }
+
+/* Tablette (max-width: 1024px) */
+@media (max-width: 1024px) {
+    .admin-dashboard {
+        max-width: 95%;
+        margin: 30px auto;
+        padding: 20px;
+    }
+
+    /* Titres */
+    .admin-dashboard h1 {
+        font-size: 1.8rem;
+    }
+
+    .admin-intro {
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Résumé général */
+    .dashboard-summary {
+        gap: 15px;
+    }
+
+    .summary-card {
+        padding: 15px;
+    }
+
+    .summary-title {
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+    }
+
+    .summary-value {
+        font-size: 1.5rem;
+    }
+
+    /* Sections */
+    .dashboard-section h2 {
+        font-size: 1.4rem;
+        margin-bottom: 12px;
+    }
+
+    /* Boutons admin */
+    .admin-actions {
+        gap: 10px;
+    }
+
+    .admin-actions a {
+        flex: 1 1 150px; /* plus petites, s'adaptent mieux */
+        font-size: 1rem;
+        padding: 0.8rem 1.2rem;
+    }
+
+    /* Modal */
+    .modal-content {
+        padding: 1.5rem;
+        max-width: 400px;
+    }
+
+    .loader {
+        width: 50px;
+        height: 50px;
+        border-width: 5px;
+    }
+
+    #loadingText, #resultText {
+        font-size: 0.95rem;
+    }
+
+    #closeModal {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.95rem;
+    }
+}
+
+/* Mobile standard (max-width: 768px) */
+@media (max-width: 768px) {
+    .admin-dashboard {
+        max-width: 95%;
+        margin: 20px auto;
+        padding: 15px;
+    }
+
+    /* Titres */
+    .admin-dashboard h1 {
+        font-size: 1.6rem;
+        text-align: center;
+    }
+
+    .admin-intro {
+        font-size: 0.9rem;
+        margin-bottom: 1.2rem;
+        text-align: center;
+    }
+
+    /* Résumé général */
+    .dashboard-summary {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .summary-card {
+        padding: 12px;
+    }
+
+    .summary-title {
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+    }
+
+    .summary-value {
+        font-size: 1.3rem;
+    }
+
+    /* Sections */
+    .dashboard-section h2 {
+        font-size: 1.25rem;
+        margin-bottom: 10px;
+    }
+
+    /* Boutons admin */
+    .admin-actions {
+        flex-direction: column; /* les boutons s'empilent */
+        gap: 10px;
+    }
+
+    .admin-actions a {
+        flex: 1 1 100%;
+        font-size: 0.95rem;
+        padding: 0.7rem 1rem;
+    }
+
+    /* Modal */
+    .modal-content {
+        padding: 1rem;
+        max-width: 90%;
+    }
+
+    .loader {
+        width: 45px;
+        height: 45px;
+        border-width: 4px;
+    }
+
+    #loadingText, #resultText {
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    #closeModal {
+        padding: 0.4rem 0.7rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Petit mobile (max-width: 480px) */
+@media (max-width: 480px) {
+    .admin-dashboard {
+        max-width: 95%;
+        margin: 15px auto;
+        padding: 10px;
+    }
+
+    /* Titres */
+    .admin-dashboard h1 {
+        font-size: 1.4rem;
+        text-align: center;
+    }
+
+    .admin-intro {
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    /* Résumé général */
+    .dashboard-summary {
+        grid-template-columns: 1fr; /* 1 card par ligne */
+        gap: 10px;
+    }
+
+    .summary-card {
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    .summary-title {
+        font-size: 0.85rem;
+        margin-bottom: 5px;
+    }
+
+    .summary-value {
+        font-size: 1.2rem;
+    }
+
+    /* Sections */
+    .dashboard-section h2 {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+
+    /* Boutons admin */
+    .admin-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .admin-actions a {
+        flex: 1 1 100%;
+        font-size: 0.9rem;
+        padding: 0.6rem 0.9rem;
+    }
+
+    /* Modal */
+    .modal-content {
+        padding: 0.8rem;
+        max-width: 90%;
+    }
+
+    .loader {
+        width: 40px;
+        height: 40px;
+        border-width: 4px;
+    }
+
+    #loadingText, #resultText {
+        font-size: 0.85rem;
+        text-align: center;
+    }
+
+    #closeModal {
+        padding: 0.35rem 0.7rem;
+        font-size: 0.85rem;
+    }
+}

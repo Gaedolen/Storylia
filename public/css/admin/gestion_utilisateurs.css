@@ -390,3 +390,309 @@ a {
 a:hover {
     color: #A67856;
 }
+
+/* Tablette (max-width: 1024px) */
+@media (max-width: 1024px) {
+
+    /* Dashboard container */
+    .admin-dashboard {
+        max-width: 95%;
+        margin: 30px auto;
+        padding: 20px;
+    }
+
+    /* Header titre + bouton */
+    .page-title {
+        font-size: 1.8rem;
+    }
+
+    .page-title h1 {
+        font-size: 1.6rem;
+    }
+
+    /* Tableau */
+    .users-table th,
+    .users-table td {
+        padding: 0.6rem 0.6rem;
+        font-size: 0.9rem;
+    }
+
+    .users-table td.message-employe,
+    .users-table th.message-employe {
+        width: 250px;
+        min-width: 250px;
+        max-width: 250px;
+        font-size: 0.85rem;
+        line-height: 1.2;
+    }
+
+    /* Boutons */
+    .btn {
+        font-size: 0.85rem;
+        padding: 0.35rem 0.6rem;
+    }
+
+    .btn-contact {
+        margin-top: 5px;
+    }
+
+    .users-table td .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 8px;
+    }
+
+    .users-table td .btn:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Modal générique */
+    .modal-content {
+        width: 380px;
+        padding: 1.2rem;
+    }
+
+    .modal-content h2 {
+        font-size: 1.1rem;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+    }
+
+    .modal-actions {
+        gap: 0.4rem;
+    }
+
+    /* Modal contact */
+    #contactModal .modal-content {
+        width: 400px;
+        padding: 1.5rem;
+    }
+
+    #contactModal h2 {
+        font-size: 1.3rem;
+    }
+
+    #contactModal input[type="text"],
+    #contactModal select,
+    #contactModal textarea {
+        font-size: 0.9rem;
+    }
+
+    /* Filtres (si page historique) */
+    .filters-container {
+        gap: 0.7rem;
+    }
+
+    .filters-container input[type="text"] {
+        width: 160px;
+    }
+}
+
+/* Portable (max-width: 768px) */
+@media (max-width: 768px) {
+
+    /* Dashboard container */
+    .admin-dashboard {
+        width: 95%;
+        padding: 15px;
+        margin: 20px auto;
+    }
+
+    /* Header */
+    .page-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .page-title h1 {
+        font-size: 1.4rem;
+    }
+
+    /* TABLE WRAPPER → scroll horizontal propre */
+    .users-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .users-table table {
+        min-width: 700px; /* évite l'écrasement */
+    }
+
+    .users-table th,
+    .users-table td {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    /* Colonne message */
+    .users-table td.message-employe,
+    .users-table th.message-employe {
+        width: 220px;
+        min-width: 220px;
+        max-width: 220px;
+        font-size: 0.75rem;
+    }
+
+    /* Boutons en colonne propre */
+    .users-table td .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 6px;
+        font-size: 0.75rem;
+        padding: 0.35rem 0.5rem;
+    }
+
+    .users-table td .btn:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Filtres */
+    .filters-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .filters-container input[type="text"],
+    .filters-container select {
+        width: 100%;
+    }
+
+    /* MODAL GENERIQUE */
+    .modal-content {
+        width: 90%;
+        padding: 1rem;
+    }
+
+    .modal-content h2 {
+        font-size: 1rem;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .modal-actions .btn {
+        width: 100%;
+    }
+
+    /* MODAL CONTACT */
+    #contactModal .modal-content {
+        width: 95%;
+        padding: 1.2rem;
+    }
+
+    #contactModal h2 {
+        font-size: 1.1rem;
+    }
+
+    #contactModal input,
+    #contactModal select,
+    #contactModal textarea {
+        font-size: 0.85rem;
+    }
+}
+
+/* Petit portable (max-width: 480px) */
+@media (max-width: 480px) {
+
+    /* Dashboard */
+    .admin-dashboard {
+        width: 98%;
+        padding: 10px;
+        margin: 15px auto;
+        border-radius: 15px;
+    }
+
+    /* Titre */
+    .page-title h1 {
+        font-size: 1.2rem;
+    }
+
+    /* TABLE */
+    .users-table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    .users-table table {
+        min-width: 650px; /* évite écrasement */
+    }
+
+    .users-table th,
+    .users-table td {
+        padding: 0.4rem;
+        font-size: 0.7rem;
+    }
+
+    /* Message employé encore plus compact */
+    .users-table td.message-employe,
+    .users-table th.message-employe {
+        width: 180px;
+        min-width: 180px;
+        max-width: 180px;
+        font-size: 0.7rem;
+        line-height: 1.1;
+    }
+
+    /* Boutons */
+    .users-table td .btn {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.4rem;
+        margin-bottom: 5px;
+        border-radius: 6px;
+    }
+
+    /* Filtres */
+    .filters-container {
+        gap: 6px;
+    }
+
+    .filters-container input,
+    .filters-container select {
+        font-size: 0.8rem;
+        padding: 6px;
+    }
+
+    /* MODAL */
+    .modal-content {
+        width: 95%;
+        padding: 0.8rem;
+        border-radius: 12px;
+    }
+
+    .modal-content h2 {
+        font-size: 0.95rem;
+    }
+
+    .modal-actions {
+        gap: 6px;
+    }
+
+    .modal-actions .btn {
+        font-size: 0.75rem;
+        padding: 0.4rem;
+    }
+
+    /* MODAL CONTACT */
+    #contactModal .modal-content {
+        width: 98%;
+        padding: 1rem;
+    }
+
+    #contactModal h2 {
+        font-size: 1rem;
+    }
+
+    #contactModal input,
+    #contactModal select,
+    #contactModal textarea {
+        font-size: 0.8rem;
+    }
+
+}

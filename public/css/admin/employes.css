@@ -130,26 +130,6 @@ h1 {
     font-weight: 500;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    h1 {
-        font-size: 1.6rem;
-    }
-
-    .table-employes {
-        font-size: 0.85rem;
-    }
-
-    .actions {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .btn-add, .back-btn {
-        text-align: center;
-    }
-}
-
 .modal-confirm {
     position: fixed;
     inset: 0;
@@ -261,14 +241,256 @@ h1 {
     }
 }
 
-/* Responsive */
+/* Tablette (max-width: 1024px) */
+@media (max-width: 1024px) {
+    /* Container */
+    .container {
+        max-width: 95%;
+        margin: 30px auto;
+        padding: 20px;
+    }
 
-@media (max-width: 480px) {
+    /* Titre */
+    h1 {
+        font-size: 1.8rem;
+        margin-bottom: 25px;
+    }
+
+    /* Table wrapper */
+    .table-wrapper {
+        padding: 15px;
+        border-radius: 10px;
+    }
+
+    /* Tableau */
+    .table-employes th,
+    .table-employes td {
+        padding: 12px 14px;
+        font-size: 0.9rem;
+    }
+
+    .table-employes thead {
+        font-size: 0.9rem;
+    }
+
+    .table-employes tbody tr td:first-child,
+    .table-employes tbody tr td:last-child {
+        border-radius: 6px;
+    }
+
+    /* Bouton supprimer */
+    .btn-delete {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+
+    /* Actions bas de page */
+    .actions {
+        gap: 12px;
+        margin-top: 25px;
+    }
+
+    .back-btn {
+        font-size: 0.9rem;
+    }
+
+    .btn-add {
+        font-size: 1rem;
+        padding: 10px 18px;
+    }
+
+    /* Modal */
     .modal-content {
-        padding: 26px 22px;
+        padding: 25px 28px;
+        max-width: 380px;
+    }
+
+    .modal-content p {
+        font-size: 1rem;
+        margin-bottom: 24px;
     }
 
     .modal-buttons {
+        gap: 15px;
+    }
+
+    .modal-confirm-yes,
+    .modal-confirm-no {
+        padding: 8px 20px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Mobile standard (max-width: 768px) */
+@media (max-width: 768px) {
+    /* Container */
+    .container {
+        max-width: 95%;
+        margin: 20px auto;
+        padding: 15px;
+    }
+
+    /* Titre */
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    /* Table wrapper */
+    .table-wrapper {
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    /* Tableau */
+    .table-employes {
+        min-width: 600px; /* scroll horizontal si nécessaire */
+    }
+
+    .table-employes th,
+    .table-employes td {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+
+    .table-employes thead {
+        font-size: 0.85rem;
+    }
+
+    .table-employes tbody tr td:first-child,
+    .table-employes tbody tr td:last-child {
+        border-radius: 5px;
+    }
+
+    /* Bouton supprimer */
+    .btn-delete {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+    }
+
+    /* Actions bas de page */
+    .actions {
         flex-direction: column;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .back-btn,
+    .btn-add {
+        width: 100%;
+        text-align: center;
+        font-size: 0.95rem;
+        padding: 10px 0;
+    }
+
+    /* Modal */
+    .modal-content {
+        padding: 20px 22px;
+        max-width: 350px;
+    }
+
+    .modal-content p {
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+    }
+
+    .modal-buttons {
+        gap: 12px;
+        flex-direction: column;
+    }
+
+    .modal-confirm-yes,
+    .modal-confirm-no {
+        width: 100%;
+        padding: 8px 0;
+        font-size: 0.85rem;
+    }
+}
+
+/* Petit mobile (max-width: 480px) */
+@media (max-width: 480px) {
+    /* Container */
+    .container {
+        max-width: 95%;
+        margin: 15px auto;
+        padding: 10px;
+    }
+
+    /* Titre */
+    h1 {
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    /* Table wrapper */
+    .table-wrapper {
+        padding: 10px;
+        border-radius: 6px;
+    }
+
+    /* Tableau */
+    .table-employes {
+        min-width: 500px; /* scroll horizontal si nécessaire */
+    }
+
+    .table-employes th,
+    .table-employes td {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+
+    .table-employes thead {
+        font-size: 0.8rem;
+    }
+
+    .table-employes tbody tr td:first-child,
+    .table-employes tbody tr td:last-child {
+        border-radius: 4px;
+    }
+
+    /* Bouton supprimer */
+    .btn-delete {
+        font-size: 0.75rem;
+        padding: 5px 8px;
+    }
+
+    /* Actions bas de page */
+    .actions {
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 15px;
+    }
+
+    .back-btn,
+    .btn-add {
+        width: 100%;
+        text-align: center;
+        font-size: 0.85rem;
+        padding: 8px 0;
+    }
+
+    /* Modal */
+    .modal-content {
+        padding: 18px 20px;
+        max-width: 320px;
+    }
+
+    .modal-content p {
+        font-size: 0.9rem;
+        margin-bottom: 18px;
+    }
+
+    .modal-buttons {
+        gap: 10px;
+        flex-direction: column;
+    }
+
+    .modal-confirm-yes,
+    .modal-confirm-no {
+        width: 100%;
+        padding: 7px 0;
+        font-size: 0.8rem;
     }
 }
