@@ -36,8 +36,16 @@
                     <td>{{ report.author.pseudo }}</td>
                     <td>{{ report.date|date('d/m/Y') }}</td>
                     <td>
-                        <a href="{{ path('employe_livre_edit', {'id': report.reportedBook.id}) }}" class="btn-edit">Modifier livre</a>
-                        <button class="btn-validate" data-report-id="{{ report.id }}">Valider / supprimer signalement</button>
+                        <a href="{{ path('employe_livre_edit', {'id': report.reportedBook.id}) }}" 
+                        class="btn-edit">
+                            <span class="desktop-text">Modifier livre</span>
+                            <span class="mobile-text">Modifier</span>
+                        </a>
+
+                        <button class="btn-validate" data-report-id="{{ report.id }}">
+                            <span class="desktop-text">Valider / supprimer signalement</span>
+                            <span class="mobile-text">Valider</span>
+                        </button>
                     </td>
                 </tr>
                 {% endif %}

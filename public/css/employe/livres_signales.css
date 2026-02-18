@@ -127,30 +127,212 @@ h1 {
     color: #714B2F;
 }
 
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
+/* ===== Responsive Tablette (max-width: 1024px) avec padding horizontal ===== */
+@media (max-width: 1024px) {
+
+    /* Conteneur principal : padding réduit */
+    .employe-dashboard {
+        padding: 15px 20px;
+    }
+
+    /* Titre */
+    h1 {
+        font-size: 1.6em;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    /* Tableau : texte et padding réduits + espace horizontal */
     .table-reports {
         font-size: 0.8em;
+        max-width: calc(100% - 40px); /* espace 20px à gauche et droite */
+        margin: 0 auto 40px auto;    /* centré */
+        overflow-x: auto;            /* scroll si nécessaire */
+        display: block;              /* permet overflow-x sur table complète */
     }
 
+    .table-reports th,
+    .table-reports td {
+        padding: 6px 8px;
+    }
+
+    /* Colonnes principales légèrement plus compactes */
+    .table-reports th:nth-child(2),
+    .table-reports td:nth-child(2),
+    .table-reports th:nth-child(3),
+    .table-reports td:nth-child(3),
+    .table-reports th:nth-child(4),
+    .table-reports td:nth-child(4) {
+        width: 120px;
+        white-space: normal;
+        word-wrap: break-word;
+    }
+
+    /* Boutons */
     .btn-edit,
     .btn-validate {
-        margin: 3px 2px;
-        padding: 5px 8px;
+        margin: 3px 4px;
+        padding: 5px 10px;
         font-size: 0.8em;
     }
 
+    /* Modal */
+    .modal-content {
+        max-width: 600px;
+        padding: 18px;
+    }
+
+    .modal-content h3 {
+        font-size: 1.2em;
+    }
+}
+
+/* ===== Responsive portable / tablette compacte (max-width: 768px) ===== */
+@media (max-width: 768px) {
+
+    /* Conteneur principal : padding réduit */
+    .employe-dashboard {
+        padding: 12px 15px;
+    }
+
+    /* Titre */
     h1 {
-        font-size: 1.5em;
+        font-size: 1.4em;
+        margin-top: 15px;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    /* Tableau : scroll horizontal + padding horizontal */
+    .table-reports {
+        font-size: 0.75em;
+        max-width: calc(100% - 30px); /* 15px de marge à gauche/droite */
+        margin: 0 auto 30px auto;
+        display: block;      /* permet overflow-x */
+        overflow-x: auto;    /* scroll horizontal */
+        -webkit-overflow-scrolling: touch; /* scroll fluide iOS */
+    }
+
+    .table-reports th,
+    .table-reports td {
+        padding: 5px 6px;
+        white-space: nowrap; /* garde tout sur une ligne sauf colonne Motif */
+    }
+
+    /* Colonnes principales légèrement plus compactes */
+    .table-reports th:nth-child(2),
+    .table-reports td:nth-child(2),
+    .table-reports th:nth-child(3),
+    .table-reports td:nth-child(3),
+    .table-reports th:nth-child(4),
+    .table-reports td:nth-child(4) {
+        width: 100px;
+        white-space: normal;       /* permet retour à la ligne */
+        word-wrap: break-word;     /* coupe les mots si nécessaire */
+    }
+
+    /* Forcer les boutons à être l’un au-dessus de l’autre */
+    .table-reports td .btn-edit,
+    .table-reports td .btn-validate {
+        display: block;
+        width: 100%;          /* occupe toute la largeur de la cellule */
+        margin: 0 0 5px 0;    /* 5px d’espace entre les boutons */
+        box-sizing: border-box;
+    }
+
+    /* Supprimer le margin horizontal qui était présent */
+    .table-reports td .btn-edit {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    /* Modal */
+    .modal-content {
+        max-width: 90%; /* prend presque tout l'écran */
+        padding: 15px;
+    }
+
+    .modal-content h3 {
+        font-size: 1.1em;
     }
 }
 
 @media (max-width: 480px) {
-    .table-reports, .modal-content {
-        width: 95%;
+
+    /* Conteneur principal */
+    .employe-dashboard {
+        padding: 10px 15px;
     }
 
-    .table-reports th, .table-reports td {
-        padding: 6px 4px;
+    /* Titre */
+    h1 {
+        font-size: 1.3em;
+        margin: 15px 0;
+        text-align: center;
+    }
+
+    /* Tableau scrollable horizontal */
+    .table-reports {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        margin-bottom: 20px;
+        font-size: 0.75em;
+    }
+
+    /* Cellules */
+    .table-reports th,
+    .table-reports td {
+        padding: 5px 6px;
+        text-align: center;
+        vertical-align: middle;
+        white-space: normal;     /* autorise retour à la ligne */
+        word-break: normal;      /* ne coupe pas les mots */
+    }
+
+    /* Colonnes Message & Motif */
+    .table-reports td:nth-child(4),
+    .table-reports td:nth-child(5) {
+        max-width: 160px;
+        overflow-wrap: break-word;
+    }
+
+    /* Boutons empilés */
+    .table-reports td .btn-edit,
+    .table-reports td .btn-validate {
+        display: block;
+        width: 100%;
+        margin-bottom: 6px;
+        padding: 6px 8px;   /* un peu plus compact */
+        font-size: 0.8em;
+        text-align: center;
+        box-sizing: border-box;
+    }
+
+    /* 🔹 Texte court sur mobile */
+    .desktop-text {
+        display: none;
+    }
+
+    .mobile-text {
+        display: inline;
+    }
+
+    /* Modal */
+    .modal-content {
+        width: 90%;
+        max-width: 360px;
+        padding: 15px;
+    }
+
+    .modal-content h3 {
+        font-size: 1em;
+    }
+
+    /* Badges */
+    .badge {
+        font-size: 0.65em;
+        padding: 0.15rem 0.3rem;
     }
 }

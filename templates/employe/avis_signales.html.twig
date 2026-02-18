@@ -23,6 +23,7 @@
                         <th>Note</th>
                         <th>Commentaire</th>
                         <th>Signalé par</th>
+                        <th>Message du signalement</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -35,6 +36,7 @@
                             <td>{{ review.rating }}/5</td>
                             <td>{{ review.comment }}</td>
                             <td>{% if report %}{{ report.author.pseudo }}{% else %}-{% endif %}</td>
+                            <td>{% if report %}{{ report.message }}{% else %}-{% endif %}</td>
                             <td class="admin-actions">
                                 <a href="{{ path('employe_avis_valider', {'id': review.id}) }}" class="btn-valider" title="Supprime l'avis et envoie un mail d'avertissement">Supprimer l'avis</a>
 

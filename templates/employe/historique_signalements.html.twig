@@ -28,42 +28,44 @@
         <button type="submit" class="btn btn-primary">Filtrer</button>
     </form>
 
-    <table>
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Utilisateur signalé</th>
-                <th>Signalé par</th>
-                <th>Motif</th>
-                <th>Message</th>
-                <th>Status</th>
-                <th>Date</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for report in reports %}
-            <tr>
-                <td>{{ report.id }}</td>
-                <td>{{ report.reported.pseudo }}</td>
-                <td>{{ report.author.pseudo }}</td>
-                <td>{{ report.reason }}</td>
-                <td>{{ report.message }}</td>
-                <td>
-                    {% if report.status == 'traite' %}
-                        <span class="badge badge-green">Traité</span>
-                    {% elseif report.status == 'refuse' %}
-                        <span class="badge badge-red">Refusé</span>
-                    {% elseif report.status == 'transmis_admin' %}
-                        <span class="badge badge-orange">Transmis</span>
-                    {% endif %}
-                </td>
-                <td>{{ report.date|date('d/m/Y H:i') }}</td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="7" style="text-align:center; color: #777;">Aucun signalement.</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Utilisateur signalé</th>
+                    <th>Signalé par</th>
+                    <th>Motif</th>
+                    <th>Message</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for report in reports %}
+                <tr>
+                    <td>{{ report.id }}</td>
+                    <td>{{ report.reported.pseudo }}</td>
+                    <td>{{ report.author.pseudo }}</td>
+                    <td>{{ report.reason }}</td>
+                    <td>{{ report.message }}</td>
+                    <td>
+                        {% if report.status == 'traite' %}
+                            <span class="badge badge-green">Traité</span>
+                        {% elseif report.status == 'refuse' %}
+                            <span class="badge badge-red">Refusé</span>
+                        {% elseif report.status == 'transmis_admin' %}
+                            <span class="badge badge-orange">Transmis</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ report.date|date('d/m/Y') }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="7" style="text-align:center; color: #777;">Aucun signalement.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

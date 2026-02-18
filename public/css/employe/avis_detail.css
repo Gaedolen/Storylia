@@ -126,14 +126,190 @@
     color: #FFF;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* Tablette (max-width: 1024px) */
+@media (max-width: 1024px) {
+
+    .employe-dashboard {
+        max-width: 95%;
+        margin: 30px auto;
+        padding: 18px;
+    }
+
+    .employe-dashboard h1 {
+        font-size: 30px;
+        margin-bottom: 30px;
+    }
+
+    .card {
+        padding: 20px;
+        margin-bottom: 25px;
+        border-radius: 10px;
+    }
+
+    .card h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+
+    .review-card p,
+    .book-info p {
+        font-size: 0.95rem;
+    }
+
+    .report-section {
+        padding: 12px;
+    }
+
+    .report-section h3,
+    .summary h3 {
+        font-size: 18px;
+    }
+
+    .badge-status {
+        font-size: 12px;
+        padding: 5px 12px;
+    }
+
+    /* Bloc livre */
     .book-card .book-content {
-        flex-direction: column;
-        align-items: center;
+        gap: 20px;
     }
 
     .book-card img {
+        width: 170px;
+    }
+
+    .summary {
+        padding: 12px;
+    }
+
+    .btn-retour {
+        padding: 10px 25px;
+        font-size: 0.95rem;
+    }
+}
+
+/* Portable (max-width: 768px) */
+@media (max-width: 768px) {
+
+    .employe-dashboard {
+        width: 95%;
+        margin: 25px auto;
+        padding: 15px;
+    }
+
+    .employe-dashboard h1 {
+        font-size: 24px;
+        margin-bottom: 25px;
+    }
+
+    .card {
+        padding: 18px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+    }
+
+    .card h2 {
+        font-size: 18px;
         margin-bottom: 15px;
+    }
+
+    .review-card p,
+    .book-info p {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    /* Bloc signalement */
+    .report-section {
+        padding: 12px;
+        margin-top: 15px;
+    }
+
+    .report-section h3 {
+        font-size: 16px;
+    }
+
+    .badge-status {
+        font-size: 11px;
+        padding: 4px 10px;
+    }
+
+    /* Bloc livre → empilement vertical */
+    .book-card .book-content {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    /* Cover plus petite mais propre */
+    .book-card img {
+        width: 120px;
+        flex-shrink: 0;
+    }
+
+    /* Infos à droite */
+    .book-info {
+        flex: 1;
+    }
+
+    .summary {
+        margin-top: 15px;
+        width: 100%;
+    }
+
+    .summary h3 {
+        font-size: 16px;
+    }
+
+    /* Bouton retour pleine largeur */
+    .btn-retour {
+        display: block;
+        width: 100%;
+        text-align: center;
+        padding: 12px;
+        font-size: 0.9rem;
+        margin-top: 20px;
+    }
+}
+
+/* Petit portable (max-width: 480px) */
+@media (max-width: 480px) {
+    .book-card .book-content {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        align-items: flex-start;
+        flex-wrap: nowrap;
+    }
+
+    /* Cover à gauche */
+    .book-card img {
+        width: 80px;
+        height: auto;
+        flex-shrink: 0;
+        margin-bottom: 0;
+    }
+
+    .book-info {
+        flex: 1 1 auto;
+        text-align: left;
+    }
+
+    .summary {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .card h2 {
+        font-size: 1.5rem;
+        text-align: left;
+    }
+
+    .employe-dashboard h1 {
+        font-size: 1.8rem;
+        margin-bottom: 25px;
+        text-align: center;
     }
 }

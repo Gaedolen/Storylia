@@ -83,3 +83,137 @@ body {
 .btn-message {
     background-color: #3B2F2F;
 }
+
+/* === Tablette (max-width: 1024px) === */
+@media (max-width: 1024px) {
+
+    /* Dashboard container */
+    .employe-dashboard {
+        max-width: 95%;
+        margin: 30px auto;
+        padding: 20px;
+    }
+
+    /* Titres */
+    .employe-dashboard h1 {
+        font-size: 1.8rem;
+    }
+
+    .employe-intro {
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Sections */
+    .dashboard-section h2 {
+        font-size: 1.4rem;
+        margin-bottom: 12px;
+    }
+
+    /* Actions */
+    .employe-actions {
+        gap: 12px;
+    }
+
+    .employe-actions a {
+        flex: 1 1 220px; /* boutons un peu plus compacts pour tablette */
+        font-size: 1rem;
+        padding: 1rem 1.2rem;
+    }
+
+    .employe-actions a:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    }
+}
+
+/* === Portable (max-width: 768px) === */
+@media (max-width: 768px) {
+
+    /* Dashboard container */
+    .employe-dashboard {
+        width: 95%;
+        padding: 15px;
+        margin: 20px auto;
+    }
+
+    /* Titres */
+    .employe-dashboard h1 {
+        font-size: 1.6rem;
+    }
+
+    .employe-intro {
+        font-size: 0.9rem;
+        margin-bottom: 1.8rem;
+    }
+
+    /* Sections */
+    .dashboard-section h2 {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+    }
+
+    /* Actions → boutons empilés */
+    .employe-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .employe-actions a {
+        flex: 1 1 100%;
+        text-align: center;
+        font-size: 0.95rem;
+        padding: 0.9rem 1rem;
+    }
+
+    .employe-actions a:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+    }
+}
+
+/* === Petit portable (max-width: 480px) === */
+@media (max-width: 480px) {
+
+    /* Dashboard container */
+    .employe-dashboard {
+        width: 98%;
+        padding: 10px;
+        margin: 15px auto;
+    }
+
+    /* Titres */
+    .employe-dashboard h1 {
+        font-size: 1.4rem;
+    }
+
+    .employe-intro {
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Sections */
+    .dashboard-section h2 {
+        font-size: 1.15rem;
+        margin-bottom: 8px;
+    }
+
+    /* Actions → boutons empilés et compacts */
+    .employe-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .employe-actions a {
+        flex: 1 1 100%;
+        text-align: center;
+        font-size: 0.85rem;
+        padding: 0.7rem 1rem;
+        border-radius: 10px;
+    }
+
+    .employe-actions a:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    }
+}

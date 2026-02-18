@@ -130,39 +130,183 @@ tbody td[colspan] {
 }
 
 /* ===== Responsive ===== */
+@media (max-width: 1024px) {
+    form.filter-form {
+        flex-wrap: wrap;
+        gap: 0.8rem;
+    }
+
+    form.filter-form div {
+        min-width: 120px;
+    }
+
+    form.filter-form input[type="text"],
+    form.filter-form select {
+        font-size: 0.9rem;
+        padding: 0.45rem 0.65rem;
+    }
+
+    form.filter-form button {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    table thead th,
+    table tbody td {
+        font-size: 0.9rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    .badge {
+        min-width: 60px;
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: rgba(255,255,255,0.15);
+    }
+
+    tbody td:nth-child(5) {
+        word-wrap: break-word;
+        white-space: normal;
+        max-width: 200px;
+    }
+
+}
+
 @media (max-width: 768px) {
-    form {
+    form.filter-form {
         flex-direction: column;
         align-items: flex-start;
+        gap: 0.6rem;
+        padding: 0 1rem;
     }
 
-    table thead {
-        display: none;
-    }
-
-    table, tbody, tr, td {
-        display: block;
+    form.filter-form div {
         width: 100%;
     }
 
-    tbody tr {
-        margin-bottom: 1rem;
-        background-color: #E8CBAE;
-        border-radius: 12px;
-        padding: 0.5rem;
+    form.filter-form input[type="text"],
+    form.filter-form select {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.6rem;
     }
 
-    tbody td {
-        padding: 0.5rem;
-        text-align: right;
-        position: relative;
+    form.filter-form button {
+        font-size: 0.85rem;
+        padding: 0.45rem 0.9rem;
     }
 
-    tbody td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 0.5rem;
-        font-weight: bold;
+    .table-container {
+        overflow-x: auto;
+        padding: 0 1rem;
+    }
+
+    table {
+        min-width: 700px;
+        width: 100%;
+        border-spacing: 0;
+    }
+
+    thead th, tbody td {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.6rem;
         text-align: left;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    thead th:nth-child(2),
+    tbody td:nth-child(2),
+    thead th:nth-child(3),
+    tbody td:nth-child(3) {
+        width: 100px;
+    }
+
+    .badge {
+        font-size: 0.75rem;
+        min-width: 50px;
+        padding: 0.2rem 0.4rem;
+    }
+}
+
+@media (max-width: 480px) {
+    form.filter-form {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0 0.5rem;
+        align-items: stretch;
+    }
+
+    form.filter-form div {
+        width: 100%;
+    }
+
+    form.filter-form label {
+        font-size: 0.85rem;
+    }
+
+    form.filter-form input[type="text"],
+    form.filter-form select {
+        font-size: 0.8rem;
+        padding: 0.35rem 0.5rem;
+    }
+
+    form.filter-form button {
+        width: 100%;
+        font-size: 0.8rem;
+        padding: 0.4rem;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 0 0.5rem;
+    }
+
+    table {
+        min-width: 700px;
+        width: 100%;
+        font-size: 0.8rem;
+    }
+
+    thead th,
+    tbody td {
+        padding: 0.4rem 0.6rem;
+        white-space: nowrap;
+    }
+
+    thead th:nth-child(4),
+    tbody td:nth-child(4) {
+        width: 100px;
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    thead th:nth-child(2),
+    tbody td:nth-child(2),
+    thead th:nth-child(3),
+    tbody td:nth-child(3) {
+        width: 100px;
+        white-space: normal;
+        word-wrap: break-word;
+    }
+
+    .badge {
+        font-size: 0.7rem;
+        min-width: 50px;
+        padding: 0.2rem 0.4rem;
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: rgba(255,255,255,0.15);
+    }
+
+    tbody td:nth-child(5) {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
