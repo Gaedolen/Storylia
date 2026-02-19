@@ -177,6 +177,34 @@ if (!window.searchBookModalInit) {
                 alert('Erreur de connexion ou de création du livre.');
             }
         });
+        
+        // ----- Filtres mobile -----
+        const openFiltresBtn = document.getElementById('open-filtres');
+        const closeFiltresBtn = document.getElementById('close-filtres');
+        const filtres = document.querySelector('.filtres');
+        const overlay = document.getElementById('filtres-overlay');
+
+        if (openFiltresBtn && filtres && overlay) {
+            openFiltresBtn.addEventListener('click', () => {
+                filtres.classList.add('active');
+                overlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            });
+
+            overlay.addEventListener('click', () => {
+                filtres.classList.remove('active');
+                overlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            });
+
+            if (closeFiltresBtn) {
+                closeFiltresBtn.addEventListener('click', () => {
+                    filtres.classList.remove('active');
+                    overlay.classList.add('hidden');
+                    document.body.style.overflow = '';
+                });
+            }
+        }
     }
 
     // ----- Initialisation -----

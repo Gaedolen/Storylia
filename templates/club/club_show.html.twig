@@ -3,6 +3,7 @@
 {% block title %}{{ club.name }}{% endblock %}
 
 {% block stylesheets %}
+    {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/club/show.css') }}">
 {% endblock %}
 

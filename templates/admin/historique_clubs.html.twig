@@ -3,7 +3,8 @@
 {% block title %}Historique des clubs signalés{% endblock %}
 
 {% block stylesheets %}
-<link rel="stylesheet" href="{{ asset('css/admin/gestion_utilisateurs.css') }}">
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/admin/gestion_utilisateurs.css') }}">
 {% endblock %}
 
 {% block body %}

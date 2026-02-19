@@ -3,7 +3,8 @@
 {% block title %}Livres signalés - Admin{% endblock %}
 
 {% block stylesheets %}
-<link rel="stylesheet" href="{{ asset('css/employe/livres_signales.css') }}">
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/employe/livres_signales.css') }}">
 {% endblock %}
 
 {% block body %}

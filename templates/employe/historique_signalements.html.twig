@@ -3,8 +3,9 @@
 {% block title %}Historique des signalements utilisateurs{% endblock %}
 
 {% block stylesheets %}
-        <link rel="stylesheet" href="{{ asset('css/employe/historique_signalements.css') }}">
-    {% endblock %}
+    {{ parent() }}
+     <link rel="stylesheet" href="{{ asset('css/employe/historique_signalements.css') }}">
+{% endblock %}
 
 {% block body %}
     <h1>Historique des signalements utilisateurs</h1>

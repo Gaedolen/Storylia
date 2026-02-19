@@ -55,14 +55,16 @@ html, body {
 /* Menu */
 .menu-section {
     display: flex;
-    align-items: center;
-    gap: 15px;
-    position: relative;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
 }
 
 .menu-nav {
     display: flex;
     gap: 15px;
+    flex-wrap: nowrap;
+    white-space: nowrap; 
 }
 
 .menu-nav a {
@@ -86,7 +88,7 @@ html, body {
 }
 
 /* ======= SEARCH BAR ======= */
-.search-bar {
+.search {
     display: flex;
     align-items: center;
     width: 100%;
@@ -99,7 +101,7 @@ html, body {
     overflow: hidden;
 }
 
-.search-bar input[type="text"] {
+.search input[type="text"] {
     flex: 1;
     padding: 12px 20px;
     border: none;
@@ -108,11 +110,11 @@ html, body {
     outline: none;
 }
 
-.search-bar input[type="text"]::placeholder {
+.search input[type="text"]::placeholder {
     color: #b3a192;
 }
 
-.search-bar button {
+.search button {
     padding: 0 16px;
     background: none;
     border: none;
@@ -123,23 +125,22 @@ html, body {
     transition: color 0.2s ease;
 }
 
-.search-bar button i {
+.search button i {
     color: #3c2f2f;
     font-size: 16px;
 }
 
-.search-bar button:hover i {
+.search button:hover i {
     color: #c97c5d;
 }
 
-/* Burger */
-.burger-btn {
+/* ===== DESKTOP PAR DÉFAUT ===== */
+.header-icons-mobile {
     display: none;
-    font-size: 32px;
-    color: white;
-    background: none;
-    border: none;
-    cursor: pointer;
+}
+
+.menu-nav-mobile {
+    display: none;
 }
 
 /* === Footer === */
@@ -225,86 +226,373 @@ html, body {
     font-size: 14px;
 }
 
-
 /* === Responsive === */
-
-/* Tablette et mobile */
-@media (max-width: 1024px) {
-    .menu-nav {
-        display: none;
-        flex-direction: column;
-        gap: 12px;
-        position: absolute;
-        top: 100%;
-        right: 0;
-        background: #5F7F5F;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        width: 220px;
-    }
-
-    .menu-nav.show-menu {
-        display: flex;
-    }
-
-    .burger-btn {
-        display: block;
-    }
-
-    .separator {
-        display: none;
-    }
-
-    .search-bar {
-        display: none;
-    }
-}
-
-/* Mobile spécifique */
-@media (max-width: 425px) {
-    .logo {
-        height: 60px;
-    }
-
-    .menu-nav {
-        width: 180px;
-        top: 90px;
-        right: 5px;
-    }
-}
-
-/* Desktop */
-@media (min-width: 1025px) {
-    .menu-section {
-        display: flex;
-        flex-direction: column; /* menu au dessus, recherche en dessous */
-        align-items: flex-end; /* aligne tout à droite */
-        gap: 10px; /* espace entre menu et barre de recherche */
-    }
-
-    .menu-nav {
-        display: flex !important;
-        flex-direction: row;
-        gap: 15px;
-        background: none;
-        padding: 0;
-        position: static;
-    }
-
-    /* Cacher la loupe */
+@media screen and (max-width: 1024px) {
+    .menu-section,
+    .search,
     .icon-search {
         display: none;
     }
 
+    .container-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 95%;
+        margin: 0 auto;
+        flex-direction: row;
+    }
+
+    .logo {
+        height: 60px;
+    }
+
+    .header-icons-mobile-1024 {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .menu-nav {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 12px;
+    }
+
+    .menu-nav a {
+        font-size: 16px;
+        color: white;
+    }
+
+    .search-1024 {
+        width: 250px;
+    }
+
+    .search-1024 input[type="text"] {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+
+    .header-icons-mobile {
+        display: flex;
+        flex-direction: row;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .search-icon-mobile,
     .burger-btn {
+        font-size: 1.5rem;
+        color: white;
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .menu-nav-mobile {
+        display: none;
+        flex-direction: column;
+        position: fixed;
+        top: 80px;
+        right: 0;
+        background-color: #5F7F5F;
+        padding: 15px;
+        gap: 10px;
+        border-radius: 5px 0 0 5px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        width: 220px;
+        z-index: 2000;
+    }
+
+    .menu-nav-mobile::before {
+        content: "";
+        position: absolute;
+        top: -3px; left: -3px; right: -3px; bottom: -3px;
+        z-index: -1;
+        border-radius: 8px 0 0 8px;
+        background: linear-gradient(to left, #7d996b, #2E5D2F);
+    }
+
+    .menu-nav-mobile.show-menu {
+        display: flex;
+        animation: slideDown 0.3s ease forwards;
+    }
+
+    .menu-nav-mobile a {
+        color: white;
+        padding: 8px 10px;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: background 0.3s, color 0.3s;
+    }
+
+    .menu-nav-mobile a:hover {
+        background-color: rgba(255,255,255,0.1);
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .right-header-1024 .menu-nav {
         display: none;
     }
 
-    /* Barre de recherche visible et alignée à droite */
-    .search-bar {
+    .nav-footer {
+        padding: 25px 20px;
+    }
+
+    .navbar-footer a {
+        font-size: 18px;
+    }
+
+    .reseaux-sociaux .retrouvez-nous {
+        font-size: 16px;
+    }
+
+    .reseaux-sociaux i {
+        font-size: 28px;
+    }
+
+    .footer-bottom {
+        font-size: 13px;
+    }
+
+}
+
+@media screen and (max-width: 780px) {
+
+    /* Masquer menu desktop et barre de recherche */
+    .menu-section,
+    .search,
+    .icon-search {
+        display: none;
+    }
+
+    /* Container header : logo à gauche, icônes à droite */
+    .container-header {
         display: flex;
-        width: 300px; /* tu peux ajuster la largeur */
-        justify-content: flex-end; /* assure que le contenu reste à droite */
+        justify-content: space-between;
+        align-items: center;
+        width: 95%;
+        margin: 0 auto;
+        flex-direction: row;
+    }
+
+    /* Loupe + burger */
+    .header-icons-mobile {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .search-icon-mobile,
+    .burger-btn {
+        font-size: 1.8rem;
+        color: white;
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .menu-nav-mobile {
+        display: none;
+        flex-direction: column;
+        position: fixed;
+        top: 80px;
+        right: 0;
+        background-color: #5F7F5F;
+        padding: 15px;
+        gap: 12px;
+        border-radius: 5px 0 0 5px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        z-index: 2000;
+        width: 220px;
+
+        border: 3px solid transparent;
+        background-clip: padding-box;
+    }
+
+    .menu-nav-mobile::before {
+        content: "";
+        position: absolute;
+        top: -3px; left: -3px; right: -3px; bottom: -3px;
+        z-index: -1;
+        border-radius: 8px 0 0 8px;
+        background: linear-gradient(to left, #7d996b, #2E5D2F);
+    }
+
+    .menu-nav-mobile.show-menu {
+        display: flex;
+        animation: slideDown 0.3s ease forwards;
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .menu-nav-mobile a {
+        color: white;
+        font-size: 18px;
+        padding: 8px 10px;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: background 0.3s, color 0.3s;
+    }
+
+    .menu-nav-mobile a:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-footer {
+        padding: 20px 15px;
+    }
+
+    .navbar-footer {
+        gap: 8px;
+    }
+
+    .navbar-footer a {
+        font-size: 16px;
+    }
+
+    .reseaux-sociaux {
+        gap: 10px;
+    }
+
+    .reseaux-sociaux .retrouvez-nous {
+        font-size: 14px;
+    }
+
+    .reseaux-sociaux i {
+        font-size: 24px;
+    }
+
+    .footer-bottom {
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+
+    .menu-section,
+    .search,
+    .icon-search {
+        display: none;
+    }
+
+    .container-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 95%;
+        margin: 0 auto;
+        flex-direction: row;
+    }
+
+    .header-icons-mobile {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .search-icon-mobile,
+    .burger-btn {
+        font-size: 1.6rem;
+        color: white;
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .menu-nav-mobile {
+        display: none;
+        flex-direction: column;
+        position: fixed;
+        top: 70px;
+        right: 0;
+        background-color: #5F7F5F;
+        padding: 12px;
+        gap: 10px;
+        border-radius: 5px 0 0 5px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+        z-index: 2000;
+        width: 180px;
+        border: 3px solid transparent;
+        background-clip: padding-box;
+    }
+
+    .menu-nav-mobile::before {
+        content: "";
+        position: absolute;
+        top: -2px; left: -2px; right: -2px; bottom: -2px;
+        z-index: -1;
+        border-radius: 6px 0 0 6px;
+        background: linear-gradient(to left, #7d996b, #2E5D2F);
+    }
+
+    .menu-nav-mobile.show-menu {
+        display: flex;
+        animation: slideDown 0.25s ease forwards;
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .menu-nav-mobile a {
+        color: white;
+        font-size: 16px;
+        padding: 6px 10px;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background 0.3s, color 0.3s;
+    }
+
+    .menu-nav-mobile a:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-footer {
+        padding: 15px 10px;
+    }
+
+    .footer-top {
+        gap: 10px;
+    }
+
+    .navbar-footer a {
+        font-size: 14px;
+    }
+
+    .reseaux-sociaux .retrouvez-nous {
+        font-size: 13px;
+    }
+
+    .reseaux-sociaux i {
+        font-size: 20px;
+    }
+
+    .footer-bottom {
+        font-size: 11px;
+        margin-top: 10px;
     }
 }

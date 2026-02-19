@@ -3,6 +3,7 @@
 {% block title %}Résutat de recherche{% endblock %}
 
 {% block stylesheets %}
+    {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/book/search.css') }}">
 {% endblock %}
 
@@ -12,70 +13,10 @@
         <!-- Colonne gauche : filtres -->
         <aside class="filtres">
             <h3><strong>Filtres</strong></h3>
+            <button id="close-filtres" class="close-filtres">✕</button>
+
             <form method="get" action="{{ path('app_recherche_livre') }}">
                 <input type="hidden" name="q" value="{{ app.request.get('q') }}">
-                
-                {# <label>Catégorie :</label>
-                <select name="category">
-                    <option value="">Toutes</option>
-
-                    {% set categories = {
-                        'Fiction': {
-                            'Science-Fiction': 'scifi',
-                            'Fantastique': 'fantastique',
-                            'Fantasy': 'fantasy',
-                            'Dystopie': 'dystopie',
-                            'Steampunk': 'steampunk'
-                        },
-                        'Policier / Suspense': {
-                            'Policier': 'policier',
-                            'Thriller': 'thriller',
-                            'Espionnage': 'espionnage',
-                            'Horreur': 'horreur'
-                        },
-                        'Romance & Jeunesse': {
-                            'Aventure': 'aventure',
-                            'Young Adult': 'young_adult'
-                        },
-                        'Romance et roman adulte': {
-                            'Romance': 'romance',
-                            'Érotique': 'erotique',
-                            'Chick-lit': 'chicklit'
-                        },
-                        'Culture, Histoire & Documentaire': {
-                            'Essai': 'essai',
-                            'Biographie': 'biographie',
-                            'Philosophie': 'philosophie',
-                            'Historique': 'historique',
-                            'Science': 'science',
-                            'Sociologie': 'sociologie'
-                        },
-                        'Arts & Littérature': {
-                            'Poésie': 'poesie',
-                            'Théâtre': 'theatre'
-                        },
-                        'Mythes et Légendes': {
-                            'Contes et légendes': 'conte_legend',
-                            'Mythologie': 'mythologie'
-                        },
-                        'Graphique': {
-                            'Roman Graphique': 'graphic_novel',
-                            'Bande dessinée': 'bd',
-                            'Manga': 'manga'
-                        }
-                    } %} #}
-
-                    {# {% for main, subcats in categories %}
-                        <optgroup label="{{ main }}">
-                            {% for label, value in subcats %}
-                                <option value="{{ value }}"
-                                    {% if app.request.get('category') == value %}selected{% endif %}>
-                                    {{ label }}
-                                </option>
-                            {% endfor %}
-                        </optgroup>
-                    {% endfor %}
-                </select> #}
 
                 <label>Date de parution :</label>
                 <select name="date">
@@ -157,12 +98,18 @@
         <main class="resultats">
 
             {# Formulaire de recherche #}
-            <form class="search-bar" action="{{ path('app_recherche_livre') }}" method="get">
-                <input type="text" name="q" placeholder="Rechercher un livre, un auteur..." required>
-                <button type="submit">
-                <i class="bi bi-search"></i>
+            <div class="search-bar-container">
+                <form class="search-bar" action="{{ path('app_recherche_livre') }}" method="get">
+                    <input type="text" name="q" placeholder="Rechercher un livre, un auteur..." required>
+                    <button type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
+
+                <button id="open-filtres" class="btn-filtres-mobile">
+                    ☰ Filtres
                 </button>
-            </form>
+            </div>
 
             <h2>Résultats pour “{{ app.request.get('q') }}”</h2>
 
@@ -256,6 +203,8 @@
         </aside>
 
     </div>
+
+    <div id="filtres-overlay" class="filtres-overlay hidden"></div>
 
     {% block javascripts %}
         {{ parent() }}

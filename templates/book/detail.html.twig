@@ -3,6 +3,7 @@
 {% block title %}{{ book.title }}{% endblock %}
 
 {% block stylesheets %}
+    {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/book/detail.css') }}">
 {% endblock %}
 

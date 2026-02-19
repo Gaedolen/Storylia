@@ -4,6 +4,7 @@
 
 {% block head %}
     {% block stylesheets %}
+        {{ parent() }}
         <link rel="stylesheet" href="{{ asset('css/employe/utilisateurs_signales.css') }}">
     {% endblock %}
 {% endblock %}

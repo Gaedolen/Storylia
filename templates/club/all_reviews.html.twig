@@ -3,7 +3,8 @@
 {% block title %}Avis du livre{% endblock %}
 
 {% block stylesheets %}
-<link rel="stylesheet" href="{{ asset('css/club/all_reviews.css') }}">
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/club/all_reviews.css') }}">
 {% endblock %}
 
 {% block body %}

@@ -13,14 +13,14 @@
         <link rel="icon" href="{{ asset('images/logo2.PNG') }}" type="image/png">
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-        <!-- Fichier CSS -->
-        <link rel="stylesheet" href="{{ asset('css/base.css') }}">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
         <!-- Bootstrap CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+        <!-- Fichier CSS -->
+        <link rel="stylesheet" href="{{ asset('css/base.css') }}">
 
         <!-- Lien Bootstrap icons -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
@@ -40,84 +40,78 @@
     <body>
         <div class="page-container">
             <header class="navbar-custom">
+
+                <!-- Conteneur principal : logo à gauche, icônes à droite -->
                 <div class="container-header">
+                    <!-- LOGO -->
                     <div class="logo-left">
-                        <a href="{% if is_granted('ROLE_ADMIN') %}{{ path('admin_dashboard') }}{% elseif is_granted('ROLE_EMPLOYE') %}{{ path('employe_dashboard') }}{% else %}{{ path('app_accueil') }}{% endif %}">
+                        <a href="{% if is_granted('ROLE_ADMIN') %}{{ path('admin_dashboard') }}
+                                {% elseif is_granted('ROLE_EMPLOYE') %}{{ path('employe_dashboard') }}
+                                {% else %}{{ path('app_accueil') }}{% endif %}">
                             <img src="{{ asset('images/logo.PNG') }}" alt="Storylia" class="logo">
                         </a>
                     </div>
 
-                    <div class='menu-section'>
-
-                        <a href="{{ path('app_recherche_livre') }}" class="icon-search">
+                    <!-- ICONES MOBILE : loupe + burger -->
+                    <div class="header-icons-mobile">
+                        <a href="{{ path('app_recherche_livre') }}" class="search-icon-mobile">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </a>
-
                         <button class="burger-btn" id="burgerBtn">
                             <i class="fa-solid fa-bars"></i>
                         </button>
+                    </div>
+
+                    <!-- MENU DESKTOP -->
+                    <div class="menu-section">
 
                         <nav class="menu-nav">
                             {% if app.user %}
                                 {% if is_granted('ROLE_ADMIN') %}
                                     <a href="{{ path('admin_dashboard') }}">Accueil</a>
                                     <span class="separator">|</span>
-
                                     <a href="{{ path('admin_employes') }}">Gérer les employés</a>
                                     <span class="separator">|</span>
-
                                     <a href="{{ path('admin_gestion_utilisateurs') }}">Gérer les utilisateurs</a>
                                     <span class="separator">|</span>
-
                                     <a href="{{ path('clubs_signales') }}">Gérer les clubs problématiques</a>
                                 {% elseif is_granted('ROLE_EMPLOYE') %}
                                     <a href="{{ path('employe_dashboard') }}">Accueil</a>
                                     <span class="separator">|</span>
-
                                     <a href="#">Vérifier les livres</a>
                                     <span class="separator">|</span>
-
                                     <a href="{{ path('employe_utilisateurs_signales') }}">Signalements</a>
                                 {% else %}
                                     <a href="{{ path('app_accueil') }}">Accueil</a>
                                     <span class="separator">|</span>
-
                                     <a href="{{ path('club_index') }}">Club Lecture</a>
                                     <span class="separator">|</span>
-
                                     <a href="{{ path('app_recherche_livre') }}">Livres</a>
                                     <span class="separator">|</span>
-
                                     <a href="#">Contact</a>
                                 {% endif %}
 
-                                <!-- Liens communs à tous les utilisateurs connectés -->
+                                <!-- Liens communs -->
                                 <span class="separator">|</span>
                                 <a href="{{ path('app_profil') }}">Mon profil</a>
-
                                 <span class="separator">|</span>
                                 <a href="{{ path('logout') }}">Déconnexion</a>
 
-                                {% else %}
-                                <!-- Utilisateur non connecté -->
+                            {% else %}
                                 <a href="{{ path('app_accueil') }}">Accueil</a>
                                 <span class="separator">|</span>
-
                                 <a href="{{ path('app_login') }}">Club Lecture</a>
                                 <span class="separator">|</span>
-
                                 <a href="{{ path('app_recherche_livre') }}">Livres</a>
                                 <span class="separator">|</span>
-
                                 <a href="{{ path('nous_contacter') }}">Contact</a>
                                 <span class="separator">|</span>
-                                
                                 <a href="{{ path('app_login') }}">Se connecter</a>
                             {% endif %}
                         </nav>
 
-                        {# Formulaire de recherche #}
-                        <form class="search-bar" action="{{ path('app_recherche_livre') }}" method="get">
+                        <!-- Barre de recherche desktop -->
+                        <form class="search" action="{{ path('app_recherche_livre') }}" method="get">
                             <input type="text" name="q" placeholder="Rechercher un livre, un auteur..." required>
                             <button type="submit">
                                 <i class="bi bi-search"></i>
@@ -125,6 +119,36 @@
                         </form>
                     </div>
                 </div>
+
+                <!-- MENU MOBILE -->
+                <nav class="menu-nav-mobile">
+                    {% if app.user %}
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('admin_dashboard') }}">Accueil</a>
+                            <a href="{{ path('admin_employes') }}">Employés</a>
+                            <a href="{{ path('admin_gestion_utilisateurs') }}">Utilisateurs</a>
+                            <a href="{{ path('clubs_signales') }}">Clubs</a>
+                        {% elseif is_granted('ROLE_EMPLOYE') %}
+                            <a href="{{ path('employe_dashboard') }}">Accueil</a>
+                            <a href="{{ path('app_recherche_livre') }}">Vérifier livres</a>
+                            <a href="{{ path('employe_utilisateurs_signales') }}">Signalements</a>
+                        {% else %}
+                            <a href="{{ path('app_accueil') }}">Accueil</a>
+                            <a href="{{ path('club_index') }}">Club Lecture</a>
+                            <a href="{{ path('app_recherche_livre') }}">Livres</a>
+                            <a href="{{ path('nous_contacter') }}">Contact</a>
+                        {% endif %}
+                        <a href="{{ path('app_profil') }}">Profil</a>
+                        <a href="{{ path('logout') }}">Déconnexion</a>
+                    {% else %}
+                        <a href="{{ path('app_accueil') }}">Accueil</a>
+                        <a href="{{ path('app_login') }}">Club Lecture</a>
+                        <a href="{{ path('app_recherche_livre') }}">Livres</a>
+                        <a href="{{ path('nous_contacter') }}">Contact</a>
+                        <a href="{{ path('app_login') }}">Se connecter</a>
+                    {% endif %}
+                </nav>
+
             </header>
 
             <main class="content">
@@ -170,10 +194,10 @@
 
         <script>
             const burgerBtn = document.getElementById('burgerBtn');
-            const menuNav = document.querySelector('.menu-nav');
+            const menuMobile = document.querySelector('.menu-nav-mobile');
 
             burgerBtn.addEventListener('click', () => {
-                menuNav.classList.toggle('show-menu');
+                menuMobile.classList.toggle('show-menu');
             });
         </script>
 

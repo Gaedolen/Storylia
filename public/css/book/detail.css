@@ -156,23 +156,6 @@ body {
     border-radius: 6px;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .livre-details {
-        padding: 20px;
-    }
-    .livre-details h2 {
-        font-size: 1.6rem;
-    }
-    .livre-details p strong {
-        width: 100px;
-    }
-    .livre-details .tags span {
-        font-size: 0.85rem;
-        padding: 3px 8px;
-    }
-}
-
 /* Résumé */
 .livre-resume {
     flex: 1;
@@ -533,18 +516,6 @@ a {
     cursor: pointer;
 }
 
-/* --- RESPONSIVE --- */
-@media (max-width: 450px) {
-    .modal-content {
-        width: 92%;
-        padding: 18px;
-    }
-
-    .modal-content h3 {
-        font-size: 1.2rem;
-    }
-}
-
 /* === Champs de sujet === */
 #add-subject-modal {
     display: none;
@@ -656,19 +627,6 @@ a {
     cursor: pointer;
     font-size: 1rem;
 }
-
-/* Responsive */
-@media (max-width: 450px) {
-    #add-subject-modal .modal-content {
-        width: 92%;
-        padding: 18px;
-    }
-
-    #add-subject-modal h3 {
-        font-size: 1.2rem;
-    }
-}
-
 
 /* == Modal de MAJ d'un résumé == */
 #edit-summary-modal {
@@ -782,19 +740,6 @@ a {
     color: #8b5a12;       /* couleur marron foncé assortie à ton thème */
     margin-bottom: 8px;
     font-style: italic;
-}
-
-
-/* Responsive */
-@media (max-width: 450px) {
-    #edit-summary-modal .modal-content {
-        width: 92%;
-        padding: 18px;
-    }
-
-    #edit-summary-modal h3 {
-        font-size: 1.2rem;
-    }
 }
 
 /* === Modal d'ajout à la bibliothèque === */
@@ -1050,18 +995,6 @@ a {
     cursor: not-allowed;
 }
 
-/* responsive */
-@media (max-width: 450px) {
-    #reading-date-modal .modal-content {
-        width: 92%;
-        padding: 18px;
-    }
-
-    #reading-date-modal h3 {
-        font-size: 1.2rem;
-    }
-}
-
 /* Modal de note */
 #rating-modal {
     display: none;
@@ -1164,32 +1097,6 @@ a {
     transform: translateY(-2px);
 }
 
-/* Responsive */
-@media (max-width: 450px) {
-    #rating-modal .modal-content {
-        width: 92%;
-        padding: 20px;
-    }
-    #rating-modal h3 {
-        font-size: 1.2rem;
-    }
-    #rating-modal .star {
-        font-size: 28px;
-    }
-}
-
-/* Responsive */
-@media (max-width: 450px) {
-    #bookshelf-modal .modal-content {
-        width: 92%;
-        padding: 18px;
-    }
-
-    #bookshelf-modal h3 {
-        font-size: 1.2rem;
-    }
-}
-
 /* Styles pour les <a> qui remplacent les boutons si non connecté */
 a.btn-main {
     display: inline-block;
@@ -1254,4 +1161,373 @@ a.btn-main:hover {
     display: flex;
     flex-direction: column;
     gap: 12px;
+}
+
+/* RESPONSIVE ≤ 1024px */
+@media (max-width: 1024px) {
+
+    /* Réduction globale des colonnes */
+    .book-top-block {
+        grid-template-columns: 180px 1fr 180px;
+        gap: 20px;
+        width: 95%;
+    }
+
+    .book-actions-left,
+    .book-actions-right {
+        flex: 0 0 180px;
+    }
+
+    .btn-main {
+        font-size: 0.9rem;
+        padding: 10px 12px;
+    }
+
+    /* Couverture plus petite */
+    .livre-infos img {
+        width: 200px;
+        height: 290px;
+        margin-right: 20px;
+    }
+
+    /* Bloc détails */
+    .livre-details {
+        height: 290px;
+        padding: 18px;
+        font-size: 0.9rem;
+    }
+
+    .livre-details h2 {
+        font-size: 1.3rem;
+    }
+
+    /* Résumé */
+    .livre-resume {
+        width: 90%;
+        padding: 18px;
+        font-size: 0.95rem;
+    }
+
+    /* Bloc avis */
+    .book-reviews-block {
+        gap: 25px;
+        width: 95%;
+    }
+
+    /* Bloc note */
+    .book-rating {
+        width: 150px;
+        padding: 15px;
+    }
+
+    /* Cercle SVG réduit proprement */
+    .rating-circle {
+        width: 80px;
+        height: 80px;
+    }
+
+    .rating-circle text.percentage {
+        font-size: 0.55em; /* ajuste visuellement pour rester centré */
+    }
+
+    /* Bulles avis */
+    .review-bubble {
+        padding: 15px;
+    }
+
+    .review-user {
+        width: 90px;
+    }
+
+    .review-user img {
+        width: 60px;
+        height: 60px;
+    }
+
+    .review-separator {
+        margin: 0 15px;
+    }
+
+    .review-text p {
+        font-size: 0.9rem;
+    }
+
+    /* Modales légèrement réduites */
+    .modal-content {
+        max-width: 380px;
+        padding: 20px;
+    }
+
+    #edit-summary-modal .modal-content,
+    #bookshelf-modal .modal-content {
+        max-width: 420px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+
+    /* Empiler tout verticalement */
+    .book-top-block {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center
+    }
+
+    .livre-container {
+        order: 1;
+        width: 100%;
+    }
+
+    .livre-resume {
+        order: 2;
+        width: 90%;
+    }
+
+    /* Bloc Gestion du livre */
+    .book-actions-left,
+    .bookshelf-extra-actions {
+        order: 3;
+        width: 80%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.8rem;
+        border-radius: 8px;
+        background-color: #E8CBAE;
+        position: relative;
+        box-shadow: 
+            inset 0 4px 10px rgba(0,0,0,0.15),
+            0 4px 10px rgba(0,0,0,0.15); 
+    }
+
+    /* Titre du bloc Gestion */
+    .book-actions-left::before {
+        content: "Gestion du livre";
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        display: block;
+        font-size: 1rem;
+        color: #714B2F;
+    }
+
+    /* Bloc Modification du livre */
+    .book-actions-right {
+        order: 4;
+        width: 80%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.8rem;
+        border-radius: 8px;
+        background-color: #E8CBAE;
+        position: relative;
+        box-shadow: 
+            inset 0 4px 10px rgba(0,0,0,0.15),
+            0 4px 10px rgba(0,0,0,0.15); 
+    }
+
+    /* Titre du bloc Modification */
+    .book-actions-right::before {
+        content: "Modification du livre";
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        display: block;
+        font-size: 1rem;
+        color: #714B2F;
+    }
+
+    /* Boutons pleine largeur */
+    .book-actions-left button,
+    .book-actions-right button,
+    .bookshelf-extra-actions button {
+        width: 60%;
+    }
+
+    /* Bloc Note et Avis */
+    .book-reviews-block {
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    /* Bloc Note à gauche, largeur fixe */
+    .book-rating {
+        flex: 0 0 150px; /* largeur fixe, ne s'étend pas */
+        max-width: 150px;
+        align-self: flex-start;
+    }
+
+    /* Bloc Avis à droite, prend le reste */
+    .book-reviews {
+        flex: 1;
+    }
+
+    /* Ajuster le SVG de la note pour qu’il reste à l’intérieur */
+    .book-rating svg {
+        width: 100%;
+        height: auto;
+    }
+
+    /* Image et infos en colonne */
+    .livre-infos {
+        flex-direction: row;
+        gap: 1rem;
+    }
+
+    .livre-infos img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .livre-details {
+        width: 100%;
+    }
+
+    .tags {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 480px) {
+
+    /* Empiler tout verticalement et centrer les blocs */
+    .book-top-block {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    /* Livre + résumé */
+    .livre-container {
+        order: 1;
+        width: 100%;
+    }
+
+    .livre-resume {
+        order: 2;
+        width: 95%;
+    }
+
+    /* Bloc Gestion du livre */
+    .book-actions-left,
+    .bookshelf-extra-actions {
+        order: 3;
+        width: 90%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.8rem;
+        border-radius: 8px;
+        background-color: #E8CBAE;
+        position: relative;
+        box-shadow: 
+            inset 0 4px 10px rgba(0,0,0,0.15),
+            0 4px 10px rgba(0,0,0,0.15); 
+    }
+
+    .book-actions-left::before {
+        content: "Gestion du livre";
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        display: block;
+        font-size: 0.9rem; /* légèrement réduit */
+        color: #714B2F;
+    }
+
+    /* Bloc Modification du livre */
+    .book-actions-right {
+        order: 4;
+        width: 90%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.8rem;
+        border-radius: 8px;
+        background-color: #E8CBAE;
+        position: relative;
+        box-shadow: 
+            inset 0 4px 10px rgba(0,0,0,0.15),
+            0 4px 10px rgba(0,0,0,0.15); 
+    }
+
+    .book-actions-right::before {
+        content: "Modification du livre";
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        display: block;
+        font-size: 0.9rem; /* légèrement réduit */
+        color: #714B2F;
+    }
+
+    /* Boutons pleine largeur réduite */
+    .book-actions-left button,
+    .book-actions-right button,
+    .bookshelf-extra-actions button {
+        width: 70%;
+    }
+
+    /* Bloc Note et Avis : empilé mais Note centré verticalement entre Modif et Avis */
+    .book-reviews-block {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        width: 95%;
+        align-items: center;
+        position: relative;
+    }
+
+    /* Bloc Note centré verticalement par rapport aux autres */
+    .book-rating {
+        flex: 0 0 120px; /* largeur fixe plus petite */
+        max-width: 140px;
+        width: 100%;
+        margin: 0 auto; /* centre horizontal */
+        /* Pour espacer du bloc modif et du bloc avis */
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .book-reviews {
+        flex: 1;
+        width: 100%;
+    }
+
+    .book-rating svg {
+        width: 100%;
+        height: auto;
+    }
+
+    /* Infos livre : image + détails en colonne */
+    .livre-infos {
+        flex-direction: row;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .livre-infos img {
+        width: 120px;      /* largeur fixe adaptée aux petits écrans */
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px; /* optionnel : pour un look plus léger */
+    }
+
+    .livre-details {
+        width: 100%;
+        text-align: center;
+        font-size: 0.85rem; /* légèrement réduit pour le bloc infos */
+    }
+
+    .tags {
+        width: 100%;
+        justify-content: center;
+        font-size: 0.75rem; /* aussi réduit */
+    }
 }

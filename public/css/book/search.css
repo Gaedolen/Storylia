@@ -70,6 +70,10 @@ h2, h3 {
     background-color: #a65d42;
 }
 
+#close-filtres {
+    display: none;
+}
+
 /* === Bouton "Vous ne trouvez pas votre livre ?" === */
 .btn-ajouter-livre {
     margin-top: 20px;
@@ -559,16 +563,247 @@ h2, h3 {
     text-decoration: underline;
 }
 
+.btn-filtres-mobile {
+    display: none;
+}
+
+
 /* ======= RESPONSIVE ======= */
-@media (max-width: 992px) {
+@media (max-width: 1024px) {
+
+    /* Layout principal */
     .recherche-container {
-        grid-template-columns: 1fr;
-        padding: 30px 20px;
+        grid-template-columns: 200px 1fr 200px;
+        gap: 20px;
+        padding: 30px 25px;
     }
-    .filtres, .auteurs {
-        position: static;
-    }
+
+    /* Titres un peu plus compacts */
     .resultats h2 {
-        text-align: center;
+        font-size: 1.5rem;
+    }
+
+    /* Cartes livres un peu plus compactes */
+    .livre-card {
+        flex-direction: row;
+    }
+
+    .cover {
+        width: 100px;
+        height: 150px;
+    }
+
+    .info {
+        padding: 12px 14px;
+    }
+
+    .info .title {
+        font-size: 1.1rem;
+    }
+
+    .info .author {
+        font-size: 0.9rem;
+    }
+
+    /* Sidebar filtres + auteurs plus légers */
+    .filtres,
+    .auteurs {
+        padding: 15px;
+    }
+
+    .filtres h3,
+    .auteurs h3 {
+        font-size: 1.1rem;
+    }
+
+    #close-filtres {
+        display: none;
+    }
+
+    /* Barre de recherche plus large */
+    .search-bar {
+        max-width: 100%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+
+    /* ===== Layout principal ===== */
+
+    .recherche-container {
+        display: block;
+        padding: 15px;
+    }
+
+    main.resultats {
+        width: 100%;
+    }
+
+    .auteurs {
+        margin-top: 40px;
+    }
+
+    /* ===== Bouton Filtres Mobile ===== */
+    .search-bar-container {
+        display: flex;
+        flex-direction: column;   /* barre puis bouton */
+        align-items: flex-start;  /* bouton à gauche */
+        gap: 5px;                 /* espace entre barre et bouton */
+    }
+
+    .btn-filtres-mobile {
+        padding: 5px 10px;
+        font-size: 13px;
+        background-color: #C97C5D;
+        color: #fff;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: background 0.2s;
+        display: inline-block;
+    }
+
+    .btn-filtres-mobile:hover {
+        background-color: #B46749;
+    }
+
+    /* ===== Drawer Filtres ===== */
+
+    .filtres {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 280px;
+        height: 100vh;
+        background: white;
+        z-index: 1000;
+        padding: 25px 20px;
+        overflow-y: auto;
+        transition: left 0.3s ease;
+        box-shadow: 2px 0 15px rgba(0,0,0,0.2);
+    }
+
+    .filtres.active {
+        left: 0;
+    }
+
+    /* Bouton fermeture interne */
+    .close-filtres {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 22px;
+        cursor: pointer;
+    }
+
+    /* ===== Overlay ===== */
+
+    .filtres-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.4);
+        z-index: 900;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    /* ===== Search bar responsive ===== */
+
+    .search-bar {
+        display: flex;
+        gap: 5px;
+    }
+
+    .search-bar input {
+        flex: 1;
+    }
+
+    /* ===== Cards livres ===== */
+
+    .livres-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .livre-card {
+        display: flex;
+        gap: 15px;
+    }
+
+    .livre-card .cover {
+        width: 80px;
+        height: 120px;
+        flex-shrink: 0;
+        overflow: hidden;
+        border-radius: 6px;
+        background-color: #f0e6da;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .livre-card .cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    /* ===== Pagination ===== */
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+
+}
+
+@media screen and (max-width: 480px) {
+
+    .livre-card {
+        display: flex;
+        gap: 10px;           /* espace entre image et texte */
+        align-items: center; /* centre verticalement la carte */
+        padding: 8px;
+    }
+
+    .livre-card .cover {
+        width: 60px;         /* plus petite sur mobile */
+        height: 90px;        /* ratio classique 2:3 */
+        flex-shrink: 0;
+        overflow: hidden;
+        border-radius: 6px;
+        background-color: #f0e6da;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .livre-card .cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;       /* garde le crop propre */
+        object-position: center; /* centre le contenu */
+    }
+
+    .info {
+        padding: 8px 10px;       /* moins d’espace sur mobile */
+    }
+
+    .info .title {
+        font-size: 1rem;
+    }
+
+    .info .author {
+        font-size: 0.85rem;
     }
 }
