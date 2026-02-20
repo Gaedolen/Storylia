@@ -249,21 +249,356 @@ h2 {
     font-size: 0.75rem;
 }
 
-
-/* === Responsive === */
 @media (max-width: 1024px) {
+
+    .clubs-container {
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .profil-menu-horizontal {
+        gap: 20px;
+        padding: 8px 12px;
+        margin: 15px 0 8px 15px;
+        border-radius: 18px;
+    }
+
+    .profil-user img {
+        width: 55px;
+        height: 55px;
+    }
+
+    .profil-user .pseudo {
+        font-size: 0.95rem;
+    }
+
+    .profil-links {
+        gap: 8px;
+    }
+
+    .profil-links li a {
+        padding: 7px 10px;
+        font-size: 0.9rem;
+    }
+
+    .profile-clubs-container {
+        padding: 15px;
+        margin: 20px auto;
+    }
+
+    .profile-clubs-container h2 {
+        font-size: 22px;
+        margin-bottom: 12px;
+    }
+
+    .listing-container {
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .clubs-header {
+        gap: 12px;
+        max-width: 100%;
+        padding-right: 5px;
+        margin-bottom: 12px;
+    }
+
+    .clubs-header h2 {
+        font-size: 20px;
+    }
+
+    .btn-create-club {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        border-radius: 22px;
+    }
+
     .clubs-list {
-        flex-direction: column;
+        gap: 15px;
+    }
+
+    /* Carte club */
+    .club-card {
+        flex-direction: row;       /* on garde l'image à gauche */
+        padding: 12px;
+        gap: 12px;
+        max-width: 100%;
+    }
+
+    .club-card-left img,
+    .club-photo-placeholder {
+        width: 120px;
+        height: 120px;
+    }
+
+    .club-card-meta {
+        font-size: 12px;
+        gap: 3px;
+    }
+
+    .club-card-right h3 {
+        font-size: 20px;
+        margin-bottom: 8px;
+    }
+
+    .club-description {
+        font-size: 13px;
+        min-height: 50px;
+        padding: 8px;
+    }
+
+    .pref-badge {
+        font-size: 12px;
+        padding: 3px 6px;
+    }
+
+    /* Clubs inactifs */
+    .inactive-label {
+        font-size: 0.7rem;
+        padding: 2px 5px;
     }
 }
 
-@media (max-width: 425px) {
-    .club-card {
+@media (max-width: 768px) {
+
+    .profil-menu-horizontal {
+        gap: 15px;
+        padding: 7px 10px;
+        margin: 12px 0 6px 12px;
+        border-radius: 15px;
+    }
+
+    .profil-user img {
+        width: 48px;
+        height: 48px;
+    }
+
+    .profil-user .pseudo {
+        font-size: 0.85rem;
+    }
+
+    .profil-links {
+        gap: 6px;
+    }
+
+    .profil-links li a {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+        border-radius: 10px;
+    }
+
+    /* Conteneurs */
+    .clubs-container,
+    .profile-clubs-container,
+    .listing-container {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    /* Header (titre + bouton) */
+    .clubs-header {
+        display: flex;
         flex-direction: column;
-        align-items: center;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .clubs-header h2 {
+        font-size: 18px;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .btn-create-club {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+        border-radius: 20px;
+    }
+
+    /* Liste */
+    .clubs-list {
+        gap: 15px;
+    }
+
+    /* Carte club */
+    .club-card {
+        display: flex;
+        flex-direction: column;   /* image au-dessus */
+        width: 100%;
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .club-card-left {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .club-card-left img,
+    .club-photo-placeholder {
+        width: 100%;
+        max-width: 250px;
+        height: auto;
+        border-radius: 12px;
     }
 
     .club-card-right {
         width: 100%;
+    }
+
+    .club-card-right h3 {
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+
+    .club-description {
+        font-size: 13px;
+        padding: 8px;
+        min-height: auto;
+    }
+
+    .club-card-meta {
+        font-size: 12px;
+        gap: 4px;
+    }
+
+    .pref-badge {
+        font-size: 11px;
+        padding: 3px 6px;
+    }
+
+    .inactive-label {
+        font-size: 0.7rem;
+        padding: 2px 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profil-menu-horizontal {
+        gap: 10px;
+        padding: 6px 8px;
+        margin: 10px 0 5px 10px;
+        border-radius: 12px;
+    }
+
+    .profil-user img {
+        width: 42px;
+        height: 42px;
+        border-width: 2px;
+    }
+
+    .profil-user .pseudo {
+        font-size: 0.75rem;
+    }
+
+    .profil-links {
+        gap: 5px;
+    }
+
+    .profil-links li a {
+        padding: 5px 7px;
+        font-size: 0.7rem;
+        border-radius: 8px;
+    }
+
+    .clubs-container,
+    .profile-clubs-container,
+    .listing-container {
+        padding: 8px;
+        gap: 12px;
+    }
+
+    /* Header (titre + bouton) */
+    .clubs-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .clubs-header h2 {
+        font-size: 18px;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .btn-create-club {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+        border-radius: 20px;
+    }
+
+    /* Liste */
+    .clubs-list {
+        gap: 12px;
+    }
+
+    /* Carte club */
+    .club-card {
+        flex-direction: row;       /* image à gauche, texte à droite */
+        width: 100%;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    /* Bloc gauche (image + méta) */
+    .club-card-left {
+        flex: 0 0 100px;           /* largeur fixe pour l'image */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .club-card-left img,
+    .club-photo-placeholder {
+        width: 100px;
+        height: 100px;
+        border-radius: 10px;
+        object-fit: cover;
+    }
+
+    .club-card-meta {
+        font-size: 10px;
+        gap: 2px;
+        text-align: center;
+    }
+
+    /* Bloc droit (titre + description + badges) */
+    .club-card-right {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .club-card-right h3 {
+        font-size: 16px;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .club-description {
+        font-size: 12px;
+        padding: 6px;
+        min-height: 50px;
+    }
+
+    .club-preferences {
+        gap: 4px;
+    }
+
+    .pref-badge {
+        font-size: 10px;
+        padding: 2px 5px;
+    }
+
+    /* Label inactif */
+    .inactive-label {
+        font-size: 0.7rem;
+        padding: 2px 4px;
     }
 }

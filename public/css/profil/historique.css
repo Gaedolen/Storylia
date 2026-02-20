@@ -208,6 +208,8 @@ nav.profil-menu-horizontal .profil-links li a:active {
     width: 180px;
     height: 280px;
     object-fit: cover;
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.25);
 }
 
@@ -275,142 +277,313 @@ nav.profil-menu-horizontal .profil-links li a:active {
     color: #8b5a2e;
 }
 
-/* --- Responsive --- */
-/* Mobile */
-@media (max-width: 425px) {
-    /* Masquer la photo et le pseudo du menu */
-    .profil-user {
-        display: none;
+@media (max-width: 1024px) {
+
+    /* Conteneur général */
+    .historique-container {
+        padding: 15px;
+        gap: 15px;
     }
 
-    /* Menu horizontal verticalisé */
     .profil-menu-horizontal {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-        padding: 10px;
+        gap: 20px;
+        padding: 8px 12px;
+        margin: 15px 0 8px 15px;
+        border-radius: 18px;
     }
 
-    /* Liens du menu plus petits */
+    .profil-user img {
+        width: 55px;
+        height: 55px;
+    }
+
+    .profil-user .pseudo {
+        font-size: 0.95rem;
+    }
+
+    .profil-links {
+        gap: 8px;
+    }
+
     .profil-links li a {
-        font-size: 13px;
-        padding: 6px 10px;
+        padding: 7px 10px;
+        font-size: 0.9rem;
     }
 
-    /* Cartes livres simplifiées */
-    .book-card {
-        flex-direction: column;
-        align-items: center;
-        width: 120px;
-        height: auto;
-        margin: 10px;
-        padding: 0;
-        background: none;
-        box-shadow: none;
-        border-radius: 0;
+    /* Grille historique */
+    .grid-historique {
+        gap: 15px;
     }
 
-    .book-card .cover img {
-        width: 100px;
-        height: 150px;
-        object-fit: cover;
-        margin-bottom: 5px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    /* Année */
+    .year-card h3 {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
     }
 
-    .book-card .info {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 0;
-        background: none;
-        width: 100%;
-        text-align: center;
-        height: auto;
-        background: none;
-        flex-direction: column;
-        box-shadow: none;
+    .year-card {
+        padding: 8px;
+        margin-bottom: 15px;
     }
 
-    .book-card .info h3 {
-        display: block;
-        font-size: 14px;
-        font-weight: 600;
-        margin: 0;
+    /* Mois */
+    .month-card {
+        padding: 10px;
+        border-radius: 14px;
+        margin-bottom: 10px;
     }
 
-    .book-card .info h3 a {
-        color: #FAF3E0 !important;
-        text-decoration: none;
+    .month-card h4 {
+        font-size: 0.95rem;
+        margin-bottom: 6px;
     }
 
-    /* Masquer uniquement les p et reading-date */
-    .book-card .info p,
-    .book-card .info .reading-date {
-        display: none !important;
-    }
-
-    /* Ajuster grille historique */
+    /* Livres du mois */
     .month-books {
-        justify-content: center;
+        gap: 12px;
+    }
+
+    .book-card {
+        width: 280px;
+        height: 200px;
+        margin: 10px;
+        flex-direction: row;
+    }
+
+    .cover img {
+        width: 120px;
+        height: 200px;
+    }
+
+    .info {
+        height: 200px;
+        padding: 6px;
+    }
+
+    .info h3 {
+        font-size: 16px;
+    }
+
+    .info p {
+        font-size: 13px;
+    }
+
+    .reading-date {
+        font-size: 0.8rem;
+    }
+
+    /* Flèches */
+    .arrow-icon {
+        width: 22px;
+        height: 22px;
+    }
+
+    .month-header .arrow-icon {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* Conteneur général */
+    .historique-container {
+        padding: 10px;
         gap: 10px;
-        flex-wrap: wrap;
+    }
+
+    .profil-menu-horizontal {
+        gap: 15px;
+        padding: 7px 10px;
+        margin: 12px 0 6px 12px;
+        border-radius: 15px;
+    }
+
+    .profil-user img {
+        width: 48px;
+        height: 48px;
+    }
+
+    .profil-user .pseudo {
+        font-size: 0.85rem;
+    }
+
+    .profil-links {
+        gap: 6px;
+    }
+
+    .profil-links li a {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+        border-radius: 10px;
+    }
+
+    .grid-historique {
+        gap: 12px;
+    }
+
+    .month-books {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* 3 cartes par ligne */
+        gap: 12px;
+    }
+
+    .book-card {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        height: 200px;  /* hauteur fixe pour toutes les cartes */
+        margin: 0;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .cover {
+        flex: 0 0 120px;   /* largeur fixe proportionnelle */
+        height: 100%;      /* prend toute la hauteur de la carte */
+        overflow: hidden;
+        border-radius: 12px 0 0 12px;
+    }
+
+    .cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;  /* couverture remplie et centrée */
+        display: block;
+    }
+
+    .info {
+        flex: 1;
+        height: 100%;      /* même hauteur que la carte */
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border-radius: 0 12px 12px 0;
+        background-color: #fff8f0;
+        box-shadow:
+            inset -4px 0 8px rgba(0,0,0,0.1),
+            4px 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .info h3 {
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+
+    .info p {
+        font-size: 11px;
+        margin-bottom: 3px;
+    }
+
+    .reading-date {
+        font-size: 0.75rem;
+    }
+
+    .arrow-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .month-header .arrow-icon {
+        width: 16px;
+        height: 16px;
     }
 }
 
-/* Tablette */
-@media (min-width: 426px) and (max-width: 1024px) {
-    .profil-menu-horizontal { 
-        flex-direction: row; 
-        flex-wrap: wrap; 
-        gap: 15px; 
+@media (max-width: 480px) {
+        .profil-menu-horizontal {
+        gap: 10px;
+        padding: 6px 8px;
+        margin: 10px 0 5px 10px;
+        border-radius: 12px;
     }
 
-    .profil-links { 
-        flex-wrap: wrap; 
-        gap: 10px; 
+    .profil-user img {
+        width: 42px;
+        height: 42px;
+        border-width: 2px;
     }
 
-    .month-books { 
-        justify-content: flex-start; 
+    .profil-user .pseudo {
+        font-size: 0.75rem;
     }
 
-    .book-card { 
-        flex-direction: row; 
-        width: 48%; 
-        height: 250px; 
-        margin: 10px 1%; 
+    .profil-links {
+        gap: 5px;
     }
 
-    .book-card .cover img { 
-        width: 120px; 
-        height: 180px; 
+    .profil-links li a {
+        padding: 5px 7px;
+        font-size: 0.7rem;
+        border-radius: 8px;
     }
 
-    .book-card .info { 
-        padding: 10px; 
-        height: 180px; 
-    }
-}
-
-/* Desktop */
-@media (min-width: 1025px) {
-    .month-books { 
-        justify-content: flex-start; 
+    .month-books {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* 2 cartes par ligne */
+        gap: 10px;
     }
 
-    .book-card { 
-        width: 400px; 
-        height: 280px; 
-        flex-direction: row; 
-        margin: 10px; 
+    .book-card {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        height: 180px;  /* hauteur fixe adaptée au mobile */
+        margin: 0;
+        border-radius: 10px;
+        overflow: hidden;
     }
 
-    .book-card .cover img { 
-        width: 180px; 
-        height: 280px; 
+    .cover {
+        flex: 0 0 100px;   /* largeur proportionnelle réduite */
+        height: 100%;
+        overflow: hidden;
+        border-radius: 10px 0 0 10px;
     }
-    .book-card .info { 
-        height: 240px; 
+
+    .cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;  /* couverture remplie et centrée */
+        display: block;
+    }
+
+    .info {
+        flex: 1;
+        height: 100%;
+        padding: 6px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border-radius: 0 10px 10px 0;
+        background-color: #fff8f0;
+        box-shadow:
+            inset -3px 0 6px rgba(0,0,0,0.08),
+            3px 3px 6px rgba(0,0,0,0.06);
+    }
+
+    .info h3 {
+        font-size: 13px;
+        margin-bottom: 3px;
+    }
+
+    .info p {
+        font-size: 11px;
+        margin-bottom: 2px;
+    }
+
+    .reading-date {
+        font-size: 0.7rem;
+    }
+
+    .arrow-icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .month-header .arrow-icon {
+        width: 14px;
+        height: 14px;
     }
 }

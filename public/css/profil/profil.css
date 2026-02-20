@@ -844,35 +844,34 @@ nav.profil-menu-horizontal .profil-links li a:active {
     fill: none;
 }
 
+.progress-bar-mobile {
+    display: none;
+}
 
-/* --- RESPONSIVE TABLETTE & MOBILE --- */
 @media (max-width: 1024px) {
-    /* Conteneur principal */
-    .profil-container {
-        padding: 15px;
-        gap: 15px;
-    }
-
-    /* Menu profil horizontal */
     .profil-menu-horizontal {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
-    }
-
-    /* Photo et pseudo */
-    .profil-user {
-        flex-direction: row;
-        gap: 10px;
+        gap: 20px;
+        padding: 8px 12px;
+        margin: 15px 0 8px 15px;
+        border-radius: 18px;
     }
 
     .profil-user img {
-        width: 50px;
-        height: 50px;
+        width: 55px;
+        height: 55px;
     }
 
     .profil-user .pseudo {
-        font-size: 1rem;
+        font-size: 0.95rem;
+    }
+
+    .profil-links {
+        gap: 8px;
+    }
+
+    .profil-links li a {
+        padding: 7px 10px;
+        font-size: 0.9rem;
     }
 
     /* Grid principal */
@@ -881,38 +880,117 @@ nav.profil-menu-horizontal .profil-links li a:active {
         gap: 15px;
     }
 
+    .grid-profil > div {
+        margin-bottom: 25px;
+    }
+
     /* Lecture en cours et dernières lectures */
+    /* Bloc lecture en cours plus compact */
     .reading-row {
-        flex-direction: column;
-        gap: 15px;
+        display: flex;
+        flex-direction: column !important;
+        align-items: stretch;
+        gap: 25px;
     }
 
-    /* Cercle de progression */
-    .circle-wrapper, #progressContainer {
-        width: 140px;
-        height: 140px;
+    .lecture-cover img {
+        width: 160px;   /* avant 200px */
     }
 
-    #progressContainer.large {
-        width: 160px;
-        height: 160px;
+    .lecture-info h4 {
+        font-size: 1.2rem;
     }
 
-    .progress-input {
-        width: 60px;
-        font-size: 14px;
+    .lecture-info p {
+        font-size: 1rem;
     }
 
-    .progress-percent {
-        font-size: 14px;
+    .card {
+        padding: 15px;
     }
 
+    /* Masquer cercle desktop */
+    #progressContainer,
+    #percentageDisplay,
     #updateProgressBtn {
-        font-size: 0.8rem;
-        padding: 4px 8px;
+        display: none;
     }
 
-    #progressContainer { --scale: 0.85; }
+    /* Barre mobile responsive */
+    .progress-bar-mobile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    .progress-bar-inputs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .progress-input-mobile {
+        width: 60px;
+        padding: 6px;
+        font-size: 0.95rem;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .total-pages-text-mobile {
+        font-size: 0.95rem;
+        align-self: center;
+    }
+
+    /* Conteneur barre avec bordure */
+    .progress-bar-track {
+        width: 90%;
+        height: 20px;
+        border-radius: 12px;
+        position: relative;
+        background-color: #fff; /* partie non lue */
+        border: 2px solid #C97C5D; /* bordure orange */
+        overflow: hidden;
+    }
+
+    /* Partie lue en orange */
+    .progress-bar-fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        background-color: #C97C5D;
+        z-index: 2;
+        border-radius: 12px 0 0 12px;
+        transition: width 0.5s ease;
+    }
+
+    .progress-bar-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .progress-percent-mobile {
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    .progress-btn-mobile {
+        padding: 6px 12px;
+        font-size: 0.95rem;
+        cursor: pointer;
+        background-color: #C97C5D;
+        color: white;
+        border: none;
+        border-radius: 5px;
+    }
 
     /* Carousel */
     .carousel-wrapper {
@@ -931,24 +1009,61 @@ nav.profil-menu-horizontal .profil-links li a:active {
 }
 
 @media (max-width: 768px) {
-    /* Menu et navigation */
     .profil-menu-horizontal {
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
+        gap: 15px;
+        padding: 7px 10px;
+        margin: 12px 0 6px 12px;
+        border-radius: 15px;
+    }
+
+    .profil-user img {
+        width: 48px;
+        height: 48px;
+    }
+
+    .profil-user .pseudo {
+        font-size: 0.85rem;
+    }
+
+    .profil-links {
+        gap: 6px;
+    }
+
+    .profil-links li a {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+        border-radius: 10px;
+    }
+
+    /* Grid profil */
+    .grid-profil {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
     }
 
     /* Lecture en cours */
+    .current-reading {
+        flex: 0 0 auto;
+    }
+
+    .lecture-container {
+        flex-direction: row;
+        align-items: center;
+        gap: 20px;
+        padding-right: 0;
+    }
+
     .lecture-cover img {
         width: 180px;
     }
 
     .lecture-info h4 {
-        font-size: 1.4rem;
+        font-size: 1.3rem;
     }
 
     .lecture-info p {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
 
     /* Cercle de progression */
@@ -957,28 +1072,47 @@ nav.profil-menu-horizontal .profil-links li a:active {
         height: 120px;
     }
 
+    #progressContainer.large {
+        width: 150px;
+        height: 150px;
+    }
+
+    .progress-center {
+        max-width: 90px;
+    }
+
     .progress-input {
-        width: 50px;
-        font-size: 13px;
+        width: 60px;
+        font-size: 0.85rem;
+    }
+
+    .total-pages-text {
+        font-size: 10px;
     }
 
     .progress-percent {
-        font-size: 12px;
-    }
-
-    #progressContainer.large {
-        width: 140px;
-        height: 140px;
+        font-size: 14px;
     }
 
     #updateProgressBtn {
-        font-size: 0.75rem;
-        padding: 3px 6px;
+        padding: 4px 8px;
+        font-size: 0.8rem;
     }
 
-    #progressContainer { --scale: 0.70; }
+    /* Bloc carrousel */
+    .last-read .carousel-wrapper {
+        width: 100%;
+        max-width: 95%;
+        padding: 30px 20px;
+        margin: 0 auto;
+        box-shadow: 0 4px 12px rgba(113,75,47,0.2);
+    }
 
-    /* Carousel */
+    .carousel-books-row {
+        gap: 12px;
+        justify-content: center;
+    }
+
     .carousel-card {
         width: 120px;
         height: 200px;
@@ -988,65 +1122,147 @@ nav.profil-menu-horizontal .profil-links li a:active {
         max-height: 130px;
     }
 
+    .carousel-card .card-title {
+        font-size: 0.75rem;
+    }
+
+    .carousel-card .card-text {
+        font-size: 0.65rem;
+    }
+
+    /* Flèches carousel plus petites */
     .carousel-control-prev,
     .carousel-control-next {
-        width: 30px;
-        height: 30px;
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
     }
 
-    .carousel-control-prev { left: 5px; }
-    .carousel-control-next { right: 5px; }
-}
-
-@media (max-width: 576px) {
-    /* Menu et navigation */
-    .profil-user {
-        flex-direction: row;
-        align-items: center;
-        gap: 8px;
+    /* Cartes générales */
+    .card {
+        padding: 15px;
+        border-radius: 20px;
     }
 
-    .profil-user img {
-        width: 45px;
-        height: 45px;
+    .card h3 {
+        font-size: 1.2rem;
     }
 
-    .profil-user .pseudo {
+    /* Bloc infos perso */
+    .personal-info {
+        padding: 15px;
+        border-radius: 20px;
+    }
+
+    .personal-info-header h3 {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+
+    /* Info grid */
+    .info-grid {
+        gap: 10px;
+    }
+
+    .info-item {
+        padding: 10px 12px;
+        border-radius: 12px;
+    }
+
+    .info-item i {
+        font-size: 1.1rem;
+    }
+
+    .info-item .value {
+        font-size: 0.85rem;
+    }
+
+    /* Présentation */
+    .presentation {
+        padding: 15px;
+    }
+
+    .presentation h4 {
+        font-size: 1rem;
+    }
+
+    .presentation p {
         font-size: 0.9rem;
     }
 
+    /* Lien bibliothèque */
+    .link-card {
+        padding: 10px 12px;
+    }
+
+    .link-card .label {
+        font-size: 0.9rem;
+    }
+
+    .link-card .value {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
     .profil-menu-horizontal {
+        gap: 10px;
+        padding: 6px 8px;
+        margin: 10px 0 5px 10px;
+        border-radius: 12px;
+    }
+
+    .profil-user img {
+        width: 42px;
+        height: 42px;
+        border-width: 2px;
+    }
+
+    .profil-user .pseudo {
+        font-size: 0.75rem;
+    }
+
+    .profil-links {
         gap: 5px;
-        flex-wrap: wrap;
-        justify-content: center;
+    }
+
+    .profil-links li a {
+        padding: 5px 7px;
+        font-size: 0.7rem;
+        border-radius: 8px;
+    }
+
+    /* Grid profil → empilement */
+    .grid-profil {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
     }
 
     /* Lecture en cours */
+    .lecture-container {
+        flex-direction: row;
+        align-items: center;
+        gap: 15px;
+        padding-right: 0;
+    }
+
     .lecture-cover img {
         width: 140px;
     }
 
     .lecture-info h4 {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
 
     .lecture-info p {
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
 
     /* Cercle de progression */
     .circle-wrapper, #progressContainer {
-        width: 100px;
-        height: 100px;
-    }
-
-    .progress-input {
-        width: 40px;
-        font-size: 12px;
-    }
-
-    .progress-percent {
-        font-size: 11px;
+        width: 90px;
+        height: 90px;
     }
 
     #progressContainer.large {
@@ -1054,40 +1270,133 @@ nav.profil-menu-horizontal .profil-links li a:active {
         height: 120px;
     }
 
-    #updateProgressBtn {
-        font-size: 0.7rem;
-        padding: 2px 5px;
+    .progress-center {
+        max-width: 70px;
     }
 
-    #progressContainer { --scale: 0.55; }
+    .progress-input {
+        width: 50px;
+        font-size: 0.75rem;
+    }
 
-    /* Carousel */
-    .carousel-wrapper {
-        padding: 20px 10px;
-        margin: 0 10px;
+    .total-pages-text {
+        font-size: 9px;
+    }
+
+    .progress-percent {
+        font-size: 12px;
+    }
+
+    #updateProgressBtn {
+        padding: 3px 6px;
+        font-size: 0.75rem;
+    }
+
+    /* Bloc carrousel */
+    .last-read .carousel-wrapper {
+        width: 100%;
+        max-width: 95%;
+        padding: 20px 15px;
+        margin: 0 auto;
+        box-shadow: 0 3px 10px rgba(113,75,47,0.2);
+    }
+
+    .carousel-books-row {
+        gap: 8px;
+        justify-content: flex-start;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
     }
 
     .carousel-card {
+        flex: 0 0 auto;
         width: 100px;
-        height: 180px;
+        height: 160px;
+        scroll-snap-align: start;
     }
 
     .carousel-card img {
         max-height: 100px;
     }
 
-    .carousel-control-prev,
-    .carousel-control-next {
-        width: 25px;
-        height: 25px;
+    .carousel-card .card-title {
+        font-size: 0.65rem;
     }
 
-    .carousel-control-prev { left: 3px; }
-    .carousel-control-next { right: 3px; }
+    .carousel-card .card-text {
+        font-size: 0.6rem;
+    }
 
-    /* Lecture row empilée */
-    .reading-row {
-        flex-direction: column;
-        gap: 10px;
+    /* Flèches carousel plus petites */
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 24px;
+        height: 24px;
+        font-size: 0.7rem;
+    }
+
+    /* Cartes générales */
+    .card {
+        padding: 10px;
+        border-radius: 15px;
+    }
+
+    .card h3 {
+        font-size: 1rem;
+    }
+
+    /* Bloc infos perso */
+    .personal-info {
+        padding: 10px;
+        border-radius: 15px;
+    }
+
+    .personal-info-header h3 {
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+
+    /* Info grid */
+    .info-grid {
+        gap: 8px;
+    }
+
+    .info-item {
+        padding: 8px 10px;
+        border-radius: 10px;
+    }
+
+    .info-item i {
+        font-size: 1rem;
+    }
+
+    .info-item .value {
+        font-size: 0.8rem;
+    }
+
+    /* Présentation */
+    .presentation {
+        padding: 12px 15px;
+    }
+
+    .presentation h4 {
+        font-size: 0.9rem;
+    }
+
+    .presentation p {
+        font-size: 0.85rem;
+    }
+
+    /* Lien bibliothèque */
+    .link-card {
+        padding: 8px 10px;
+    }
+
+    .link-card .label {
+        font-size: 0.8rem;
+    }
+
+    .link-card .value {
+        font-size: 0.75rem;
     }
 }

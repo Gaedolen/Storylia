@@ -264,6 +264,32 @@
                                             {% endif %}
                                         </div>
                                     </div>
+                                    
+                                    {# ===== Barre de progression responsive ===== #}
+                                    <div class="progress-bar-mobile">
+                                        <div class="progress-bar-inputs">
+                                            {% if totalPages == 0 %}
+                                                <input id="pagesReadInputMobile" type="number" min="0" value="{{ pagesRead }}" class="progress-input-mobile" placeholder="Pages lues">
+                                                <input id="totalPagesInputMobile" type="number" min="1" value="{{ totalPages }}" class="progress-input-mobile" placeholder="Total">
+                                            {% else %}
+                                                <input id="pagesReadInputMobile" type="number" min="0" value="{{ pagesRead }}" class="progress-input-mobile">
+                                                <span class="total-pages-text-mobile">sur {{ totalPages }}</span>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="progress-bar-track">
+                                            <!-- Partie animée = reste à lire -->
+                                            <div class="progress-bar-remaining"></div>
+                                            <!-- Partie lue -->
+                                            <div class="progress-bar-fill"
+                                                style="width: {{ percent|number_format(0) }}%;"></div>
+                                        </div>
+
+                                        <div class="progress-bar-info">
+                                            <span class="progress-percent-mobile">{{ percent|number_format(0) }}%</span>
+                                            <button type="button" class="progress-btn-mobile">Mettre à jour</button>
+                                        </div>
+                                    </div>
 
                                     <div id="percentageDisplay" class="progress-percent">
                                         {{ percent|number_format(0) }}%

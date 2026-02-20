@@ -287,3 +287,135 @@ p a:hover svg {
     text-align: center;
 }
 
+/* =======================
+   Responsive : 1024px
+   ======================= */
+@media screen and (max-width: 1024px) {
+
+    .form-container {
+        gap: 20px; /* réduire un peu l’espace entre les colonnes */
+    }
+
+    .conteneur-principal {
+        max-width: 700px;
+        padding: 25px 15px;
+    }
+
+    h1 {
+        font-size: 32px;
+    }
+
+    .line-separator {
+        width: 1.5px;
+    }
+
+    .form-control {
+        font-size: 15px;
+        padding: 9px;
+    }
+
+    .btn-create-account {
+        font-size: 1.1rem;
+        padding: 10px 25px;
+        max-width: 180px;
+    }
+}
+
+/* =======================
+   Responsive : 768px
+   ======================= */
+@media screen and (max-width: 768px) {
+
+    /* Empilement des colonnes et centrage */
+    .form-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .left-container,
+    .right-container {
+        width: 90%;
+    }
+
+    .line-separator {
+        display: none; /* plus de séparateur vertical */
+    }
+
+    .conteneur-principal {
+        max-width: 95%;
+        padding: 20px 15px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    .form-control {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .btn-create-account {
+        font-size: 0.95rem;
+        padding: 12px 25px;
+        width: 80%;
+        max-width: 220px;
+    }
+
+    .file-name {
+        font-size: 13px;
+    }
+
+    .agree-terms__text {
+        font-size: 12px;
+    }
+}
+
+/* =======================
+   Responsive : 480px
+   ======================= */
+@media screen and (max-width: 480px) {
+
+    /* Empilement complet */
+    .form-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .left-container,
+    .right-container {
+        width: 100%;
+    }
+
+    .conteneur-principal {
+        padding: 15px 10px;
+        margin: 20px 10px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .form-control {
+        font-size: 13px;
+        padding: 7px;
+    }
+
+    .btn-create-account {
+        font-size: 0.9rem;
+        width: 85%;
+        max-width: none;
+        padding: 12px 20px;
+    }
+
+    .file-name {
+        font-size: 12px;
+    }
+
+    .agree-terms__text {
+        font-size: 11px;
+        line-height: 1.1;
+    }
+}

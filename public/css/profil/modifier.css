@@ -172,3 +172,133 @@ input[type="file"] {
 .btn-save:hover {
     background: #b56a4c; /* Accent foncé */
 }
+
+@media (max-width: 1024px) {
+
+    .profil-main {
+        max-width: 90%;
+        padding: 20px;
+        margin: 30px auto;
+    }
+
+    .profil-header h2 {
+        font-size: 24px;
+    }
+
+    .header-line {
+        width: 50%;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="file"],
+    .bio-box textarea {
+        font-size: 14px;
+        padding: 8px 10px;
+    }
+
+    .preferences-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px 15px;
+    }
+
+    .pref-item label {
+        font-size: 15px;
+    }
+
+    .btn-save {
+        font-size: 16px;
+        padding: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .profil-main {
+        max-width: 95%;
+        padding: 15px;
+        margin: 20px auto;
+    }
+
+    .profil-header h2 {
+        font-size: 22px;
+    }
+
+    .header-line {
+        width: 45%;
+        height: 2.5px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="file"] {
+        font-size: 13px;
+        padding: 7px 9px;
+    }
+
+    .bio-box textarea {
+        font-size: 14px;
+        padding: 10px;
+        min-height: 180px;
+    }
+
+    .preferences-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px 15px;
+    }
+
+    .pref-item label {
+        font-size: 14px;
+    }
+
+    .btn-save {
+        font-size: 15px;
+        padding: 9px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .profil-main {
+        max-width: 95%;
+        padding: 12px;
+        margin: 15px auto;
+    }
+
+    .profil-header h2 {
+        font-size: 20px;
+    }
+
+    .header-line {
+        width: 40%;
+        height: 2px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="file"] {
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+
+    .bio-box textarea {
+        font-size: 13px;
+        padding: 8px;
+        min-height: 220px; /* Champ bio encore plus grand pour mobile */
+    }
+
+    /* Préférences : maximum 2 colonnes */
+    .preferences-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px 10px;
+    }
+
+    .pref-item label {
+        font-size: 13px;
+    }
+
+    .btn-save {
+        font-size: 14px;
+        padding: 8px;
+    }
+}
