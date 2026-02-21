@@ -3,6 +3,22 @@
     margin: 0 auto;
 }
 
+.propositions-header {
+    display: flex;
+    flex-direction: column; /* bouton retour au-dessus */
+    gap: 10px;              /* espace entre retour et ligne titre+btn */
+    align-items: flex-start;
+    margin: 15px;
+}
+
+/* Ligne avec titre + bouton proposer */
+.propositions-header .header-title-proposer {
+    display: flex;
+    align-items: center;     /* bouton collé verticalement au titre */
+    justify-content: flex-start;
+    gap: 10px;               /* petit espace entre titre et bouton */
+}
+
 h1 {
     color: #714B2F;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
@@ -244,4 +260,303 @@ button.btn-primary:hover:not(:disabled) {
 button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+@media (max-width: 1024px) {
+
+    /* Header : bouton retour au-dessus */
+    .propositions-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .propositions-header a.btn-back {
+        align-self: flex-start;
+        max-width: 150px;
+    }
+
+    /* Bloc titre + bouton proposer */
+    .header-title-proposer {
+        display: flex;
+        align-items: center;          /* bouton collé verticalement */
+        justify-content: flex-start;  /* reste à gauche */
+        gap: 10px;                    /* petit espace entre titre et bouton */
+        width: 100%;
+    }
+
+    .propositions-header h1 {
+        font-size: 1.6rem;
+        margin: 0;
+        white-space: nowrap;           /* empêcher retour à la ligne du titre */
+    }
+
+    .propositions-header button.btn-primary {
+        white-space: nowrap;           /* texte bouton sur une seule ligne */
+        flex-shrink: 0;                /* ne pas rétrécir */
+        max-width: none;               /* autoriser largeur selon contenu */
+        padding: 6px 12px;             /* réduit un peu pour rester sur une ligne */
+        font-size: 0.95rem;            /* légèrement plus petit */
+    }
+
+    /* Mois / blocs */
+    .month-block {
+        margin: 15px;
+    }
+
+    .month-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .toggle-arrow {
+        font-size: 1rem;
+    }
+
+    /* Grille livres */
+    .books-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+    }
+
+    .book-card img {
+        max-height: 180px;
+    }
+
+    .book-title {
+        font-size: 0.85rem;
+    }
+
+    .book-author {
+        font-size: 0.75rem;
+    }
+
+    /* Modal responsive compacte */
+    .modal {
+        padding: 10px;
+        overflow-y: auto;
+        max-height: 90vh;
+    }
+
+    .modal-content {
+        width: 85%;
+        max-width: 550px;
+        max-height: 85vh;
+        overflow-y: auto;
+        padding: 15px;
+        border-radius: 10px;
+        box-sizing: border-box;
+    }
+
+    .modal-content h2 {
+        font-size: 1.3rem;  /* titre plus petit */
+        margin-bottom: 10px;
+    }
+
+    .close {
+        font-size: 20px;
+        top: 5px;
+        right: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* Header : bouton retour au-dessus */
+    .propositions-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin: 10px;
+    }
+
+    .propositions-header a.btn-back {
+        align-self: flex-start;
+        max-width: 130px;
+        font-size: 1rem;
+        padding: 6px 12px;
+    }
+
+    /* Ligne titre + bouton proposer */
+    .propositions-header .header-title-proposer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .propositions-header h1 {
+        font-size: 1.4rem;
+        margin: 0;
+        white-space: nowrap; /* empêcher retour à la ligne du titre */
+    }
+
+    .propositions-header button.btn-primary {
+        font-size: 0.9rem;
+        padding: 5px 10px;
+        white-space: nowrap; /* bouton sur une seule ligne */
+        flex-shrink: 0;
+    }
+
+    /* Mois / blocs */
+    .month-block {
+        margin: 10px;
+    }
+
+    .month-header h2 {
+        font-size: 1rem;
+    }
+
+    .toggle-arrow {
+        font-size: 0.9rem;
+    }
+
+    /* Grille livres : 2 ou 3 colonnes selon largeur */
+    .books-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 8px;
+    }
+
+    .book-card img {
+        max-height: 150px;
+    }
+
+    .book-title {
+        font-size: 0.8rem;
+    }
+
+    .book-author {
+        font-size: 0.7rem;
+    }
+
+    /* Modal responsive compacte */
+    .modal {
+        padding: 8px;
+        overflow-y: auto;
+        max-height: 90vh;
+    }
+
+    .modal-content {
+        width: 90%;
+        max-width: 400px;
+        max-height: 85vh;
+        overflow-y: auto;
+        padding: 12px;
+        border-radius: 8px;
+        box-sizing: border-box;
+    }
+
+    .modal-content h2 {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+
+    .close {
+        font-size: 18px;
+        top: 5px;
+        right: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    /* Header : bouton retour au-dessus */
+    .propositions-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        margin: 8px;
+    }
+
+    .propositions-header a.btn-back {
+        align-self: flex-start;
+        max-width: 120px;
+        font-size: 0.9rem;
+        padding: 5px 10px;
+    }
+
+    /* Ligne titre + bouton proposer */
+    .propositions-header .header-title-proposer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 6px;
+        width: 100%;
+        flex-wrap: wrap; /* si manque de place, bouton passe à la ligne */
+    }
+
+    .propositions-header h1 {
+        font-size: 1.2rem;
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    .propositions-header button.btn-primary {
+        font-size: 0.8rem;
+        padding: 4px 8px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    /* Mois / blocs */
+    .month-block {
+        margin: 8px;
+    }
+
+    .month-header h2 {
+        font-size: 0.95rem;
+    }
+
+    .toggle-arrow {
+        font-size: 0.85rem;
+    }
+
+    /* Grille livres : 1 colonne */
+    .books-grid {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 6px;
+    }
+
+    .book-card img {
+        max-height: 120px;
+    }
+
+    .book-title {
+        font-size: 0.75rem;
+    }
+
+    .book-author {
+        font-size: 0.65rem;
+    }
+
+    /* Modal responsive compacte */
+    .modal {
+        padding: 6px;
+        overflow-y: auto;
+        max-height: 90vh;
+    }
+
+    .modal-content {
+        width: 95%;
+        max-width: 320px;
+        max-height: 85vh;
+        overflow-y: auto;
+        padding: 10px;
+        border-radius: 6px;
+        box-sizing: border-box;
+    }
+
+    .modal-content h2 {
+        font-size: 1rem;
+        margin-bottom: 6px;
+    }
+
+    .close {
+        font-size: 16px;
+        top: 5px;
+        right: 6px;
+    }
 }

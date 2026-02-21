@@ -14,16 +14,23 @@
     <div class="listing-header">
         <h2>Liste des clubs{% if search %} - "{{ search }}"{% endif %}</h2>
 
-        <form method="get" action="{{ path('club_index') }}" class="search-form">
-            <input type="text" name="q" placeholder="Rechercher un club ou un utilisateur..." value="{{ search }}">
-            <button type="submit">🔍</button>
-        </form>
+        <div class="search-form-container">
+            <form method="get" action="{{ path('club_index') }}" class="search-form">
+                <input type="text" name="q" placeholder="Rechercher un club ou un utilisateur..." value="{{ search }}">
+                <button type="submit"><i class="bi bi-search"></i></button>
+            </form>
+
+            <!-- Bouton mobile pour ouvrir filtres -->
+            <button id="open-filtres" class="btn-filtres-mobile">☰ Filtres</button>
+        </div>
     </div>
 
     <div class="listing-main">
         <!-- === Colonne de gauche : filtres === -->
         <aside class="filters">
             <h3>Filtres</h3>
+            <button id="close-filtres" class="close-filtres">✕</button>
+
             <form method="get" action="{{ path('club_index') }}">
                 <div class="filter-group">
                     <label>Préférences :</label>
@@ -73,103 +80,110 @@
             </form>
         </aside>
 
+        <div id="filtres-overlay" class="filtres-overlay hidden"></div>
+
         <!-- === Colonne centrale : liste des clubs === -->
-        <section class="clubs-list">
-            {% for club in clubs %}
-                <div class="club-card">
-                    <div class="club-card-left">
-                        {% if club.photo %}
-                            <img src="{{ asset('uploads/clubs/' ~ club.photo) }}" alt="{{ club.name }}">
-                        {% else %}
-                            <div class="club-photo-placeholder">Aucune photo</div>
-                        {% endif %}
-
-                        <div class="club-card-meta">
-                            <span class="club-participants">{{ club.membres|length }} participants</span>
-                            <span class="creation-date">Créé le {{ club.creationDate|date('d/m/Y') }}</span>
-
-                            {# Bouton de participation #}
-                            {% if app.user 
-                                and app.user != club.creator 
-                                and app.user not in club.membres
-                            %}
-                                <a href="{{ path('club_participer', { id: club.id }) }}" class="btn-participer">
-                                    Participer
-                                </a>
+        <div class="listing-content">
+            <section class="clubs-list">
+                {% for club in clubs %}
+                    <div class="club-card">
+                        <div class="club-card-left">
+                            {% if club.photo %}
+                                <img src="{{ asset('uploads/clubs/' ~ club.photo) }}" alt="{{ club.name }}">
+                            {% else %}
+                                <div class="club-photo-placeholder">Aucune photo</div>
                             {% endif %}
                         </div>
+
+                        <div class="club-card-right">
+                            <h3>{{ club.name }}</h3>
+
+                            <div class="club-card-meta">
+                                <span class="club-participants">{{ club.membres|length }} participants</span>
+                                <span class="creation-date">Créé le {{ club.creationDate|date('d/m/Y') }}</span>
+
+                                {% if app.user 
+                                    and app.user != club.creator 
+                                    and app.user not in club.membres
+                                %}
+                                    <a href="{{ path('club_participer', { id: club.id }) }}" class="btn-participer">
+                                        Participer
+                                    </a>
+                                {% endif %}
+                            </div>
+
+                            <div class="club-description">{{ club.description }}</div>
+
+                            <div class="club-preferences">
+                                {% set preferencesLabels = {
+                                    'scifi': 'Science-Fiction',
+                                    'fantastique': 'Fantastique',
+                                    'fantasy': 'Fantasy',
+                                    'dystopie': 'Dystopie',
+                                    'steampunk': 'Steampunk',
+                                    'policier': 'Policier',
+                                    'thriller': 'Thriller',
+                                    'espionnage': 'Espionnage',
+                                    'horreur': 'Horreur',
+                                    'aventure': 'Aventure',
+                                    'young_adult': 'Young Adult',
+                                    'romance': 'Romance',
+                                    'erotique': 'Érotique',
+                                    'chicklit': 'Chick-lit',
+                                    'essai': 'Essai',
+                                    'biographie': 'Biographie',
+                                    'philosophie': 'Philosophie',
+                                    'historique': 'Historique',
+                                    'science': 'Science',
+                                    'sociologie': 'Sociologie',
+                                    'poesie': 'Poésie',
+                                    'theatre': 'Théâtre',
+                                    'conte_legend': 'Contes et légendes',
+                                    'mythologie': 'Mythologie',
+                                    'graphic_novel': 'Roman Graphique',
+                                    'bd': 'Bande dessinée',
+                                    'manga': 'Manga'
+                                } %}
+
+                                {% for code in club.preferences %}
+                                    <span class="pref-badge">{{ preferencesLabels[code] }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="club-card-right">
-                        <h3>{{ club.name }}</h3>
-
-                        <div class="club-description">
-                            {{ club.description }}
-                        </div>
-
-                        <div class="club-preferences">
-                            {% set preferencesLabels = {
-                                'scifi': 'Science-Fiction',
-                                'fantastique': 'Fantastique',
-                                'fantasy': 'Fantasy',
-                                'dystopie': 'Dystopie',
-                                'steampunk': 'Steampunk',
-                                'policier': 'Policier',
-                                'thriller': 'Thriller',
-                                'espionnage': 'Espionnage',
-                                'horreur': 'Horreur',
-                                'aventure': 'Aventure',
-                                'young_adult': 'Young Adult',
-                                'romance': 'Romance',
-                                'erotique': 'Érotique',
-                                'chicklit': 'Chick-lit',
-                                'essai': 'Essai',
-                                'biographie': 'Biographie',
-                                'philosophie': 'Philosophie',
-                                'historique': 'Historique',
-                                'science': 'Science',
-                                'sociologie': 'Sociologie',
-                                'poesie': 'Poésie',
-                                'theatre': 'Théâtre',
-                                'conte_legend': 'Contes et légendes',
-                                'mythologie': 'Mythologie',
-                                'graphic_novel': 'Roman Graphique',
-                                'bd': 'Bande dessinée',
-                                'manga': 'Manga'
-                            } %}
-
-                            {% for code in club.preferences %}
-                                <span class="pref-badge">{{ preferencesLabels[code] }}</span>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            {% else %}
-                <p>Aucun club trouvé.</p>
-            {% endfor %}
-        </section>
-
-        <!-- === Colonne de droite : utilisateurs === -->
-        <aside class="users-sidebar">
-            <h3>Utilisateurs</h3>
-            <div class="users-list">
-                {% for user in users %}
-                    <a href="{{ path('app_utilisateur_profil', {'id': user.id}) }}" class="user-card">
-                        {% if user.profilePicture %}
-                            <img src="{{ asset('uploads/profiles/' ~ user.profilePicture) }}" alt="{{ user.pseudo }}">
-                        {% else %}
-                            <img src="{{ asset('uploads/profiles/default.png') }}" alt="Utilisateur sans photo">
-                        {% endif %}
-                        <div class="user-info">
-                            <p class="pseudo">{{ user.pseudo }}</p>
-                        </div>
-                    </a>
                 {% else %}
-                    <p>Aucun utilisateur trouvé.</p>
+                    <p>Aucun club trouvé.</p>
                 {% endfor %}
-            </div>
-        </aside>
+            </section>
+
+            <!-- === Colonne de droite : utilisateurs === -->
+            <aside class="users-sidebar">
+                <h3>Utilisateurs</h3>
+                <div class="users-list">
+                    {% for user in users %}
+                        <a href="{{ path('app_utilisateur_profil', {'id': user.id}) }}" class="user-card">
+                            {% if user.profilePicture %}
+                                <img src="{{ asset('uploads/profiles/' ~ user.profilePicture) }}" alt="{{ user.pseudo }}">
+                            {% else %}
+                                <img src="{{ asset('uploads/profiles/default.png') }}" alt="Utilisateur sans photo">
+                            {% endif %}
+                            <div class="user-info">
+                                <p class="pseudo">{{ user.pseudo }}</p>
+                            </div>
+                        </a>
+                    {% else %}
+                        <p>Aucun utilisateur trouvé.</p>
+                    {% endfor %}
+                </div>
+            </aside>
+        </div>
     </div>
 
 </div>
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/club-filters.js') }}"></script>
+{% endblock %}
+
 {% endblock %}

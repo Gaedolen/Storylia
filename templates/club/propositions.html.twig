@@ -20,22 +20,24 @@
             ← Retour
         </a>
 
-        <!-- Titre -->
-        <h1>Toutes les propositions</h1>
+        <div class="header-title-proposer">
+            <!-- Titre -->
+            <h1>Toutes les propositions</h1>
 
-        <!-- Bouton proposer -->
-        {% set userHasProposed = nextMonthReading.bookProposals
-            |filter(p => p.proposer == app.user)
-            |length > 0 %}
+            <!-- Bouton proposer -->
+            {% set userHasProposed = nextMonthReading.bookProposals
+                |filter(p => p.proposer == app.user)
+                |length > 0 %}
 
-        <button 
-            id="openProposerModal" 
-            class="btn btn-primary"
-            data-url="{{ path('club_proposer_livre', {'clubId': club.id, 'month': targetMonth}) }}"
-            {% if userHasProposed %}disabled{% endif %}
-        >
-            Proposer un livre pour le mois de {{ targetMonthName }}
-        </button>
+            <button 
+                id="openProposerModal" 
+                class="btn btn-primary"
+                data-url="{{ path('club_proposer_livre', {'clubId': club.id, 'month': targetMonth}) }}"
+                {% if userHasProposed %}disabled{% endif %}
+            >
+                Proposer un livre pour le mois de {{ targetMonthName }}
+            </button>
+        </div>
     </div>
 
 

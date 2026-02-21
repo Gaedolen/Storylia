@@ -131,3 +131,242 @@ h3 {
     box-shadow: 0 6px 12px rgba(0,0,0,0.15);
     transition: all 0.2s ease-in-out;
 }
+
+@media (max-width: 1024px) {
+
+    /* Container général */
+    .club-more-info {
+        margin: 15px;
+        padding: 10px;
+    }
+
+    /* Titres un peu plus petits */
+    h3 {
+        font-size: 26px;
+    }
+
+    .club-info-text h2 {
+        font-size: 24px;
+    }
+
+    .club-info-text p {
+        font-size: 1rem;
+    }
+
+    /* Créateur : centré horizontalement */
+    .club-creator-section {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .club-creator-section .creator-card {
+        width: 400px;
+        max-width: 90%;
+        margin: 0; /* plus besoin de auto */
+    }
+
+    /* Membres : colonne, mais alignement à gauche */
+    .club-members-section {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .members-grid {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+    }
+
+    /* Cartes membres */
+    .member-card {
+        width: 90%;
+        height: auto;
+        padding: 8px;
+        gap: 10px;
+    }
+
+    /* Photos et pseudo */
+    .creator-photo,
+    .member-photo {
+        width: 60px;
+        height: 60px;
+    }
+
+    .creator-pseudo,
+    .member-pseudo {
+        font-size: 0.95rem;
+    }
+
+    /* Carte infos du club : passer en colonne */
+    .club-details-section .club-info-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .club-photo {
+        width: 120px;
+        height: 120px;
+    }
+
+    .preferences-container {
+        justify-content: center;
+    }
+}
+
+
+@media (max-width: 780px) {
+
+    /* Container général */
+    .club-more-info {
+        margin: 10px;
+        padding: 5px;
+    }
+
+    h3 {
+        font-size: 22px;
+    }
+
+    .club-info-text h2 {
+        font-size: 20px;
+    }
+
+    .club-info-text p {
+        font-size: 0.95rem;
+    }
+
+    /* Créateur et membres : empilement vertical */
+    .club-creator-section,
+    .club-members-section {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .creator-card,
+    .member-card {
+        width: 90%;
+        height: auto;
+        padding: 6px;
+        gap: 8px;
+    }
+
+    .creator-photo,
+    .member-photo {
+        width: 50px;
+        height: 50px;
+    }
+
+    .creator-pseudo,
+    .member-pseudo {
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    /* Membres : une seule colonne si besoin */
+    .members-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));
+        gap: 8px;
+    }
+
+    /* Infos club : colonne et centré */
+    .club-details-section .club-info-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .club-photo {
+        width: 100px;
+        height: 100px;
+    }
+
+    .preferences-container {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+
+    /* Container général */
+    .club-more-info {
+        margin: 5px;
+        padding: 5px;
+    }
+
+    h3 {
+        font-size: 18px;
+    }
+
+    .club-info-text h2 {
+        font-size: 18px;
+    }
+
+    .club-info-text p {
+        font-size: 0.85rem;
+    }
+
+    /* Créateur et membres : empilement vertical complet */
+    .club-creator-section,
+    .club-members-section {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .creator-card,
+    .member-card {
+        width: 95%;
+        height: auto;
+        padding: 5px;
+        gap: 6px;
+    }
+
+    .creator-photo,
+    .member-photo {
+        width: 40px;
+        height: 40px;
+    }
+
+    .creator-pseudo,
+    .member-pseudo {
+        font-size: 0.8rem;
+        text-align: center;
+    }
+
+    /* Membres : une seule colonne */
+    .members-grid {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    /* Infos club : colonne et centré */
+    .club-details-section .club-info-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 8px;
+    }
+
+    .club-photo {
+        width: 80px;
+        height: 80px;
+    }
+
+    .preferences-container {
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .preference-badge {
+        padding: 4px 8px;
+        font-size: 0.75rem;
+    }
+}

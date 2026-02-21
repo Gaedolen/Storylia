@@ -18,6 +18,12 @@
     color: #714B2F; /* Titres principaux */
 }
 
+.listing-content {
+    display: flex;           /* ligne */
+    gap: 20px;
+    align-items: flex-start;
+}
+
 .search-form {
     display: flex;
     gap: 5px;
@@ -49,8 +55,10 @@
 /* === Layout === */
 .listing-main {
     display: grid;
-    grid-template-columns: 220px 1fr 220px;
+    grid-template-columns: 280px 1fr 250px; /* filtres plus larges, clubs flexibles, utilisateurs fixes */
     gap: 20px;
+    align-items: start;
+    position: relative;
 }
 
 /* === Filtres === */
@@ -101,8 +109,21 @@
     background-color: #A65B4C; /* Accent foncé */
 }
 
+.btn-filtres-mobile {
+    display: none; /* caché sur desktop */
+}
+
+.filtres-overlay {
+    display: none; /* juste caché par défaut */
+}
+
+.close-filtres {
+    display: none;
+}
+
 /* === Clubs List === */
 .clubs-list {
+    flex: 1;                 /* occupe tout l'espace horizontal disponible */
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -230,9 +251,13 @@
 
 /* === Users list === */
 .users-sidebar {
-    background-color: #E8CBAE; /* Fond de cartes */
+    width: 250px;            /* fixe pour sidebar */
+    background-color: #E8CBAE;
+    border-radius: 20px;
     padding: 15px;
-    border-radius: 12px;
+    position: absolute;
+    top: 0;              /* alignée en haut */
+    right: 0;            /* collée à droite */
 }
 
 .users-list h3 {
@@ -279,25 +304,434 @@
 }
 
 /* === Responsive === */
-@media (max-width: 1024px) {
+@media screen and (max-width: 1024px) {
+
+    /* === Layout principal : passage en colonne === */
     .listing-main {
-        grid-template-columns: 1fr; /* Tout en colonne */
+        display: block;
     }
 
-    .filters, .users-list {
-        order: -1;
-        margin-bottom: 20px;
+    .listing-content {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
     }
-}
 
-@media (max-width: 425px) {
+    /* === Search + bouton filtres === */
     .listing-header {
+        display: flex;
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
     }
 
-    .search-form input {
+    .search-form {
+        display: flex;
         width: 100%;
+        gap: 5px;
+    }
+
+    .search-form input[type="text"] {
+        flex: 1;             /* prend tout l'espace possible */
+        min-width: 300px;    /* largeur minimale */
+        max-width: 700px;    /* largeur maximale */
+        padding: 10px 16px;
+        font-size: 14px;
+        border-radius: 25px;
+        border: 1px solid #d4c2b0;
+        outline: none;
+    }
+
+    .search-form button {
+        background-color: #C97C5D;
+        border: none;
+        border-radius: 50%;
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+    .search-form button:hover {
+        background-color: #B46749;
+    }
+
+    .search-form button i {
+        color: #fff;          /* loupe blanche */
+        font-size: 16px;
+    }
+
+    /* === Bouton Filtres pour mobile === */
+    #open-filtres {
+        display: inline-block;
+        padding: 6px 12px;
+        font-size: 14px;
+        background-color: #C97C5D;
+        color: #fff;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        margin-top: 5px;
+    }
+
+    #open-filtres:hover {
+        background-color: #B46749;
+    }
+
+    /* === Drawer filtres === */
+    .filters {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 280px;
+        height: 100vh;
+        padding: 25px 20px;
+        background: #E8CBAE;
+        z-index: 1000;
+        overflow-y: auto;
+        border-radius: 0;
+        box-shadow: 2px 0 15px rgba(0,0,0,0.2);
+        transition: left 0.3s ease;
+    }
+
+    .filters.active {
+        left: 0;
+    }
+
+    /* Bouton fermeture du drawer */
+    #close-filtres {
+        display: inline-block;
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-size: 22px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #3B2F2F;
+    }
+
+    /* Overlay derrière le drawer */
+    #filtres-overlay {
+        display: none; /* caché par défaut */
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.4);
+        z-index: 900;
+    }
+
+    #filtres-overlay.active {
+        display: block;
+    }
+
+    /* === Clubs list === */
+    .clubs-list {
+        flex: 1;              /* prend tout l'espace horizontal disponible */
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .club-card {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .club-card-left,
+    .club-card-right {
+        width: 100%;
+        align-items: flex-start;
+    }
+
+    .club-card-left {
+        flex-direction: row;
+        gap: 10px;
+    }
+
+    .club-card-left img,
+    .club-photo-placeholder {
+        width: 100px;
+        height: 100px;
+    }
+
+    .club-card-meta {
+        align-items: flex-start;
+        margin-top: 0;
+    }
+
+    .club-card-right h3 {
+        font-size: 20px;
+    }
+
+    .club-description {
+        font-size: 13px;
+        min-height: auto;
+    }
+
+    .club-preferences {
+        gap: 4px;
+    }
+
+    .pref-badge {
+        font-size: 12px;
+        padding: 3px 6px;
+    }
+
+    .btn-participer {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    /* === Users sidebar === */
+    .users-sidebar {
+        width: 250px;         /* largeur fixe pour les utilisateurs */
+        flex-shrink: 0;       /* ne rétrécit pas */
+        position: sticky;
+        align-self: flex-start;
+    }
+
+    .user-card img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .user-info .pseudo {
+        font-size: 13px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+
+    /* === Layout principal : clubs + users sur la même ligne === */
+    .listing-main {
+        display: flex;
+        flex-direction: row;  /* ligne */
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    /* === Clubs list prend le maximum d'espace disponible === */
+    .clubs-list {
+        flex: 1;               /* prend tout l'espace restant */
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    /* === Users sidebar fixe largeur à droite === */
+    .users-sidebar {
+        width: 220px;          /* largeur fixe pour sidebar */
+        flex-shrink: 0;        /* ne rétrécit pas */
+        position: sticky;
+        align-self: flex-start;
+    }
+
+    /* === Barre de recherche === */
+    .listing-header {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .search-form {
+        display: flex;
+        width: 100%;
+        gap: 5px;
+    }
+
+    .search-form input[type="text"] {
+        flex: 1;
+        padding: 10px 16px;
+        font-size: 14px;
+        border-radius: 25px;
+        border: 1px solid #d4c2b0;
+        outline: none;
+    }
+
+    .search-form button {
+        background-color: #C97C5D;
+        border: none;
+        border-radius: 50%;
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+    .search-form button:hover {
+        background-color: #B46749;
+    }
+
+    .search-form button i {
+        color: #fff;          /* loupe blanche */
+        font-size: 16px;
+    }
+
+    /* === Clubs cards === */
+    .club-card {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .club-card-left img,
+    .club-photo-placeholder {
+        width: 80px;
+        height: 80px;
+    }
+
+    .club-card-right h3 {
+        font-size: 18px;
+    }
+
+    .club-description {
+        font-size: 13px;
+    }
+
+    .club-preferences {
+        gap: 4px;
+    }
+
+    .pref-badge {
+        font-size: 12px;
+        padding: 3px 6px;
+    }
+
+    .btn-participer {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    /* === Users cards === */
+    .user-card img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .user-info .pseudo {
+        font-size: 13px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+
+    /* Conteneur principal : clubs puis users */
+    .listing-content {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .clubs-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .club-card {
+        display: flex;
+        flex-direction: row; /* image à gauche, infos à droite */
+        gap: 10px;
+        width: 100%;
+    }
+
+    .club-card-left {
+        flex-shrink: 0;
+        width: 60px;
+        height: 60px;
+    }
+
+    .club-card-left img,
+    .club-photo-placeholder {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+
+    .club-card-right {
+        display: flex;
+        flex-direction: column;
+        gap: 6px; /* espace entre titre, badges, description */
+        width: calc(100% - 60px); /* laisse la place pour l'image */
+    }
+
+    .club-card-right h3 {
+        font-size: 16px;
+        margin: 0;
+        width: 100%;            /* prend toute la largeur dispo */
+        word-break: break-word; /* casse les mots si trop long */
+    }
+
+    .club-card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        align-items: center;
+    }
+
+    .participants-badge,
+    .club-date {
+        flex-shrink: 0;
+    }
+
+    /* Utilisateurs en dessous */
+    .users-sidebar {
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    .user-card {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .user-card img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+    }
+
+    .user-info .pseudo {
+        font-size: 13px;
+    }
+
+    /* Barre de recherche */
+    .listing-header {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .search-form {
+        width: 100%;
+        display: flex;
+        gap: 5px;
+    }
+
+    .search-form input[type="text"] {
+        flex: 1;
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+
+    .search-form button {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .search-form button i {
+        font-size: 15px;
+        color: #fff;
     }
 }
