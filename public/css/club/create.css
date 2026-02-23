@@ -161,3 +161,191 @@ textarea {
 .btn-create-club:hover {
     background: #b56a4c;
 }
+
+@media (max-width: 1024px) {
+
+    /* Container principal */
+    .club-create-main {
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 25px;
+    }
+
+    /* Header */
+    .club-create-header h2 {
+        font-size: 22px;
+    }
+
+    .header-line {
+        width: 70%;
+    }
+
+    /* Inputs */
+    input[type="text"],
+    input[type="file"],
+    textarea {
+        font-size: 14px;
+        padding: 9px 11px;
+    }
+
+    /* Description */
+    textarea {
+        min-height: 110px;
+    }
+
+    .bio-counter {
+        font-size: 12px;
+    }
+
+    /* Préférences */
+    .preferences-grid {
+        gap: 10px 15px;
+    }
+
+    .pref-item label {
+        font-size: 15px;
+    }
+
+    .pref-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Bouton */
+    .btn-create-club {
+        font-size: 16px;
+        padding: 11px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* Container principal */
+    .club-create-main {
+        max-width: 90%;
+        margin: 25px auto;
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    /* Header */
+    .club-create-header h2 {
+        font-size: 20px;
+    }
+
+    .header-line {
+        width: 80%;
+    }
+
+    /* Form groups */
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    /* Inputs */
+    input[type="text"],
+    input[type="file"],
+    textarea {
+        font-size: 14px;
+        padding: 8px 10px;
+    }
+
+    textarea {
+        min-height: 100px;
+    }
+
+    .bio-counter {
+        font-size: 12px;
+    }
+
+    /* Préférences → passage en 1 colonne */
+    .preferences-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px 15px;
+    }
+
+    .pref-item label {
+        font-size: 14px;
+    }
+
+    .pref-item input[type="checkbox"] {
+        width: 17px;
+        height: 17px;
+    }
+
+    /* Bouton */
+    .btn-create-club {
+        font-size: 15px;
+        padding: 10px;
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    /* Container principal */
+    .club-create-main {
+        max-width: 95%;
+        margin: 20px auto;
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    /* Header */
+    .club-create-header h2 {
+        font-size: 18px;
+    }
+
+    .header-line {
+        width: 90%;
+        height: 2px;
+    }
+
+    /* Form groups */
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    /* Inputs */
+    input[type="text"],
+    input[type="file"],
+    textarea {
+        font-size: 13px;
+        padding: 7px 9px;
+    }
+
+    textarea {
+        min-height: 90px;
+    }
+
+    .bio-counter {
+        font-size: 11px;
+    }
+
+    /* Préférences → 1 colonne mobile */
+    .preferences-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .pref-item {
+        gap: 8px;
+    }
+
+    /* Checkbox un peu plus grandes pour mobile */
+    .pref-item input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+    }
+
+    .pref-item label {
+        font-size: 14px;
+    }
+
+    /* Bouton */
+    .btn-create-club {
+        font-size: 16px;
+        padding: 12px;
+        margin-top: 18px;
+    }
+}

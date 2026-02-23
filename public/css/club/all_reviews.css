@@ -109,13 +109,219 @@ body {
 }
 
 /* Responsive */
-@media (max-width: 900px) {
-    .book-info-container {
-        flex-direction: column;
+@media (max-width: 1024px) {
+
+    /* Conteneur principal */
+    .book-review-page {
+        margin: 25px auto;
+        padding: 15px;
     }
-    .book-left, .book-right {
-        width: 100%;
-        padding-left: 0;
-        border-left: none;
+
+    /* Bloc Livre */
+    .book-info-container {
+        gap: 20px;
+        padding: 15px;
+        margin-bottom: 30px;
+    }
+
+    .book-left {
+        width: 45%;
+    }
+
+    .book-cover {
+        max-width: 220px;
+    }
+
+    .book-meta h2 {
+        font-size: 1.3rem;
+    }
+
+    .book-meta p {
+        font-size: 13px;
+    }
+
+    /* Bloc Résumé */
+    .book-right {
+        width: 55%;
+        padding-left: 15px;
+    }
+
+    .book-right h3 {
+        font-size: 1.2rem;
+    }
+
+    .book-right p {
+        font-size: 0.95rem;
+    }
+
+    /* Bloc Avis */
+    .reviews-container h3 {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+
+    .review-card {
+        padding: 12px 15px;
+    }
+
+    .review-user {
+        font-size: 0.95rem;
+    }
+
+    .review-date {
+        font-size: 11px;
+    }
+
+    .review-comment p {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* Conteneur principal */
+    .book-review-page {
+        margin: 20px auto;
+        padding: 12px;
+    }
+
+    /* Bloc Livre : passage en colonne */
+    .book-info-container {
+        flex-direction: row;   /* reste en ligne */
+        gap: 15px;
+    }
+
+    .book-left {
+        width: 45%;
+    }
+
+    .book-right {
+        width: 55%;
+        padding-left: 15px;
+        border-left: 2px solid #C97C5D; /* séparation verticale */
+        border-top: none; /* supprime la ligne horizontale si ajoutée */
+        margin-top: 0;
+        padding-top: 0;
+    }
+
+    .book-cover {
+        max-width: 180px;
+    }
+
+    .book-meta h2 {
+        font-size: 1.1rem;
+    }
+
+    .book-meta p {
+        font-size: 12px;
+    }
+
+    .book-right h3 {
+        font-size: 1rem;
+    }
+
+    .book-right p {
+        font-size: 0.85rem;
+    }
+
+    /* Bloc Avis */
+    .reviews-container h3 {
+        font-size: 1.1rem;
+    }
+
+    .review-card {
+        padding: 12px;
+    }
+
+    .review-header {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .review-user {
+        font-size: 0.9rem;
+    }
+
+    .review-date {
+        font-size: 11px;
+    }
+
+    .review-comment p {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+
+    /* Page */
+    .book-review-page {
+        margin: 15px auto;
+        padding: 10px;
+    }
+
+    /* Bloc Livre */
+    .book-info-container {
+        flex-direction: row; /* reste en ligne */
+        gap: 10px;
+    }
+
+    .book-left {
+        width: 45%;
+    }
+
+    .book-right {
+        width: 55%;
+        padding-left: 10px;
+        border-left: 2px solid #C97C5D; /* ligne verticale conservée */
+        border-top: none;
+    }
+
+    .book-cover {
+        max-width: 140px;
+    }
+
+    .book-meta h2 {
+        font-size: 1rem;
+    }
+
+    .book-meta p {
+        font-size: 11px;
+    }
+
+    .book-right p {
+        font-size: 0.8rem;
+    }
+
+    /* Bloc Avis */
+    .reviews-container h3 {
+        font-size: 1rem;
+        margin-bottom: 12px;
+    }
+
+    .review-list {
+        gap: 15px;
+    }
+
+    .review-card {
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    .review-header {
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .review-user {
+        font-size: 0.85rem;
+    }
+
+    .review-date {
+        font-size: 10px;
+    }
+
+    .review-comment p {
+        font-size: 0.8rem;
+        line-height: 1.4;
     }
 }

@@ -144,34 +144,41 @@
     font-size: 1.5rem;
 }
 
+.club-book-of-month a {
+    text-decoration: none;
+    color: inherit; /* garde la couleur du texte */
+}
+
 /* Livre card */
-.book-card {
+.book-card-nm {
     display: flex;
     gap: 1rem;
     margin-bottom: 1rem;
 }
 
-.book-card img {
+.book-card-nm img {
     width: 100px;
     height: 150px;
     object-fit: cover;
     border-radius: 5px;
 }
 
-.book-info {
+.book-information {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 
 .book-title {
-    color: #3B2F2F;
+    color: #FAF3E0;
+    text-decoration: none;
     font-weight: bold;
     font-size: 1.1rem;
     margin: 0;
 }
 
 .book-author, .book-proposer {
+    color: #FAF3E0;
     font-size: 0.95rem;
     margin: 0.2rem 0;
 }
@@ -461,121 +468,109 @@
 }
 
 /* Carrousel propositions */
-
+/* Section carousel centrée */
 .recent-books-carousel {
-    max-width: 1800px;
-    margin: 2rem auto;
-    padding: 0 1rem;
+    max-width: 1200px;      /* largeur max */
+    margin: 0 auto 2rem;    /* centrage horizontal + marge en bas */
+    padding: 1rem;
+    background-color: #A67856; /* fond container */
+    border-radius: 12px;
+    box-sizing: border-box;
 }
 
+/* Header du carousel : titre + bouton */
 .recent-books-header {
     display: flex;
-    justify-content: space-between; /* titre à gauche, bouton à droite */
-    align-items: center;            /* verticalement centré */
+    justify-content: flex-start;  /* titre à gauche, bouton à côté */
+    align-items: center;
+    gap: 10px;                    /* petit espace entre titre et bouton */
     margin-bottom: 1rem;
 }
 
 .recent-books-header h2 {
-    margin: 0; /* supprime le margin par défaut du h2 */
+    margin: 0;
     font-size: 1.8rem;
     color: #3B2F2F;
 }
 
 .recent-books-header .btn {
-    padding: 8px 14px;
-    background-color: #C97C5D;
-    color: white;
+    padding: 8px 16px;
+    font-size: 0.95rem;
     border-radius: 25px;
-    border: none;
-    text-decoration: none;
+    background-color: #C97C5D;   /* couleur du bouton */
+    color: #fff;
     font-weight: 600;
+    text-decoration: none;
+    border: none;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
     box-shadow:
-        0 6px 10px rgba(0, 0, 0, 0.3),
-        inset 0 4px 6px rgba(0, 0, 0, 0.2);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        0 6px 10px rgba(0,0,0,0.3),
+        inset 0 4px 6px rgba(0,0,0,0.2);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .recent-books-header .btn:hover {
     background-color: #B46749;
     transform: translateY(-2px);
-} 
-
-.carousel-container {
-    background-color: #A67856;
-    padding: 15px 15px 15px 15px;
-    border-radius: 15px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1),
-            0 8px 20px rgba(0,0,0,0.15);
 }
 
-.recent-books-carousel {
-    position: relative;
-    width: 100%;
-    padding: 20px 0;
+/* Container horizontal pour les livres */
+.recent-books-container {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    overflow-x: auto;     
+    padding: 10px 0;
+    scroll-behavior: smooth;
 }
 
-.carousel-card-link {
-    text-decoration: none;
-    color: inherit;
-    display: inline-block;
+/* Scrollbar horizontale */
+.recent-books-container::-webkit-scrollbar {
+    height: 8px;
 }
 
-.carousel-card {
+.recent-books-container::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 4px;
+}
+
+/* Chaque carte */
+.book-card {
+    flex: 0 0 auto;
     width: 180px;
     height: 300px;
-    display: flex;
-    flex-direction: column;
     border-radius: 10px;
-    background-color: #fff5ef;
+    background-color: #FAF3E0; /* fond carte */
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-decoration: none;
+    color: inherit;
     transition: transform 0.3s;
 }
 
-.carousel-card:hover {
+.book-card:hover {
     transform: translateY(-5px);
 }
 
-.carousel-card img {
+.book-card img {
     width: 100%;
-    max-height: 200px;
-    object-fit: contain;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 5px;
     display: block;
-    margin: 0 auto;
+    margin-bottom: 5px;
 }
 
-.carousel-card .card-body {
-    padding: 5px;
-}
-
-.carousel-card .card-title {
-    font-size: 0.9rem;
-    margin-bottom: 2px;
+.book-card .card-body {
     text-align: center;
 }
 
-.carousel-control-prev,
-.carousel-control-next {
-    width: 35px;
-    height: 35px;
-    background-color: rgba(0,0,0,0.4);
-    border-radius: 50%;
-    top: 50%;
-    transform: translateY(-50%);
+.book-card .card-title {
+    font-weight: bold;
+    font-size: 1rem;
+    margin: 0;
 }
 
-.carousel-control-prev {
-    left: 15px;
-}
-
-.carousel-control-next {
-    right: 15px;
-}
-
-.carousel-inner {
-    overflow: visible;
-}
 
 /* Modal */
 #voteModal {
@@ -837,4 +832,527 @@
 #reportClubModal .btn-warning:hover {
     background-color: #B46749;
     transform: translateY(-2px);
+}
+
+@media (max-width: 1024px) {
+
+    /* -------------------
+       Header du club
+    ------------------- */
+    .club-header {
+        gap: 1.5rem;
+        padding: 1.5rem 1rem;
+        flex-wrap: wrap; /* permet de passer sur deux lignes si nécessaire */
+    }
+
+    .club-title-actions {
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .club-title-actions h1 {
+        font-size: 2rem;
+    }
+
+    .club-actions a,
+    .club-actions button {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+
+    /* -------------------
+       Livre du mois prochain
+    ------------------- */
+    .club-book-of-month {
+        flex: 1 1 100%;
+        width: 100%;
+        padding: 1.2rem;
+        margin-top: 1rem;
+    }
+
+    .club-book-of-month h2 {
+        font-size: 1.3rem;
+    }
+
+    .book-card-nm img {
+        width: 120px;
+        height: auto;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+
+    .book-information {
+        gap: 0.3rem;
+        margin-left: 10px;
+    }
+
+    .book-title {
+        font-size: 1.1rem;
+    }
+
+    .book-author {
+        font-size: 0.95rem;
+    }
+
+    /* -------------------
+       Section lecture du mois
+    ------------------- */
+    .book-presentation h2 {
+        font-size: 1.5rem;
+    }
+
+    .book-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .book-cover {
+        width: 120px;
+        height: auto;
+    }
+    
+    .reading-month-section {
+        flex-direction: column;
+        gap: 0; /* plus de distance entre les blocs */
+        padding: 1.5rem 1rem;
+        align-items: center; /* centre horizontalement les blocs */
+    }
+
+    /* Bloc livre du mois courant */
+    .book-presentation {
+        width: 100%; /* largeur réduite pour laisser espace latéral */
+        margin: 0 auto 0; /* pas de marge en bas pour coller au bloc suivant */
+    }
+
+    /* Bloc reviews */
+    .club-reviews-wrapper {
+        width: 90%;       /* même largeur que le livre du mois */
+        margin: 0 auto;   /* centré */
+    }
+
+    .club-reviews {
+        width: 100%;
+        max-height: none;
+        margin-top: 0;        /* collé au bloc du dessus */
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        border-bottom-left-radius: 15px;
+        border-bottom-right-radius: 15px;
+    }
+
+    /* -------------------
+       Carousel des propositions
+    ------------------- */
+    .recent-books-carousel {
+        background-color: #A67856;
+        border-radius: 12px;
+        max-width: 950px;
+        margin: 1.5rem auto;
+        padding: 1rem 2rem;
+        box-sizing: border-box;
+    }
+
+    .recent-books-header h2 {
+        font-size: 1.4rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .recent-books-header .btn {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+
+    .recent-books-container {
+        padding: 0 0;
+        gap: 0.8rem;
+    }
+
+    .book-card {
+        width: 150px;
+        height: auto;
+    }
+
+    .book-card img {
+        height: 180px;
+    }
+
+    /* -------------------
+       Modal vote et signalement
+    ------------------- */
+    #voteModal .modal-content,
+    #reportClubModal .modal-content {
+        width: 90%;
+        max-width: 600px;
+        padding: 20px;
+    }
+
+    /* -------------------
+       Grille de vote
+    ------------------- */
+    .books-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    /* -------------------
+       Résumé du livre
+    ------------------- */
+    .book-summary h3 {
+        font-size: 1.2rem;
+    }
+
+    .book-summary p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* -------------------
+       Header du club
+    ------------------- */
+    .club-header {
+        flex-direction: column;       /* empile les blocs */
+        gap: 0.8rem;
+        padding: 1rem;
+    }
+
+    .club-title-actions {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .club-title-actions h1 {
+        font-size: 1.8rem;
+    }
+
+    .club-actions a,
+    .club-actions button {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+
+    /* -------------------
+       Livre du mois prochain
+    ------------------- */
+    .club-book-of-month {
+        flex: 1 1 100%;
+        width: 100%;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+
+    .club-book-of-month h2 {
+        font-size: 1.2rem;
+    }
+
+    .book-card-nm img {
+        width: 100px;
+        height: auto;
+    }
+
+    .book-information {
+        gap: 0.3rem;
+        margin-left: 8px;
+    }
+
+    .book-title {
+        font-size: 1rem;
+    }
+
+    .book-author {
+        font-size: 0.9rem;
+    }
+
+    /* -------------------
+       Section livre du mois
+    ------------------- */
+    .reading-month-section {
+        flex-direction: column;
+        gap: 0; /* coller les blocs */
+        padding: 1rem 1rem;
+        align-items: center; /* centre horizontalement */
+    }
+
+    /* Bloc livre du mois courant */
+    .book-presentation {
+        width: 100%;
+        margin: 0 auto 0; /* pas de marge en bas pour coller au bloc reviews */
+    }
+
+    .book-presentation h2 {
+        font-size: 1.4rem;
+    }
+
+    .book-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem;
+    }
+
+    .book-cover {
+        width: 100px;
+        height: auto;
+    }
+
+    /* Bloc reviews */
+    .club-reviews-wrapper {
+        width: 90%;       /* même largeur que le livre du mois */
+        margin: 0 auto;
+    }
+
+    .club-reviews {
+        width: 100%;
+        max-height: none;
+        margin-top: 0;        /* collé au bloc du dessus */
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+        padding: 0.8rem 1rem;
+    }
+
+    /* -------------------
+       Carousel des propositions
+    ------------------- */
+    .recent-books-carousel {
+        background-color: #A67856;
+        border-radius: 12px;
+        max-width: 90%;      /* moins large que l’écran */
+        margin: 1.5rem auto;
+        padding: 1rem 1.5rem; /* padding interne pour éviter que les cartes collent */
+        box-sizing: border-box;
+    }
+
+    .recent-books-header h2 {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .recent-books-header .btn {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+    }
+
+    .recent-books-container {
+        padding: 0 0.5rem; /* espace interne pour le scroll horizontal */
+        gap: 0.5rem;
+    }
+
+    .book-card {
+        width: 140px;
+        height: auto;
+    }
+
+    .book-card img {
+        height: 150px;
+    }
+
+    /* -------------------
+       Modals vote et signalement
+    ------------------- */
+    #voteModal .modal-content,
+    #reportClubModal .modal-content {
+        width: 90%;
+        max-width: 600px;
+        padding: 18px;
+    }
+
+    /* -------------------
+       Grille de vote (modal)
+    ------------------- */
+    .books-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    /* -------------------
+       Résumé du livre
+    ------------------- */
+    .book-summary h3 {
+        font-size: 1.1rem;
+    }
+
+    .book-summary p {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+
+    /* -------------------
+       Header du club
+    ------------------- */
+    .club-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.8rem;
+    }
+
+    .club-title-actions {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .club-title-actions h1 {
+        font-size: 1.5rem;
+    }
+
+    .club-actions a,
+    .club-actions button {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+    }
+
+    /* -------------------
+       Livre du mois prochain
+    ------------------- */
+    .club-book-of-month {
+        flex: 1 1 100%;
+        width: 100%;
+        padding: 0.8rem;
+        margin-top: 0.8rem;
+    }
+
+    .club-book-of-month h2 {
+        font-size: 1.1rem;
+    }
+
+    .book-card-nm img {
+        width: 80px;
+        height: auto;
+    }
+
+    .book-information {
+        gap: 0.2rem;
+        margin-left: 5px;
+    }
+
+    .book-title {
+        font-size: 0.95rem;
+    }
+
+    .book-author {
+        font-size: 0.85rem;
+    }
+
+    /* -------------------
+       Section livre du mois
+    ------------------- */
+    .reading-month-section {
+        flex-direction: column;
+        gap: 0; /* coller les blocs */
+        padding: 0.8rem;
+        align-items: center;
+    }
+
+    .book-presentation {
+        width: 100%;
+        margin: 0 auto 0; /* collé au bloc suivant */
+    }
+
+    .book-presentation h2 {
+        font-size: 1.2rem;
+    }
+
+    .book-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .book-cover {
+        width: 80px;
+        height: auto;
+    }
+
+    /* -------------------
+       Bloc reviews
+    ------------------- */
+    .club-reviews-wrapper {
+        width: 90%;
+        margin: 0 auto;
+    }
+
+    .club-reviews {
+        width: 100%;
+        max-height: none;
+        margin-top: 0;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+        padding: 0.6rem 0.8rem;
+    }
+
+    /* -------------------
+       Carousel des propositions
+    ------------------- */
+    .recent-books-carousel {
+        background-color: #A67856;
+        border-radius: 12px;
+        max-width: 95%;   /* légèrement plus large que 768px */
+        margin: 1rem auto;
+        padding: 0.8rem 1rem; /* padding interne pour les cartes */
+        box-sizing: border-box;
+    }
+
+    .recent-books-header h2 {
+        font-size: 1rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .recent-books-header .btn {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+    }
+
+    .recent-books-container {
+        padding: 0 0.5rem; /* espace interne pour le scroll */
+        gap: 0.4rem;
+    }
+
+    .book-card {
+        width: 120px;
+        height: auto;
+    }
+
+    .book-card img {
+        height: 130px;
+    }
+
+    /* -------------------
+       Modals vote et signalement
+    ------------------- */
+    #voteModal .modal-content,
+    #reportClubModal .modal-content {
+        width: 90%;
+        max-width: 500px;
+        padding: 16px;
+    }
+
+    /* -------------------
+       Grille de vote (modal)
+    ------------------- */
+    .books-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    /* -------------------
+       Résumé du livre
+    ------------------- */
+    .book-summary h3 {
+        font-size: 1rem;
+    }
+
+    .book-summary p {
+        font-size: 0.9rem;
+    }
 }
