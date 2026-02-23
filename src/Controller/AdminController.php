@@ -319,11 +319,17 @@ class AdminController extends AbstractController
 
     #[Route('/employe/supprimer/{id}', name: 'admin_supprimer_employe', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
-    public function supprimerEmploye(int $id, Request $request, UtilisateurRepository $userRepository, EntityManagerInterface $em, CsrfTokenManagerInterface $csrfTokenManager): RedirectResponse
+    public function supprimerEmploye(
+        int $id, 
+        Request $request, 
+        UtilisateurRepository $userRepository, 
+        EntityManagerInterface $em, 
+        CsrfTokenManagerInterface $csrfTokenManager
+    ): RedirectResponse
     {
         $user = $userRepository->find($id);
 
-        if (!$user || $user->getRole()->getLabel() !== 'EMPLOYE') {
+        if (!$user || !in_array('ROLE_EMPLOYE', $user->getRoles(), true)) {
             throw $this->createNotFoundException('Employé non trouvé');
         }
 
@@ -919,14 +925,31 @@ class AdminController extends AbstractController
         return $this->json(['success' => true]);
     }
 
-    #[Route('/livres-signales/supprimer/{id}', name: 'admin_livre_supprimer', methods: ['POST'])]
+    #[Route('/admin/livres-signales/desactiver/{id}', name: 'admin_livre_desactiver', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
-    public function supprimerLivre(Book $book, EntityManagerInterface $em): Response
+    public function desactiverLivre(Book $book, EntityManagerInterface $em): JsonResponse
     {
-        $em->remove($book);
-        $em->flush();
+        try {
+            // Désactiver le livre
+            $book->setIsActive(false);
 
-        return $this->json(['success' => true, 'message' => 'Livre supprimé avec succès']);
+            // Supprimer tous les reports liés au livre
+            foreach ($book->getReports() as $report) {
+                $em->remove($report);
+            }
+
+            $em->flush();
+
+            return $this->json([
+                'success' => true,
+                'message' => 'Livre désactivé et reports supprimés avec succès'
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Erreur serveur : ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     #[Route('/livre/{id}/edit', name: 'admin_livre_edit')]

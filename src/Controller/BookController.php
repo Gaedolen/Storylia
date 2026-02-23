@@ -60,6 +60,7 @@ class BookController extends AbstractController
                 ->from(Book::class, 'b')
                 ->leftJoin('b.author', 'a')
                 ->where('LOWER(b.title) LIKE :search OR LOWER(a.name) LIKE :search')
+                ->andWhere('b.isActive = true')
                 ->setParameter('search', '%' . $search . '%')
                 ->setMaxResults(100);
 

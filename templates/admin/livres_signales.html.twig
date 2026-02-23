@@ -37,7 +37,7 @@
                 <td>
                     <a href="{{ path('admin_livre_edit', {'id': report.reportedBook.id}) }}" class="btn-edit">Modifier</a>
                     <button class="btn-validate" data-report-id="{{ report.id }}">Valider report</button>
-                    <button class="btn-delete" data-book-id="{{ report.reportedBook.id }}">Supprimer livre</button>
+                    <button class="btn-delete" data-book-id="{{ report.reportedBook.id }}">Désactiver livre</button>
                 </td>
             </tr>
             {% endif %}
@@ -89,24 +89,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Supprimer livre
     document.querySelectorAll('.btn-delete').forEach(btn => {
         btn.addEventListener('click', async () => {
             const bookId = btn.dataset.bookId;
-            if (!confirm('Êtes-vous sûr de vouloir supprimer ce livre ?')) return;
-            const resp = await fetch(`/admin/livres-signales/supprimer/${bookId}`, {
-                method: 'POST',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
-            const result = await resp.json();
-            if (result.success) {
-                alert(result.message);
-                btn.closest('tr').remove();
-            } else {
-                alert(result.message || 'Erreur serveur.');
+            if (!confirm('Êtes-vous sûr de vouloir désactiver ce livre ?')) return;
+
+            try {
+                const resp = await fetch(`/admin/admin/livres-signales/desactiver/${bookId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                // Vérifie que la réponse est du JSON
+                const contentType = resp.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('Réponse invalide du serveur');
+                }
+
+                const result = await resp.json();
+                if (result.success) {
+                    alert(result.message);
+                    btn.closest('tr').remove(); // supprime la ligne du tableau
+                } else {
+                    alert(result.message || 'Erreur serveur.');
+                }
+            } catch (e) {
+                alert('Erreur réseau ou serveur : ' + e.message);
             }
         });
     });
+
 });
 </script>
 {% endblock %}

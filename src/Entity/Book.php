@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use App\Entity\Club;
 use App\Entity\Review;
+use App\Entity\Report;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
@@ -25,6 +26,9 @@ class Book
     #[ORM\GeneratedValue]
     #[ORM\Column(type:"integer")]
     private ?int $id = null;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => true])]
+    private bool $isActive = true;
 
     #[ORM\Column(type:"string", length:255)]
     private ?string $title = null; // Titre principal (français ou VO si unique)
@@ -80,10 +84,14 @@ class Book
     #[ORM\JoinColumn(nullable: true)]
     private ?Utilisateur $utilisateur = null;
 
+    #[ORM\OneToMany(mappedBy: 'reportedBook', targetEntity: Report::class, cascade: ['remove'])]
+    private Collection $reports;
+
     // Constructeur
     public function __construct()
     {
         $this->reviews = new ArrayCollection();
+        $this->reports = new ArrayCollection();
     }
 
     // Getters & Setters
@@ -91,6 +99,17 @@ class Book
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getIsActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): self
+    {
+        $this->isActive = $isActive;
+        return $this;
     }
 
     public function getTitle(): ?string
@@ -295,6 +314,35 @@ class Book
     public function setUtilisateur(?Utilisateur $utilisateur): self
     {
         $this->utilisateur = $utilisateur;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Report>
+     */
+    public function getReports(): Collection
+    {
+        return $this->reports;
+    }
+
+    public function addReport(Report $report): self
+    {
+        if (!$this->reports->contains($report)) {
+            $this->reports->add($report);
+            $report->setReportedBook($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReport(Report $report): self
+    {
+        if ($this->reports->removeElement($report)) {
+            if ($report->getReportedBook() === $this) {
+                $report->setReportedBook(null);
+            }
+        }
+
         return $this;
     }
 }

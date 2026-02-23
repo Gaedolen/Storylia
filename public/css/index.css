@@ -645,6 +645,29 @@ h1, h2, h3, h4, h5, h6 {
     color: #FAF3E0;
 }
 
+/* Supprime le soulignement des liens des cartes */
+.card-link,
+.review-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Pour que l’effet hover soit sympa */
+.card-link:hover,
+.review-link:hover {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.review-link {
+    display: flex;          /* horizontal */
+    flex-direction: row;    /* bien en ligne */
+    align-items: center;    /* verticalement centré */
+    gap: 8px;               /* espace entre image et texte */
+    text-decoration: none;
+    color: inherit;
+}
+
 @media (max-width: 1024px) {
 
     /* Container principal */

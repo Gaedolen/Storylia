@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le livre{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/employe/edit_livre.css') }}">
+{% endblock %}
+
+{% block body %}
+<h1>Modifier le livre : {{ book.title }}</h1>
+
+<div class="livre-edit-container">
+
+    <!-- Colonne gauche -->
+    <div class="livre-edit-left">
+
+        <!-- Bloc détails du livre -->
+        <div class="livre-details">
+            <h2>Détails du livre</h2>
+            <img src="{{ asset(book.cover) }}" alt="Cover" style="width: 100%; max-width: 200px; margin-bottom: 1rem;">
+            <p><strong>Titre :</strong> {{ book.title }}</p>
+            {% if book.voTitle %}
+                <p><strong>Titre VO :</strong> {{ book.voTitle }}</p>
+            {% endif %}
+            <p><strong>Auteur :</strong> {{ book.author.name }}</p>
+            {% if book.publicationDate %}
+                <p><strong>Date de publication :</strong> {{ book.publicationDate|date('d/m/Y') }}</p>
+            {% endif %}
+            {% if book.genres %}
+                <p><strong>Genres :</strong> {{ book.genres|join(', ') }}</p>
+            {% endif %}
+            {% if book.subjects %}
+                <p><strong>Sujets :</strong> {{ book.subjects|join(', ') }}</p>
+            {% endif %}
+            {% if book.summary %}
+                <p><strong>Résumé :</strong> {{ book.summary }}</p>
+            {% endif %}
+            {% if book.isbn %}
+                <p><strong>ISBN :</strong> {{ book.isbn }}</p>
+            {% endif %}
+            {% if book.pages %}
+                <p><strong>Pages :</strong> {{ book.pages }}</p>
+            {% endif %}
+            {% if book.publishers %}
+                <p><strong>Éditeurs :</strong> {{ book.publishers|join(', ') }}</p>
+            {% endif %}
+            {% if book.format %}
+                <p><strong>Format :</strong> {{ book.format }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Bloc signalement -->
+        <div class="signalement-block">
+            <h2>Signalement</h2>
+            <p><strong>Émis par :</strong> {{ report.author.pseudo }}</p>
+            <p><strong>Date :</strong> {{ report.date|date('d/m/Y H:i') }}</p>
+            <p><strong>Raison :</strong> {{ report.reason }}</p>
+            {% if report.message %}
+                <p><strong>Message :</strong> {{ report.message }}</p>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- Colonne droite -->
+    <div class="livre-edit-right">
+        <h2>Modifier les informations</h2>
+        {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <button class="btn btn-primary mt-3">Enregistrer les modifications</button>
+        {{ form_end(form) }}
+    </div>
+
+</div>
+{% endblock %}

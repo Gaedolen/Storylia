@@ -63,16 +63,18 @@
                         {% for item in favorites %}
                             <div class="carousel-card-wrapper">
                                 <div class="carousel-card">
-                                    {% if item.book.cover %}
-                                        <img src="{{ item.book.cover }}" alt="{{ item.book.title }}" class="card-img">
-                                    {% else %}
-                                        <img src="{{ asset('images/default_cover.jpg') }}" alt="{{ item.book.title }}" class="card-img">
-                                    {% endif %}
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ item.book.title }}</h5>
+                                    <a href="{{ path('app_livre_detail', {'id': item.book.id}) }}" class="card-link">
+                                        {% if item.book.cover %}
+                                            <img src="{{ item.book.cover }}" alt="{{ item.book.title }}" class="card-img">
+                                        {% else %}
+                                            <img src="{{ asset('images/default_cover.jpg') }}" alt="{{ item.book.title }}" class="card-img">
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ item.book.title }}</h5>
+                                        </div>
+                                    </a>
                                         <p class="card-author">{{ item.book.author.name }}</p>
                                         <p class="card-rating">Note moyenne : {{ item.avgRating|number_format(1, '.', ',') }}/5</p>
-                                    </div>
                                 </div>
                             </div>
                         {% endfor %}
@@ -102,12 +104,16 @@
                                 <div class="club-members">{{ club.membres|length }} participant{{ club.membres|length > 1 ? 's' : '' }}</div>
                             </div>
                         </div>
-                        {% if not app.user or not club.membres.contains(app.user) %}
-                            <form method="POST" action="{{ path('club_participer', {'id': club.id}) }}">
-                                <button type="submit" class="btn-participate">Participer</button>
-                            </form>
+                        {% if app.user %}
+                            {% if not club.membres.contains(app.user) %}
+                                <form method="POST" action="{{ path('club_participer', {'id': club.id}) }}">
+                                    <button type="submit" class="btn-participate">Participer</button>
+                                </form>
+                            {% else %}
+                                <button class="btn-participate" disabled>Déjà membre</button>
+                            {% endif %}
                         {% else %}
-                            <button class="btn-participate" disabled>Déjà membre</button>
+                            <a href="{{ path('app_login') }}" class="btn-participate">Participer</a>
                         {% endif %}
                     </div>
                 {% else %}
@@ -122,21 +128,23 @@
             <div class="last-reviews">
                 {% for review in lastReviews|slice(0, 20) %}
                     <div class="review-card">
-                        <div class="review-left">
-                            <img src="{{ review.book.cover }}" alt="{{ review.book.title }}" class="review-cover">
-                        </div>
-                        <div class="review-right">
-                            <div class="review-book-title">{{ review.book.title }}</div>
-                            <div class="review-bubble">
-                                <div class="bubble-header">
-                                    <span class="review-author">{{ review.utilisateur.pseudo }}</span>
-                                    <span class="review-rating">Note : {{ review.rating }}/5</span>
-                                </div>
-                                <div class="bubble-text">
-                                    {{ review.comment|slice(0, 100) }}{% if review.comment|length > 100 %}...{% endif %}
+                        <a href="{{ path('app_livre_detail', {'id': review.book.id}) }}" class="review-link">
+                            <div class="review-left">
+                                <img src="{{ review.book.cover }}" alt="{{ review.book.title }}" class="review-cover">
+                            </div>
+                            <div class="review-right">
+                                <div class="review-book-title">{{ review.book.title }}</div>
+                                <div class="review-bubble">
+                                    <div class="bubble-header">
+                                        <span class="review-author">{{ review.utilisateur.pseudo }}</span>
+                                        <span class="review-rating">Note : {{ review.rating }}/5</span>
+                                    </div>
+                                    <div class="bubble-text">
+                                        {{ review.comment|slice(0, 100) }}{% if review.comment|length > 100 %}...{% endif %}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 {% else %}
                     <p>Aucun avis récent</p>

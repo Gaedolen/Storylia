@@ -57,7 +57,8 @@ h1 {
 
 /* ===== Boutons ===== */
 .btn-edit,
-.btn-validate {
+.btn-validate,
+.btn-delete {
     display: inline-block;
     margin: 0 5px;
     padding: 6px 12px;
@@ -86,6 +87,16 @@ h1 {
 
 .btn-validate:hover {
     background-color: #5F7F5F;
+}
+
+.btn-delete {
+    background-color: #aa3535;
+    color: #FAF3E0;
+    border: none;
+}
+
+.btn-delete:hover {
+    background-color: #e44646;
 }
 
 /* ===== Modal détails livre ===== */
@@ -170,7 +181,8 @@ h1 {
 
     /* Boutons */
     .btn-edit,
-    .btn-validate {
+    .btn-validate,
+    .btn-delete {
         margin: 3px 4px;
         padding: 5px 10px;
         font-size: 0.8em;
