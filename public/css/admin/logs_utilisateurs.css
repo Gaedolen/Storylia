@@ -1,0 +1,100 @@
+/* === Général === */
+body {
+    font-family: 'Comfortaa', sans-serif;
+    background-color: #FAF3E0;
+    margin: 0;
+    padding: 0;
+}
+
+.admin-dashboard {
+    max-width: 1300px;
+    margin: 50px auto;
+    padding: 30px;
+}
+
+/* === Titres === */
+.admin-dashboard h1 {
+    font-size: 2rem;
+    color: #714B2F;
+    margin-bottom: 0.5rem;
+}
+
+/* === Tableau des logs === */
+.logs-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+    background-color: #FAF3E0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    font-family: 'Comfortaa', sans-serif;
+}
+
+.logs-table th,
+.logs-table td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.logs-table th {
+    background-color: #E8CBAE;
+    color: #3B2F2F;
+    font-weight: bold;
+}
+
+.logs-table tr:nth-child(even) {
+    background-color: #fff2e0;
+}
+
+.logs-table tr:hover {
+    background-color: #f3d8b5;
+    transition: background-color 0.2s;
+}
+
+.logs-table td {
+    color: #3B2F2F;
+    font-size: 0.95rem;
+}
+
+/* === Responsive === */
+
+/* Tablette (max-width: 1024px) */
+@media (max-width: 1024px) {
+    .logs-table th,
+    .logs-table td {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Mobile standard (max-width: 768px) */
+@media (max-width: 768px) {
+    .logs-table th,
+    .logs-table td {
+        padding: 8px 10px;
+        font-size: 0.85rem;
+    }
+    
+    .logs-table {
+        font-size: 0.85rem;
+    }
+}
+
+/* Petit mobile (max-width: 480px) */
+@media (max-width: 480px) {
+    .logs-table th,
+    .logs-table td {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+    }
+
+    .logs-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* pour un scroll fluide sur mobile */
+    }
+
+    .logs-table {
+        min-width: 600px; /* largeur minimale pour forcer le scroll si le tableau est trop large */
+    }
+}

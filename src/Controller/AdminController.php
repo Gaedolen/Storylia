@@ -29,6 +29,9 @@ use App\Repository\UtilisateurRepository;
 use App\Repository\BookRepository;
 use App\Repository\ReportRepository;
 use App\Repository\ClubRepository;
+use App\Document\Log;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use App\Service\UserLogService;
 
 #[IsGranted('ROLE_ADMIN')]
 #[Route('/admin')]
@@ -955,6 +958,23 @@ class AdminController extends AbstractController
             'form' => $form->createView(),
             'book' => $book,
             'report' => $report,
+        ]);
+    }
+
+    
+    #[Route('/logs', name: 'logs_utilisateurs')]
+    #[IsGranted('ROLE_ADMIN')]
+    public function logsUtilisateur(EntityManagerInterface $em, UtilisateurRepository $userRepository, UserLogService $logger,DocumentManager $dm): Response
+    {
+        // Log de la visite admin
+        $logger->log('visite_admin_dashboard', 'L\'admin a ouvert le dashboard');
+
+        //  Récupérer les logs MongoDB
+        $logs = $dm->getRepository(Log::class)
+               ->findBy([], ['createdAt' => 'DESC']);
+
+        return $this->render('admin/logs_utilisateurs.html.twig', [
+            'logs' => $logs,
         ]);
     }
 }
