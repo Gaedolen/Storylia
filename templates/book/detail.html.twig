@@ -166,6 +166,7 @@
                     <h3>Modifier la couverture</h3>
 
                     <form action="{{ path('app_livre_edit_cover', {'id': book.id}) }}" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="_token" value="{{ csrf_token('edit_cover_' ~ book.id) }}">
                         <label class="btn-main" for="cover-input">Sélectionner une nouvelle couverture</label>
                         <input type="file" name="cover" id="cover-input" accept="image/*" style="display:none;">
                         <p class="file-name" style="margin-top:8px;color:#4b2e05;"></p>
@@ -194,6 +195,8 @@
 
                     {% if availableSlots > 0 %}
                         <form id="edit-subjects-form" action="{{ path('app_livre_edit_subjects', {'id': book.id}) }}" method="POST">
+                            <input type="hidden" name="_token" value="{{ csrf_token('edit_subjects_' ~ book.id) }}">
+
                             <div id="subjects-container">
                                 <div class="subject-field">
                                     <input type="text" name="subjects[]" placeholder="Nouveau thème" class="subject-input">
@@ -222,6 +225,8 @@
                     <h3>Mettre à jour le résumé</h3>
 
                     <form id="edit-summary-form" action="{{ path('app_livre_edit_summary', {'id': book.id}) }}" method="POST">
+                        <input type="hidden" name="_token" value="{{ csrf_token('edit_summary_' ~ book.id) }}">
+
                         <p class="summary-warning">
                             Pour plus de précision et éviter les erreurs, nous vous recommandons de reprendre le résumé officiel.
                         </p>
@@ -510,4 +515,7 @@
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('js/detailsBookModals.js') }}"></script>
+    <script>
+        const csrfBookCreate = '{{ csrf_token("book_create") }}';
+    </script>
  {% endblock %}

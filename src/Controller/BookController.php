@@ -18,6 +18,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -142,7 +145,7 @@ class BookController extends AbstractController
     }
 
     #[Route('/creation', name: 'livres_creation', methods: ['POST'])]
-    public function create(Request $request, EntityManagerInterface $em, HttpClientInterface $client): JsonResponse {
+    public function create(Request $request, EntityManagerInterface $em, HttpClientInterface $client, CsrfTokenManagerInterface $csrfTokenManager): JsonResponse {
     /** @var Utilisateur $user */
     $user = $this->getUser();
         if (!$user instanceof Utilisateur) {
@@ -153,6 +156,15 @@ class BookController extends AbstractController
         }
 
         $data = json_decode($request->getContent(), true);
+
+        // Vérification CSRF
+        $token = $data['_token'] ?? '';
+        if (!$csrfTokenManager->isTokenValid(new CsrfToken('create_book', $token))) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Token CSRF invalide.'
+            ], 403);
+        }
 
         $bookTitle = trim($data['title'] ?? '');
         $authorName = trim($data['author'] ?? '');
@@ -350,8 +362,13 @@ class BookController extends AbstractController
     }
 
     #[Route('/{id}/edit-cover', name: 'app_livre_edit_cover', methods: ['POST'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function editCover(Request $request, Book $book, EntityManagerInterface $em): JsonResponse
     {
+        $token = $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('edit_cover_' . $book->getId(), $token)) {
+            return $this->json(['success' => false, 'message' => 'Token CSRF invalide'], 403);
+        }
         $file = $request->files->get('cover');
 
         if ($file) {
@@ -374,8 +391,14 @@ class BookController extends AbstractController
     }
 
     #[Route('/{id}/edit-subjects', name: 'app_livre_edit_subjects', methods: ['POST'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function editSubjects(Request $request, Book $book, EntityManagerInterface $em): JsonResponse
     {
+        $token = $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('edit_subjects_' . $book->getId(), $token)) {
+            return $this->json(['success' => false, 'message' => 'Token CSRF invalide'], 403);
+        }
+
         $maxSubjects = 10;
         $currentSubjects = $book->getSubjects();
         $availableSlots = $maxSubjects - count($currentSubjects);
@@ -416,8 +439,14 @@ class BookController extends AbstractController
     }
 
     #[Route('/{id}/edit-summary', name: 'app_livre_edit_summary', methods: ['POST'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function editSummary(Request $request, Book $book, EntityManagerInterface $em): JsonResponse
     {
+        $token = $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('edit_summary_' . $book->getId(), $token)) {
+            return $this->json(['success' => false, 'message' => 'Token CSRF invalide'], 403);
+        }
+
         $summary = trim($request->request->get('summary', ''));
 
         // Vérifications côté serveur

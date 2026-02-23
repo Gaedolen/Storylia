@@ -152,34 +152,66 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================
     const summaryModal = document.getElementById('edit-summary-modal');
     const summaryForm = document.getElementById('edit-summary-form');
-    if (summaryForm) {
-        const textarea = summaryForm.querySelector('textarea');
-        const counter = summaryModal?.querySelector('#char-count');
-        const updateBtn = document.querySelector('button.btn-main[data-modal="edit-summary-modal"]') 
-                          || document.querySelector('button.btn-main:last-of-type');
 
+    if (summaryForm && summaryModal) {
+        const textarea = summaryForm.querySelector('textarea[name="summary"]');
+        const counter = summaryModal.querySelector('#char-count');
+        const maxLength = 1000;
+
+        // Initialisation du compteur
+        if (textarea && counter) {
+            counter.textContent = `${textarea.value.length} / ${maxLength}`;
+            textarea.addEventListener('input', () => {
+                counter.textContent = `${textarea.value.length} / ${maxLength}`;
+            });
+        }
+
+        // Bouton pour ouvrir la modal
+        const updateBtn = document.querySelector('button.btn-main[data-modal="edit-summary-modal"]');
         updateBtn?.addEventListener('click', () => {
-            openModal(summaryModal);
+            summaryModal.style.display = 'flex';
             textarea?.focus();
-            if (counter) counter.textContent = `${textarea.value.length} / 1000`;
+            if (counter) counter.textContent = `${textarea.value.length} / ${maxLength}`;
         });
 
-        textarea?.addEventListener('input', () => {
-            if (counter) counter.textContent = `${textarea.value.length} / 1000`;
+        // Bouton de fermeture
+        const closeBtn = summaryModal.querySelector('.close');
+        closeBtn?.addEventListener('click', () => summaryModal.style.display = 'none');
+
+        // Fermer modal en cliquant en dehors
+        window.addEventListener('click', e => {
+            if (e.target === summaryModal) summaryModal.style.display = 'none';
         });
 
+        // Soumission AJAX
         summaryForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(summaryForm);
+
             try {
-                const resp = await fetch(summaryForm.action, { method: 'POST', body: formData });
+                const resp = await fetch(summaryForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
                 const data = await resp.json();
+
                 if (data.success) {
+                    // Mise à jour du résumé côté DOM
                     const summaryBlock = document.querySelector('.livre-resume p');
                     if (summaryBlock) summaryBlock.textContent = data.summary;
-                    closeModal(summaryModal);
+
+                    // Fermer modal et reset textarea
+                    summaryModal.style.display = 'none';
+                } else {
+                    // Affiche l’erreur serveur (CSRF ou validation)
+                    alert(data.message || 'Erreur lors de la mise à jour du résumé.');
                 }
-            } catch { alert("Erreur réseau."); }
+            } catch (err) {
+                console.error(err);
+                alert('Erreur réseau, réessayez.');
+            }
         });
     }
 
@@ -245,7 +277,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest' 
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': csrfBookCreate
                     },
                     body
                 });
@@ -503,36 +536,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function highlightStars(val) {
             stars.forEach(s => {
-                s.textContent = s.dataset.value <= val ? '★' : '☆';
+                s.textContent = Number(s.dataset.value) <= Number(val) ? '★' : '☆';
             });
         }
 
         // Envoi
-        submitBtn?.addEventListener('click', () => {
+        submitBtn?.addEventListener('click', async () => {
             if (selectedRating == 0) {
                 alert("Veuillez sélectionner une note.");
                 return;
             }
 
-            fetch(rateUrl, {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': csrfToken,
-                },
-                body: JSON.stringify({ rating: selectedRating })
-            })
-            .then(res => res.json())
-            .then(data => {
+            try {
+                const res = await fetch(rateUrl, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({ rating: selectedRating })
+                });
+
+                const data = await res.json();
+
                 if (data.success) {
                     leaveBtn.textContent = "Note laissée ✓";
                     leaveBtn.disabled = true;
                     closeModal(modal);
                 } else {
-                    alert(data.message);
+                    alert(data.message || "Erreur côté serveur.");
                 }
-            });
+
+            } catch (err) {
+                console.error(err);
+                alert("Erreur réseau, réessayez.");
+            }
         });
     }
 

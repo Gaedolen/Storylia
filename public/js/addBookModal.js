@@ -156,16 +156,35 @@ if (!window.searchBookModalInit) {
                     voTitle = book.title && book.title !== title ? book.title : null;
                 }
 
-                const bookData = {title, voTitle, author, publicationDate: publishedDate,
-                                  genres, subjects, summary, isbn, cover, pages, publishers, format};
+                const token = formBookCreation.querySelector('input[name="_token"]').value;
+
+                const bookData = {
+                    title,
+                    voTitle,
+                    author,
+                    publicationDate: publishedDate,
+                    genres,
+                    subjects,
+                    summary,
+                    isbn,
+                    cover,
+                    pages,
+                    publishers,
+                    format,
+                    _token: token
+                };
 
                 const response = await fetch('/livres/creation', {
-                    method:'POST',
-                    headers:{'Content-Type':'application/json','X-Requested-With':'XMLHttpRequest'},
+                    method: 'POST',
+                    headers: {
+                        'Content-Type':'application/json',
+                        'X-Requested-With':'XMLHttpRequest'
+                    },
                     body: JSON.stringify(bookData)
                 });
 
                 const result = await response.json();
+
                 if(result.success) {
                     window.location.href = `/livres/${result.bookId}`;
                 } else {

@@ -72,6 +72,7 @@
                 <div id="bookCreationForm" class='hidden' style=" margin-top:20px;">
                     <h3>Ajouter un livre</h3>
                     <form id="formBookCreation">
+                        <input type="hidden" name="_token" value="{{ csrf_token('create_book') }}">
 
                         <div class="form-group">
                             <label for="bookTitle">Titre</label>
