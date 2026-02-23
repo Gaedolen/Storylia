@@ -644,3 +644,499 @@ h1, h2, h3, h4, h5, h6 {
     background-color: #C97C5D;
     color: #FAF3E0;
 }
+
+@media (max-width: 1024px) {
+
+    /* Container principal */
+    .home-main {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+        padding: 15px;
+        max-width: 1024px;
+        margin: 0 auto;
+    }
+
+    /* === HERO === */
+    .hero {
+        display: flex;
+        width: 100%;
+        min-height: 300px;
+        padding: 15px;
+        box-sizing: border-box;
+    }
+
+    .hero-container {
+        display: flex;
+        width: 100%;
+        gap: 15px;
+        align-items: stretch;
+    }
+
+    .hero-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        gap: 120px;
+        align-items: center;
+        width: 90%;
+        max-width: 900px;
+    }
+
+    .hero-img-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 25px;
+    }
+
+    .hero-club-lecture {
+        flex: 0.8;
+        padding: 15px;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .hero-content h1 {
+        font-size: 1.9rem;
+        text-align: center;
+        line-height: 1.4;
+        max-width: 90%;
+    }
+
+    .hero-buttons {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+
+    .hero-buttons button {
+        width: 160px;
+        height: 45px;
+        font-size: 1.1rem;
+        line-height: 45px;
+        text-align: center;
+    }
+
+    /* === CAROUSEL === */
+    .favorites-carousel {
+        width: 100%;
+        max-width: 100%;
+        padding: 15px;
+        margin: 0 auto;
+    }
+
+    .carousel-title {
+        font-size: 1.5rem;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    .carousel-card {
+        flex: 0 0 160px;
+    }
+
+    .card-img {
+        height: 160px;
+    }
+
+    .carousel-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.3rem;
+    }
+
+    /* === DERNIERS CLUBS + DERNIERS AVIS === */
+    .last-clubs, .last-reviews-container {
+        flex: 1;
+        width: 48%;
+        min-width: 300px;
+        max-width: 48%;
+        padding: 15px;
+        box-sizing: border-box;
+        gap: 10px;
+    }
+
+    /* Conteneur qui contient les deux colonnes */
+    .home-right {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .clubs-container, .last-reviews {
+        max-height: 300px;
+        gap: 8px;
+        overflow-y: auto;
+    }
+
+    /* Titres généraux */
+    h1, h2, h3, h4, h5, h6 {
+        font-size: clamp(1rem, 1.2vw, 1.2rem);
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* Container principal : tout empilé verticalement */
+    .home-main {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 10px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    /* === HERO === */
+    .hero {
+        display: flex;
+        flex-direction: column;   /* image et club empilés */
+        width: 100%;
+        min-height: 280px;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+
+    .hero-container {
+        display: flex;
+        flex-direction: row;   /* image + club côte à côte */
+        gap: 15px;
+        width: 100%;
+    }
+
+    .hero-img-container,
+    .hero-club-lecture {
+        flex: 1;               /* prennent chacune 50% de la largeur */
+        max-width: 50%;        /* limite pour ne pas dépasser la moitié */
+        min-width: 300px;      /* garde un minimum si l'écran est petit */
+        box-sizing: border-box;
+    }
+
+    .hero-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        gap: 60px;           /* réduit pour que tout rentre */
+        align-items: center;
+        height: 80%;
+        width: 85%;          /* réduit un peu pour ne pas dépasser le bloc image */
+        max-width: 600px;    /* limite la largeur du contenu */
+    }
+
+    .hero-content h1 {
+        font-size: 1.3rem;
+        text-align: center;
+        line-height: 1.4;
+        max-width: 95%;
+    }
+
+    /* === Hero buttons et club container === */
+    .hero-buttons {
+        display: flex;
+        flex-direction: row;
+        gap: 15px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .hero-buttons button {
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        padding: 0 12px;
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+
+    /* Bouton Se connecter */
+    .btn-connect {
+        width: auto;
+    }
+
+    /* Bouton Rechercher */
+    .btn-outline-primary {
+        width: auto;
+        padding: 4px 10px;
+        font-size: 0.85rem;
+        text-align: center;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 34px;
+    }
+
+    /* Bouton Créer un club */
+    .hero-btn {
+        width: auto;          
+        padding: 5px 12px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        text-align: center;
+    }
+
+    .hero-club-lecture a {
+        font-size: 15px;
+    }
+
+    .input-btn-club {
+        max-height: 40px;
+    }
+
+    /* Champ de saisie */
+    .input-btn-club input {
+        width: 150px;
+        max-width: 100%;
+        padding: 3px 8px;
+        font-size: 0.85rem;
+    }
+
+    /* Texte dans le conteneur club */
+    .hero-club-lecture p {
+        font-size: 15px;
+        line-height: 1.4;     /* un peu plus d'espacement */
+    }
+
+    /* === CAROUSEL === */
+    .favorites-carousel {
+        width: 100%;
+        padding: 10px;
+        max-width: 100%;
+    }
+
+    .carousel-title {
+        font-size: 1.3rem;
+        margin-bottom: 12px;
+    }
+
+    .carousel-card {
+        flex: 0 0 140px;
+    }
+
+    .card-img {
+        height: 140px;
+    }
+
+    .carousel-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 1.2rem;
+    }
+
+    /* === DERNIERS CLUBS + DERNIERS AVIS === */
+    .home-right {
+        display: flex;
+        flex-direction: row;  /* empile verticalement */
+        gap: 15px;
+        width: 100%;
+    }
+
+    .last-clubs, .last-reviews-container {
+        width: 100%;            /* full width sur tablette */
+        padding: 12px;
+        gap: 8px;
+    }
+
+    .clubs-container, .last-reviews {
+        max-height: 250px;
+        gap: 6px;
+        overflow-y: auto;
+    }
+
+    /* Titres généraux */
+    h1, h2, h3, h4, h5, h6 {
+        font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+    }
+}
+
+@media (max-width: 480px) {
+
+    /* Container principal */
+    .home-main {
+        padding: 8px;
+        gap: 15px;
+    }
+
+    /* === HERO === */
+    .hero {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        min-height: auto;
+        padding: 0;
+        margin-bottom: 10px;
+    }
+
+    .hero-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .hero-img-container {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 150px;
+        max-height: 150px;
+    }
+
+    .hero-img-container,
+    .hero-club-lecture {
+        max-width: 100%;
+        min-width: 100%;
+    }
+
+    .hero-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 90%;
+        height: 100%;
+        text-align: center;
+    }
+
+    .hero-content h1 {
+        font-size: 1.1rem;
+        line-height: 1.3;
+    }
+
+    /* === Boutons HERO === */
+    .hero-buttons {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+
+    .hero-buttons button {
+        width: 100%;
+        height: 36px;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-connect,
+    .btn-outline-primary,
+    .hero-btn {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+
+    /* === Club container === */
+
+    .input-btn-club {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .input-btn-club input {
+        width: 100%;
+        font-size: 0.85rem;
+        padding: 6px 8px;
+    }
+
+    .hero-club-lecture p,
+    .hero-club-lecture a {
+        font-size: 0.9rem;
+        text-align: flex-start;
+    }
+
+    /* === CAROUSEL === */
+    .favorites-carousel {
+        padding: 8px;
+    }
+
+    .carousel-title {
+        font-size: 1.1rem;
+    }
+
+    .carousel-card {
+        flex: 0 0 120px;
+    }
+
+    .card-img {
+        height: 120px;
+    }
+
+    .carousel-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 1rem;
+    }
+
+    /* === Derniers clubs + avis === */
+    .home-right {
+        display: flex;
+        flex-direction: column;   /* empilé */
+        align-items: center;      /* centré horizontalement */
+        gap: 18px;
+        width: 100%;
+    }
+
+    /* Blocs centrés et plus larges */
+    .last-clubs,
+    .last-reviews-container {
+        width: 90%;               /* pas 100% pour laisser respirer */
+        max-width: 400px;         /* évite que ça devienne trop large */
+        padding: 14px;
+        box-sizing: border-box;
+    }
+
+    /* Titres plus visibles */
+    .last-clubs h3,
+    .last-reviews-container h3 {
+        font-size: 1rem;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    /* Contenu interne */
+    .clubs-container,
+    .last-reviews {
+        max-height: 220px;
+        overflow-y: auto;
+        gap: 8px;
+    }
+
+    /* Texte un peu plus grand qu'avant */
+    .last-clubs *,
+    .last-reviews-container * {
+        font-size: 0.9rem;
+        line-height: 1.3;
+    }
+
+    /* Titres */
+    h1, h2, h3, h4, h5, h6 {
+        font-size: 1rem;
+    }
+}
