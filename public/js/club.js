@@ -25,7 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
             charCount.textContent = textarea.value.length;
         });
 
-        const reviewUrl = "{{ path('club_review_add') }}";
+        const reviewUrl = reviewForm.dataset.url;
+        const csrfToken = reviewForm.querySelector('input[name="_token"]').value;
 
         reviewForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -41,8 +42,16 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const response = await fetch(reviewUrl, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(data)
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "same-origin",
+                    body: JSON.stringify({
+                        comment: textarea.value,
+                        readingMonthId: monthId,
+                        rating: 5,
+                        _token: csrfToken
+                    })
                 });
 
                 const result = await response.json();

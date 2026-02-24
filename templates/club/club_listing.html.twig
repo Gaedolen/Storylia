@@ -102,13 +102,11 @@
                                 <span class="club-participants">{{ club.membres|length }} participants</span>
                                 <span class="creation-date">Créé le {{ club.creationDate|date('d/m/Y') }}</span>
 
-                                {% if app.user 
-                                    and app.user != club.creator 
-                                    and app.user not in club.membres
-                                %}
-                                    <a href="{{ path('club_participer', { id: club.id }) }}" class="btn-participer">
-                                        Participer
-                                    </a>
+                                {% if app.user and app.user != club.creator and app.user not in club.membres %}
+                                    <form method="post" action="{{ path('club_participer', { id: club.id }) }}" style="display:inline;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('participer_club_' ~ club.id) }}">
+                                        <button type="submit" class="btn-participer">Participer</button>
+                                    </form>
                                 {% endif %}
                             </div>
 

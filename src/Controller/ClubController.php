@@ -28,6 +28,8 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use DateTime;
 use DateInterval;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -104,6 +106,7 @@ class ClubController extends AbstractController
     }
 
     #[Route('/create', name: 'club_create')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function create(Request $request, EntityManagerInterface $em): Response
     {
         $club = new Club();
@@ -136,150 +139,104 @@ class ClubController extends AbstractController
     }
 
     #[Route('/clubs/{id}', name: 'club_show', methods: ['GET'])]
-    public function show(Club $club, ClubReadingMonthRepository $clubReadingMonthRepository, ClubReviewRepository $clubReviewRepository, BookProposalRepository $bookProposalRepository, ReportRepository $reportRepository): Response 
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function show(
+        Club $club,
+        ClubReadingMonthRepository $clubReadingMonthRepository,
+        ClubReviewRepository $clubReviewRepository,
+        BookProposalRepository $bookProposalRepository,
+        ReportRepository $reportRepository
+    ): Response 
     {
-        $formatter = new \IntlDateFormatter(
-            'fr_FR',
-            \IntlDateFormatter::FULL,
-            \IntlDateFormatter::NONE,
-            null,
-            null,
-            'LLLL' // nom complet du mois
-        );
+        $formatter = new \IntlDateFormatter('fr_FR', \IntlDateFormatter::FULL, \IntlDateFormatter::NONE, null, null, 'LLLL');
 
-        // Mois courant
+        $user = $this->getUser();
+        $userId = $user instanceof Utilisateur ? $user->getId() : null;
+
+        // --- Livres du mois ---
         $bookOfMonthReading = $clubReadingMonthRepository->findCurrentMonthByClub($club);
         $bookOfMonth = $bookOfMonthReading?->getBook();
         $currentMonthName = $bookOfMonthReading
             ? ucfirst($formatter->format(new DateTime($bookOfMonthReading->getMonth() . '-01')))
             : '';
 
-        // Mois prochain
         $bookOfNextMonthReading = $clubReadingMonthRepository->findNextMonthByClub($club);
         $bookOfNextMonth = $bookOfNextMonthReading?->getBook();
         $nextMonthName = $bookOfNextMonthReading
             ? ucfirst($formatter->format(new DateTime($bookOfNextMonthReading->getMonth() . '-01')))
             : '';
 
-        // Mois +2
-        $bookOfNextNextMonthReading = $clubReadingMonthRepository->findOneBy([
-            'club' => $club,
-            'month' => (new \DateTimeImmutable('first day of +2 month'))->format('Y-m'),
-        ]);
-        $nextNextMonthName = $bookOfNextNextMonthReading
-            ? ucfirst($formatter->format(new DateTime($bookOfNextNextMonthReading->getMonth() . '-01')))
-            : '';
-
-        // Avis 
-        $lastReviews = [];
-            if ($bookOfMonthReading instanceof ClubReadingMonth) {
-            $lastReviews = $clubReviewRepository->findLastReviewsByMonth($bookOfMonthReading, 3);
-        }
-
-        // Bloque le btn d'avis si l'utilisateur en a déjà laissé un
-        $userHasReviewedMonth = false;
-        $user = $this->getUser();
-
-        if ($bookOfMonthReading instanceof ClubReadingMonth && $user instanceof Utilisateur) {
-            $monthId = $bookOfMonthReading->getId(); // Ici, getId() n'est jamais sur un null
-            $userId = $user->getId();
-
-            $existingReview = $clubReviewRepository->findByUserAndMonth($userId, $monthId);
-            $userHasReviewedMonth = ($existingReview !== null);
-        }
-
-        // --- Récupération du mois des propositions (+2 mois) ---
+        // --- Mois +2 (lecture & vote) ---
+        $plus2MonthStr = (new \DateTimeImmutable('first day of +2 month'))->format('Y-m');
         $clubReadingMonth = $clubReadingMonthRepository->findOneBy([
             'club' => $club,
-            'month' => (new \DateTimeImmutable('first day of +2 month'))->format('Y-m'),
+            'month' => $plus2MonthStr,
         ]);
 
-        // --- Livres récemment proposés ---
+        $bookOfNextNextMonth = $clubReadingMonth?->getBook();
+        $nextNextMonthName = $clubReadingMonth
+            ? ucfirst($formatter->format(new DateTime($clubReadingMonth->getMonth() . '-01')))
+            : '';
+
+        // --- Derniers avis ---
+        $lastReviews = $bookOfMonthReading instanceof ClubReadingMonth
+            ? $clubReviewRepository->findLastReviewsByMonth($bookOfMonthReading, 3)
+            : [];
+
+        // --- Vérifier si l’utilisateur a déjà laissé un avis ce mois ---
+        $userHasReviewedMonth = false;
+        if ($bookOfMonthReading instanceof ClubReadingMonth && $user instanceof Utilisateur) {
+            $existingReview = $clubReviewRepository->findByUserAndMonth($userId, $bookOfMonthReading->getId());
+            $userHasReviewedMonth = $existingReview !== null;
+        }
+
+        // --- Propositions récentes ---
         $recentBookProposals = $bookProposalRepository->findRecentBooksByClub($club->getId());
 
-        // Condition de vote
-        $user = $this->getUser();
+        // --- Votes ---
         $userHasProposed = false;
         $userHasVoted = false;
         $userCanVote = false;
-
-        // --- Déterminer le livre en tête des votes (+2 mois) ---
         $leadingProposals = [];
         $maxVotes = -1;
 
-        if ($clubReadingMonth instanceof ClubReadingMonth) {
+        if ($clubReadingMonth instanceof ClubReadingMonth && $user instanceof Utilisateur) {
             foreach ($clubReadingMonth->getBookProposals() as $proposal) {
+                // Déterminer leader
                 $voteCount = count($proposal->getVotes());
-
                 if ($voteCount > $maxVotes) {
-                    // Nouveau max → on réinitialise
                     $maxVotes = $voteCount;
                     $leadingProposals = [$proposal->getId()];
                 } elseif ($voteCount === $maxVotes) {
-                    // Égalité → on ajoute
                     $leadingProposals[] = $proposal->getId();
                 }
-            }
-        }
 
-        /** @var Utilisateur $user */
-        if ($user instanceof Utilisateur && $clubReadingMonth instanceof ClubReadingMonth) {
-
-            // --- Vérifier si l’utilisateur a proposé un livre ---
-            foreach ($clubReadingMonth->getBookProposals() as $proposal) {
-                $proposer = $proposal->getProposer(); // Utilisateur qui a proposé
-                if ($proposer instanceof Utilisateur && $proposer === $user) {
+                // Vérifier si l’utilisateur a proposé
+                if ($proposal->getProposer()?->getId() === $userId) {
                     $userHasProposed = true;
-                    break;
                 }
             }
 
-            // --- Vérifier si l’utilisateur a déjà voté ---
+            // Vérifier si l’utilisateur a voté
             foreach ($clubReadingMonth->getVotes() as $vote) {
-                $voter = $vote->getUtilisateur();
-                if (!$voter instanceof Utilisateur) {
-                    continue; // Ignore si pas d’utilisateur
-                }
-
-                if ($voter->getId() === $user->getId()) {
+                if ($vote->getUtilisateur()?->getId() === $userId) {
                     $userHasVoted = true;
                     break;
                 }
             }
 
-            // --- Peut-il voter ? ---
             $userCanVote = $userHasProposed && !$userHasVoted;
         }
 
-        /** @var \App\Entity\Report|null $hasReportedClub */
-        $hasReportedClub = null;
+        // --- Signalement ---
+        $hasReportedClub = $user ? $reportRepository->findOneBy([
+            'author' => $user,
+            'reportedClub' => $club,
+        ]) : null;
 
-        if ($this->getUser()) {
-            $hasReportedClub = $reportRepository->findOneBy([
-                'author' => $this->getUser(),
-                'reportedClub' => $club,
-            ]);
-        }
-
-        $isCreator = false;
-        $isParticipant = false;
-
-        if ($user instanceof Utilisateur) {
-
-            $creator = $club->getCreator();
-
-            if ($creator && $creator->getId() === $user->getId()) {
-                $isCreator = true;
-                $isParticipant = true; // le créateur est automatiquement participant
-            } else {
-                foreach ($club->getMembres() as $member) {
-                    if ($member->getId() === $user->getId()) {
-                        $isParticipant = true;
-                        break;
-                    }
-                }
-            }
-        }
+        // --- Créateur et participation ---
+        $isCreator = $user instanceof Utilisateur && $club->getCreator()?->getId() === $userId;
+        $isParticipant = $isCreator || ($user instanceof Utilisateur && $club->getMembres()->exists(fn($i, $m) => $m->getId() === $userId));
 
         return $this->render('club/club_show.html.twig', [
             'club' => $club,
@@ -289,6 +246,7 @@ class ClubController extends AbstractController
             'bookOfMonthReading' => $bookOfMonthReading,
             'nextMonthName' => $nextMonthName,
             'nextNextMonthName' => $nextNextMonthName,
+            'bookOfNextNextMonth' => $bookOfNextNextMonth,
             'lastReviews' => $lastReviews,
             'clubReadingMonth' => $clubReadingMonth,
             'userHasReviewedMonth' => $userHasReviewedMonth,
@@ -304,17 +262,19 @@ class ClubController extends AbstractController
     }
 
     #[Route('/club/{id}/participer', name: 'club_participer', methods: ['GET','POST'])]
-    public function participer(Club $club, EntityManagerInterface $em): Response
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function participer(Club $club, Request $request, EntityManagerInterface $em): Response
     {
-        $user = $this->getUser();
-
-        if ($user && !$club->getMembres()->contains($user)) {
-            $club->addMembre($user);
-            $em->flush();
-            $this->addFlash('success', 'Vous participez maintenant à ce club !');
+        if ($this->isCsrfTokenValid('participer_club_' . $club->getId(), $request->request->get('_token'))) {
+            $user = $this->getUser();
+            if (!$club->getMembres()->contains($user)) {
+                $club->addMembre($user);
+                $em->flush();
+                $this->addFlash('success', 'Vous participez maintenant à ce club !');
+            }
         }
 
-        return $this->redirectToRoute('club_index');
+        return $this->redirectToRoute('club_show', ['id' => $club->getId()]);
     }
 
     #[Route('/clubs/{id}/edit', name: 'club_edit', methods: ['GET', 'POST'])]
@@ -495,6 +455,7 @@ class ClubController extends AbstractController
     }
 
     #[Route('/club/{clubId}/proposer-livre/{month}', name: 'club_proposer_livre')]
+    #[IsGranted('ROLE_USER')]
     public function proposerLivre(Request $request, int $clubId, string $month, EntityManagerInterface $em, BookRepository $bookRepo, ClubRepository $clubRepo): Response {
 
         /** @var Utilisateur $user */
@@ -503,6 +464,9 @@ class ClubController extends AbstractController
 
         $club = $clubRepo->find($clubId);
         if (!$club) throw $this->createNotFoundException('Club non trouvé');
+        if (!$club->getMembres()->contains($user) && $club->getCreator() !== $user) {
+            throw $this->createAccessDeniedException('Vous devez être membre du club.');
+        }
 
         $readingMonth = $club->getReadingMonths()->filter(fn($rm) => $rm->getMonth() === $month)->first();
         if (!$readingMonth) {
@@ -522,6 +486,15 @@ class ClubController extends AbstractController
 
 
         if ($request->isMethod('POST')) {
+            $monthNormalized = $month;
+
+            if (!$this->isCsrfTokenValid(
+                'propose_book_' . $club->getId() . '_' . $monthNormalized,
+                $request->request->get('_token')
+            )) {
+                throw $this->createAccessDeniedException('Token CSRF invalide');
+            }
+
             if (!$canPropose) {
                 $this->addFlash('error', 'Vous avez déjà proposé un livre ce mois.');
                 return $this->redirectToRoute('club_propositions', ['id' => $clubId]);
@@ -592,6 +565,10 @@ class ClubController extends AbstractController
         if (!$user) {
             $this->addFlash('error', 'Vous devez être connecté pour voter.');
             return $this->redirectToRoute('app_login');
+        }
+
+        if (!$this->isCsrfTokenValid('vote_' . $clubId, $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Token CSRF invalide');
         }
 
         // Récupérer le club
@@ -670,11 +647,29 @@ class ClubController extends AbstractController
     }
 
     #[Route('/club/review/add', name: 'club_review_add', methods: ['POST'])]
-    public function addReview(Request $request, EntityManagerInterface $em, Security $security, ClubReadingMonthRepository $monthRepo): JsonResponse {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+    #[IsGranted('ROLE_USER')]
+    public function addReview(
+        Request $request,
+        EntityManagerInterface $em,
+        Security $security,
+        ClubReadingMonthRepository $monthRepo,
+        CsrfTokenManagerInterface $csrfTokenManager
+    ): JsonResponse {
+
         $user = $security->getUser();
 
         $data = json_decode($request->getContent(), true);
+
+        if (!$data) {
+            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+        }
+
+        // Vérification CSRF
+        $token = new CsrfToken('review', $data['_token'] ?? '');
+
+        if (!$csrfTokenManager->isTokenValid($token)) {
+            return new JsonResponse(['error' => 'Invalid CSRF token'], 403);
+        }
 
         if (!isset($data['comment'], $data['readingMonthId'])) {
             return new JsonResponse(['error' => 'Invalid data'], 400);

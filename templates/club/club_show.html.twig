@@ -287,6 +287,9 @@
                 <h2>Votez pour le livre du mois de {{ nextNextMonthName }}</h2>
 
                 <form action="{{ path('club_vote', { clubId: club.id }) }}" method="post">
+                    <input type="hidden" name="_token" value="{{ csrf_token('vote_' ~ club.id) }}">
+
+
                     <div class="books-grid">
                         {% for proposal in clubReadingMonth.bookProposals %}
                             {% set book = proposal.book %}
@@ -296,12 +299,12 @@
                                         <img src="{{ book.cover }}" alt="{{ book.title }}" class="book-cover">
                                     </label>
 
-                                    <input 
-                                        type="radio" 
-                                        id="proposal-{{ proposal.id }}" 
-                                        name="vote[bookProposal]"
-                                        value="{{ proposal.id }}"
-                                    >
+                                        <input 
+                                            type="radio" 
+                                            id="proposal-{{ proposal.id }}" 
+                                            name="vote[bookProposal]"
+                                            value="{{ proposal.id }}"
+                                        >
                                     {% if proposal.id in leadingProposals %}
                                         <div class="crown">👑</div>
                                     {% endif %}
@@ -337,13 +340,36 @@
                 </div>
                 <div class="modal-body">
                     {% if bookOfMonthReading %}
-                        <form id="reviewForm" data-month="{{ bookOfMonthReading.id }}">
-                            <label for="comment" class="form-label">Votre avis (max 1000 caractères)</label>
-                            <textarea id="comment" name="comment" class="form-control" maxlength="1000" rows="6" required></textarea>
+                        <form 
+                            id="reviewForm"
+                            method="post"
+                            data-month="{{ bookOfMonthReading.id }}"
+                            data-url="{{ path('club_review_add') }}"
+                        >
+                            <input type="hidden" name="_token" value="{{ csrf_token('review') }}">
+
+                            <label for="comment" class="form-label">
+                                Votre avis (max 1000 caractères)
+                            </label>
+
+                            <textarea 
+                                id="comment" 
+                                name="comment" 
+                                class="form-control" 
+                                maxlength="1000" 
+                                rows="6" 
+                                required
+                            ></textarea>
+
                             <div class="text-end mt-1">
-                                <small><span id="charCount">0</span>/1000 caractères</small>
+                                <small>
+                                    <span id="charCount">0</span>/1000 caractères
+                                </small>
                             </div>
-                            <button type="submit" class="btn btn-primary mt-3">Valider</button>
+
+                            <button type="submit" class="btn btn-primary mt-3">
+                                Valider
+                            </button>
                         </form>
                     {% else %}
                         <p class="text-muted">Aucun livre du mois à commenter pour le moment.</p>

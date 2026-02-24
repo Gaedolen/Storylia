@@ -237,6 +237,7 @@
     transition: background-color 0.3s, transform 0.2s;
     border: none;
     cursor: pointer;
+    margin-bottom: 10px;
 }
 
 .btn-participer:hover {

@@ -298,6 +298,7 @@
 }
 
 .book-title {
+    color: #3B2F2F;
     font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 5px;
@@ -622,18 +623,22 @@
 /* Grille de livres */
 .books-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 cartes par ligne */
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* cartes flexibles */
     gap: 20px;
 }
 
 /* Carte livre */
 .book-card {
     display: flex;
-    background-color: #fff;
+    flex-direction: column;
+    background-color: #FAF3E0;
     border-radius: 8px;
     box-shadow: 0 3px 8px rgba(0,0,0,0.15);
     overflow: hidden;
     padding: 10px;
+    align-items: center;
+    width: 180px;
+    min-height: 260px; /* ajuste selon la taille de couverture + infos */
 }
 
 /* Checkbox en haut à droite */
@@ -651,8 +656,8 @@
 }
 
 .book-cover {
-    width: 120px;
-    height: 180px;
+    width: 100px;
+    height: 160px;
     object-fit: cover;
     border-radius: 5px;
 }
@@ -676,9 +681,16 @@
 
 .book-title {
     font-weight: bold;
-    font-size: 1.1em;
+    font-size: 1em;
     margin-bottom: 5px;
+    text-align: flex-start;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
 
 .book-author,
 .book-proposer,

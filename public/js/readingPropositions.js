@@ -100,6 +100,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 input.value = selectedBook.value;
 
                 form.appendChild(input);
+                
+                // --- Ajouter le token CSRF ---
+                const tokenInput = document.createElement('input');
+                tokenInput.type = 'hidden';
+                tokenInput.name = '_token';
+                tokenInput.value = validerBtn.dataset.token;
+
+                form.appendChild(tokenInput);
+
                 document.body.appendChild(form);
                 form.submit();
             }

@@ -15,6 +15,13 @@
                 </div>
             {% endfor %}
         </div>
-        <button id="validerBook" data-action="{{ path('club_proposer_livre', {'clubId': club.id, 'month': month}) }}" disabled>Valider</button>
+        <button 
+            id="validerBook"
+            data-action="{{ path('club_proposer_livre', {'clubId': club.id, 'month': month}) }}"
+            data-token="{{ csrf_token('propose_book_' ~ club.id ~ '_' ~ month|date('Y-m')) }}"
+            disabled
+        >
+            Valider
+        </button>
     </div>
 </div>
