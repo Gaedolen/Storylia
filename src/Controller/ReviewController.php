@@ -72,26 +72,40 @@ class ReviewController extends AbstractController
     }
 
     #[Route('/book/{id}/review', name: 'app_review_submit', methods: ['POST'])]
-    public function submitReview(Book $book, Request $request, ReviewRepository $reviewRepo, EntityManagerInterface $em) 
+    public function submitReview(Book $book, Request $request, ReviewRepository $reviewRepo, EntityManagerInterface $em): JsonResponse
     {
         $user = $this->getUser();
-        if (!$user) return $this->json(['success' => false, 'message' => 'Utilisateur non connecté.']);
-
-        $data = json_decode($request->getContent(), true);
-        $rating = $data['rating'] ?? null;
-        $comment = $data['comment'] ?? '';
-
-        if (!$rating || $rating < 1 || $rating > 5) {
-            return $this->json(['success' => false, 'message' => 'Note invalide.']);
+        if (!$user) {
+            return $this->json(['success' => false, 'message' => 'Utilisateur non connecté.']);
         }
 
+        // Vérification CSRF
+        $csrfToken = $request->headers->get('X-CSRF-TOKEN');
+        if (!$this->isCsrfTokenValid('leave_review', $csrfToken)) {
+            return $this->json(['success' => false, 'message' => 'Token CSRF invalide.']);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $comment = trim($data['comment'] ?? '');
+
+        // Validation commentaire
+        if (strlen($comment) > 1000) {
+            return $this->json(['success' => false, 'message' => 'Commentaire trop long.']);
+        }
+
+        // Cherche avis existant
         $review = $reviewRepo->findOneBy(['book' => $book, 'utilisateur' => $user]);
         if (!$review) {
             $review = new Review();
-            $review->setBook($book)->setUtilisateur($user)->setAuthor($book->getAuthor())->setDate(new \DateTime());
+            $review->setBook($book)
+                ->setUtilisateur($user)
+                ->setAuthor(author: $book->getAuthor())
+                ->setDate(new \DateTime());
         }
 
-        $review->setRating($rating)->setComment($comment);
+        // Échapper le commentaire pour éviter XSS
+        $review->setComment(strip_tags($comment));
+
         $em->persist($review);
         $em->flush();
 

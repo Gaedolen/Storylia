@@ -7,6 +7,11 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ReportRepository::class)]
+#[ORM\Table(
+    uniqueConstraints: [
+        new ORM\UniqueConstraint(columns: ['author_id', 'reported_id'])
+    ]
+)]
 class Report
 {
     public const STATUS_EN_COURS = 'en_cours';

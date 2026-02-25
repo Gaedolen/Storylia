@@ -120,15 +120,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Ouvrir la modal ---
     document.querySelectorAll('.btn-report-user').forEach(button => {
         button.addEventListener('click', () => {
-            const userId = button.dataset.userId;
-            if (!userId) return;
+            const url = button.dataset.url; // <-- URL générée par Twig
+            if (!url) return;
 
-            document.getElementById('report-user-id').value = userId;
+            // Stocker l'URL dans le formulaire (optionnel)
+            reportForm.dataset.url = url;
 
             // Reset modal
             messageInput.value = '';
             charCount.textContent = '0 / 500';
-
             modal.style.display = 'block';
         });
     });
@@ -148,10 +148,10 @@ document.addEventListener('DOMContentLoaded', () => {
     reportForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const userId = document.getElementById('report-user-id').value;
         const reason = document.getElementById('report-user-reason').value;
         const message = messageInput.value.trim();
-        const csrfToken = document.querySelector('#report-user-form input[name="_token"]').value;
+        const csrfToken = reportForm.querySelector('input[name="_token"]').value;
+        const url = reportForm.dataset.url; // <-- récupère l'URL depuis data-url
 
         if (!reason || !message) {
             alert("Veuillez remplir le motif et le message.");
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch(`/report/user/${userId}`, {
+            const response = await fetch(url, {  // <-- utilisation de l'URL Twig
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -167,6 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({ reason, message })
             });
+
             const data = await response.json();
 
             if (data.success) {
@@ -176,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 charCount.textContent = '0 / 500';
 
                 // --- Remplacer le bouton par "Signalé ✅" ---
-                const btn = document.querySelector(`.btn-report-user[data-user-id="${userId}"]`);
+                const btn = document.querySelector(`.btn-report-user[data-url="${url}"]`);
                 if (btn) {
                     btn.outerHTML = `
                         <span class="report-badge">

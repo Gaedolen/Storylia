@@ -437,6 +437,7 @@
             <form id="leave-review-form">
                 <textarea id="review-text" name="review" rows="6" maxlength="1000" placeholder="Écris ton avis..." required></textarea>
                 <div id="char-count-review">0 / 1000</div>
+                <input type="hidden" name="_token" value="{{ csrf_token('leave_review') }}">
                 <button type="submit" class="btn-main">Valider</button>
             </form>
         </div>

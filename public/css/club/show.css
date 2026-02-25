@@ -683,12 +683,12 @@
     font-weight: bold;
     font-size: 1em;
     margin-bottom: 5px;
-    text-align: flex-start;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    text-align: left;
+    line-height: 1.2em;        /* hauteur d'une ligne */
+    max-height: 2.4em;         /* 2 lignes */
     overflow: hidden;
     text-overflow: ellipsis;
+    display: block;
 }
 
 

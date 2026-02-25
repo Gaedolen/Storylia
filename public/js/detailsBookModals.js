@@ -330,94 +330,111 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal d'avis
     const reviewModal = document.getElementById('leave-review-modal');
     const reviewForm = document.getElementById('leave-review-form');
+    const textarea = reviewForm.querySelector('#review-text');
+    const counter = reviewModal.querySelector('#char-count-review');
 
-    if (reviewModal && reviewForm) {
+    if (!reviewModal || !reviewForm || !textarea || !counter) return;
 
-        const textarea = reviewForm.querySelector('#review-text');
-        const counter = reviewModal.querySelector('#char-count-review');
+    // Ouvrir la modal depuis n'importe quel bouton
+    document.querySelectorAll('[data-modal="leave-review-modal"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            // ⚡️ Mettre à jour le book-id dans la modal
+            reviewModal.dataset.bookId = btn.dataset.bookId;
 
-        // Compteur dynamique
-        textarea.addEventListener('input', () => {
-            if (counter) counter.textContent = `${textarea.value.length} / 1000`;
+            reviewModal.style.display = 'flex';
+            textarea.value = ''; // reset textarea
+            counter.textContent = `0 / 1000`;
+            textarea.focus();
         });
+    });
 
-        // Envoi
-        reviewForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+    // Fermer modal avec bouton ×
+    const closeBtn = reviewModal.querySelector('.close');
+    closeBtn.addEventListener('click', () => reviewModal.style.display = 'none');
 
-            const bookId = reviewForm.dataset.bookId || reviewModal.dataset.bookId;
-            const reviewText = textarea.value.trim();
+    // Fermer modal au clic en dehors
+    window.addEventListener('click', e => {
+        if (e.target === reviewModal) reviewModal.style.display = 'none';
+    });
 
-            if (!bookId) {
-                alert("Livre introuvable.");
-                return;
-            }
+    // Compteur dynamique
+    textarea.addEventListener('input', () => {
+        counter.textContent = `${textarea.value.length} / 1000`;
+    });
 
-            if (reviewText.length === 0) {
-                alert("Veuillez écrire un avis avant de valider.");
-                return;
-            }
+    // Soumission AJAX
+    reviewForm.addEventListener('submit', async e => {
+        e.preventDefault();
 
-            try {
-                const resp = await fetch('/laisser-avis', {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest' 
-                    },
-                    body: JSON.stringify({
-                        bookId: bookId,
-                        review: reviewText
-                    })
-                });
+        const bookId = reviewModal.dataset.bookId;
+        const reviewText = textarea.value.trim();
 
-                const result = await resp.json();
+        if (!bookId) return alert("Livre introuvable.");
+        if (reviewText.length === 0) return alert("Veuillez écrire un avis avant de valider.");
 
-                if (result.success) {
-                    closeModal(reviewModal);
+        const token = reviewForm.querySelector('input[name="_token"]').value;
 
-                    // Mettre à jour le bouton principal
-                    const externalBtn = document.querySelector('[data-modal="leave-review-modal"]');
-                    if (externalBtn) {
-                        externalBtn.textContent = 'Avis laissé ✓';
-                        externalBtn.classList.add('disabled-review-btn');
-                        externalBtn.disabled = true;
-                    }
+        try {
+            const resp = await fetch(`/book/${bookId}/review`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': token
+                },
+                body: JSON.stringify({ comment: reviewText })
+            });
 
-                    // AJOUTER LE NOUVEL AVIS EN HAUT
-                    const reviewsContainer = document.querySelector('.reviews-container');
-                    if (reviewsContainer) {
-                        const newReviewHTML = `
-                            <div class="review-bubble">
-                                <div class="review-user">
-                                    <a href="/profil/${result.userId}" class="user-card">
-                                        <img src="${result.userProfilePicture}" alt="Photo ${result.userPseudo}">
-                                        <span class="review-username">${result.userPseudo}</span>
-                                    </a>
+            const result = await resp.json();
+
+            if (result.success) {
+                // Fermer modal
+                reviewModal.style.display = 'none';
+
+                // Mettre à jour le bouton principal
+                const externalBtn = document.querySelector(`[data-book-id="${bookId}"][data-modal="leave-review-modal"]`);
+                if (externalBtn) {
+                    externalBtn.textContent = 'Avis laissé ✓';
+                    externalBtn.classList.add('disabled-review-btn');
+                    externalBtn.disabled = true;
+                }
+
+                // Ajouter le nouvel avis en haut
+                const reviewsContainer = document.querySelector('.reviews-container');
+                if (reviewsContainer) {
+                    const newReviewHTML = `
+                        <div class="review-bubble">
+                            <div class="review-user">
+                                <a href="/profil/${result.userId}" class="user-card">
+                                    <img src="${result.userProfilePicture}" alt="Photo ${result.userPseudo}">
+                                    <span class="review-username">${result.userPseudo}</span>
+                                </a>
+                            </div>
+                            <div class="review-separator"></div>
+                            <div class="review-content">
+                                <div class="review-header">
+                                    <div class="review-header-left">
+                                        <span class="review-date">${result.date}</span>
+                                        <span class="review-category-badge">${result.statusLabel}</span>
+                                    </div>
                                 </div>
-                                <div class="review-separator"></div>
-                                <div class="review-content">
-                                    <div class="review-header">
-                                        <div class="review-header-left">
-                                            <span class="review-date">${result.date}</span>
-                                            <span class="review-category-badge">${result.statusLabel}</span>
-                                        </div>
-                                    </div>
-                                    <div class="review-text">
-                                        <p>${result.review}</p>
-                                    </div>
+                                <div class="review-text">
+                                    <p>${result.review}</p>
                                 </div>
                             </div>
-                        `;
-                        reviewsContainer.insertAdjacentHTML('afterbegin', newReviewHTML);
-                    }
+                        </div>
+                    `;
+                    reviewsContainer.insertAdjacentHTML('afterbegin', newReviewHTML);
                 }
-            } catch (error) {
-                console.error(error);
-                alert("Erreur réseau, réessayez.");
+            } else {
+                alert(result.message || "Erreur côté serveur.");
             }
-        });
-    }
+
+        } catch (err) {
+            console.error(err);
+            alert("Erreur réseau, réessayez.");
+        }
+    });
 
     // ==========================
     // MODAL DATE DE LECTURE
