@@ -43,8 +43,14 @@
         <div class="dashboard-section">
             <h2>Gestion des livres</h2>
             <div class="admin-actions">
-                <a href="{{ path('import_books') }}" class="btn-import">Importer des livres</a>
-                <a href="{{ path('update_books') }}" class="btn-ajout">Mettre à jour les livres</a>
+                <form method="POST" id="importBooksForm" action="{{ path('import_books') }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('import_books_action') }}">
+                    <button type="submit" class="btn-import">Importer des livres</button>
+                </form>
+                <form method="POST" id="updateBooksForm" action="{{ path('update_books') }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('update_books_action') }}">
+                    <button type="submit" class="btn-ajout">Mettre à jour les livres</button>
+                </form>
                 <a href="{{ path('admin_livres_signales') }}" class="btn-warning">Gestion des livres signalés</a>
                 <a href="{{ path('app_recherche_livre') }}" class="btn-livres">Gestion des livres du site</a>
             </div>

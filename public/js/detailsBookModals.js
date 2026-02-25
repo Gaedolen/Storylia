@@ -273,15 +273,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     body = JSON.stringify({ bookId, readingStatusId: statusId });
                 }
 
-                const resp = await fetch(url, {
+                const resp = await fetch('/bibliotheque/ajouter-ou-mettre-a-jour', {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': csrfBookCreate
-                    },
-                    body
-                });
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        bookId: bookId,
+                        readingStatusId: statusId,
+                        _token: csrfBookCreate
+                    })
+                })
 
                 const result = await resp.json();
 

@@ -120,13 +120,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Ouvrir la modal ---
     document.querySelectorAll('.btn-report-user').forEach(button => {
         button.addEventListener('click', () => {
-            const url = button.dataset.url; // <-- URL générée par Twig
+            const url = button.dataset.url;
             if (!url) return;
 
-            // Stocker l'URL dans le formulaire (optionnel)
-            reportForm.dataset.url = url;
-
-            // Reset modal
+            reportForm.dataset.url = url; // stocker l'URL
             messageInput.value = '';
             charCount.textContent = '0 / 500';
             modal.style.display = 'block';
@@ -151,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const reason = document.getElementById('report-user-reason').value;
         const message = messageInput.value.trim();
         const csrfToken = reportForm.querySelector('input[name="_token"]').value;
-        const url = reportForm.dataset.url; // <-- récupère l'URL depuis data-url
+        const url = reportForm.dataset.url;
 
         if (!reason || !message) {
             alert("Veuillez remplir le motif et le message.");
@@ -159,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch(url, {  // <-- utilisation de l'URL Twig
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -171,7 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (data.success) {
-                alert(data.message || "Utilisateur signalé.");
                 modal.style.display = 'none';
                 reportForm.reset();
                 charCount.textContent = '0 / 500';
@@ -180,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const btn = document.querySelector(`.btn-report-user[data-url="${url}"]`);
                 if (btn) {
                     btn.outerHTML = `
-                        <span class="report-badge">
+                        <span class="report-badge in-progress">
                             <svg class="check-icon" viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M20 6L9 17l-5-5" />
                             </svg>
@@ -188,6 +184,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         </span>
                     `;
                 }
+
+                // Facultatif : prévenir l'utilisateur
+                console.log(data.message || "Utilisateur signalé.");
+
             } else {
                 alert(data.message || "Une erreur est survenue.");
             }

@@ -254,12 +254,17 @@ class ReportController extends AbstractController
     {
         $user = $this->getUser();
         if (!$user) {
-            if ($user === $utilisateur) {
-                return new JsonResponse([
-                    'success' => false,
-                    'message' => 'Vous ne pouvez pas vous signaler vous-même.'
-                ], 400);
-            }
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Vous devez être connecté pour signaler un utilisateur.'
+            ], 401);
+        }
+
+        if ($user === $utilisateur) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Vous ne pouvez pas vous signaler vous-même.'
+            ], 400);
         }
 
         $csrfToken = $request->headers->get('X-CSRF-TOKEN');
@@ -286,28 +291,14 @@ class ReportController extends AbstractController
             return new JsonResponse(['success' => false, 'message' => 'Données invalides.'], 400);
         }
 
-        $allowedReasons = [
-            'harcelement',
-            'usurpation',
-            'spam',
-            'contenu_inapproprie',
-            'autre'
-        ];
-
+        $allowedReasons = ['harcelement','usurpation','spam','contenu_inapproprie','autre'];
         if (!in_array($data['reason'], $allowedReasons, true)) {
-            return new JsonResponse([
-                'success' => false,
-                'message' => 'Motif invalide.'
-            ], 400);
+            return new JsonResponse(['success' => false, 'message' => 'Motif invalide.'], 400);
         }
 
         $message = trim($data['message']);
-
         if (strlen($message) < 10 || strlen($message) > 500) {
-            return new JsonResponse([
-                'success' => false,
-                'message' => 'Message invalide.'
-            ], 400);
+            return new JsonResponse(['success' => false, 'message' => 'Message invalide.'], 400);
         }
 
         $report = new Report();
@@ -320,7 +311,11 @@ class ReportController extends AbstractController
         $em->persist($report);
         $em->flush();
 
-        return new JsonResponse(['success' => true, 'message' => 'Utilisateur signalé.']);
+        // Retour JSON pour le JS
+        return new JsonResponse([
+            'success' => true,
+            'message' => 'Utilisateur signalé.'
+        ]);
     }
 
     #[Route('/club/{id}', name: 'club', methods: ['POST'])]

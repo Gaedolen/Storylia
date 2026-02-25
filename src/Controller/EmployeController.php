@@ -51,29 +51,32 @@ class EmployeController extends AbstractController
         ]);
     }
 
-    #[Route('/avis-signales/valider/{id}', name: 'employe_avis_valider')]
-    public function validerAvis(int $id, ReviewRepository $reviewRepository, EntityManagerInterface $em, MailerInterface $mailer): Response
+    #[Route('/avis-signales/valider/{id}', name: 'employe_avis_valider', methods: ['POST'])]
+    public function validerAvis(int $id, ReviewRepository $reviewRepository, EntityManagerInterface $em, MailerInterface $mailer, Request $request): Response
     {
+        if (!$this->isCsrfTokenValid('valider_avis_'.$id, $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Token CSRF invalide.');
+        }
+
         $review = $reviewRepository->find($id);
         if (!$review) {
-            $this->addFlash('warning', 'Cet avis a déjà été traité.');
+            $this->addFlash('warning', 'Cet avis a déjà été supprimé.');
             return $this->redirectToRoute('employe_avis_signales');
         }
 
+        $report = $review->getReports()->first(); // pour le mail
+
         $user = $review->getUtilisateur();
 
-        // Gestion avis en BDD
-        $review->setStatus('refuse');
+        // Supprime la review (Doctrine supprimera automatiquement le report lié)
+        $em->remove($review);
         $em->flush();
-
-
-        $report = $review->getReports()->first();
 
         // Envoi du mail
         $email = (new TemplatedEmail())
             ->from('no-reply@storylia.com')
             ->to($user->getEmail())
-            ->subject('Votre avis a été modéré')
+            ->subject('Votre avis a été supprimé')
             ->htmlTemplate('email/avis_supprime.html.twig')
             ->context([
                 'user' => $user,
@@ -83,16 +86,21 @@ class EmployeController extends AbstractController
 
         $mailer->send($email);
 
-        $this->addFlash('success', 'Avis supprimé et utilisateur notifié.');
+        $this->addFlash('success', 'Avis et signalement supprimés, utilisateur notifié.');
         return $this->redirectToRoute('employe_avis_signales');
     }
 
-    #[Route('/avis-signales/supprimer-report/{id}', name: 'employe_report_supprimer')]
-    public function supprimerReport(int $id, EntityManagerInterface $em, ReportRepository $reportRepository): Response
+    #[Route('/avis-signales/supprimer-report/{id}', name: 'employe_report_supprimer', methods: ['POST'])]
+    public function supprimerReport(int $id, EntityManagerInterface $em, ReportRepository $reportRepository, Request $request): Response
     {
         $report = $reportRepository->find($id);
         if (!$report) {
             throw $this->createNotFoundException("Signalement introuvable.");
+        }
+
+        // Vérification CSRF
+        if (!$this->isCsrfTokenValid('supprimer_report_'.$id, $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Token CSRF invalide.');
         }
 
         $em->remove($report);
@@ -116,7 +124,7 @@ class EmployeController extends AbstractController
     }
 
     #[Route('/livres-signales/valider/{id}', name: 'employe_livre_valider', methods: ['POST'])]
-    public function validerLivre(int $id, ReportRepository $reportRepository, EntityManagerInterface $em): Response
+    public function validerLivre(int $id, ReportRepository $reportRepository, EntityManagerInterface $em, Request $request): Response
     {
         $report = $reportRepository->find($id);
 
@@ -124,7 +132,12 @@ class EmployeController extends AbstractController
             return $this->json(['success' => false, 'message' => 'Report introuvable.']);
         }
 
-        // Supprime le report
+        $data = json_decode($request->getContent(), true);
+
+        if (!$this->isCsrfTokenValid('valider_livre_'.$id, $data['_token'] ?? '')) {
+            return $this->json(['success' => false, 'message' => 'Token CSRF invalide.']);
+        }
+
         $em->remove($report);
         $em->flush();
 

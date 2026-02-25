@@ -21,24 +21,46 @@ class BookshelfController extends AbstractController
     #[Route('/ajouter-ou-mettre-a-jour', name: 'bookshelf_add_or_update', methods: ['POST'])]
     public function addOrUpdate(Request $request, EntityManagerInterface $em): JsonResponse
     {
+        $user = $this->getUser();
+
+        if (!$user) {
+            return $this->json(['success' => false, 'message' => 'Non connecté'], 403);
+        }
+
+        // --- CSRF ---
+        $data = json_decode($request->getContent(), true);
+        $token = $data['_token'] ?? null;
+
+        if (!$this->isCsrfTokenValid('book_create', $token)) {
+            throw $this->createAccessDeniedException('Token CSRF invalide.');
+        }
+        // --- Récupération des données ---
         $data = json_decode($request->getContent(), true);
         $bookId = $data['bookId'] ?? null;
         $statusId = $data['readingStatusId'] ?? null;
 
-        $user = $this->getUser();
-
-        if (!$user || !$bookId || !$statusId) {
-            return $this->json(['success' => false, 'message' => 'Données manquantes.']);
+        if (!$bookId || !$statusId) {
+            return $this->json(['success' => false, 'message' => 'Données manquantes.'], 400);
         }
 
         $book = $em->getRepository(Book::class)->find($bookId);
         $status = $em->getRepository(ReadingStatus::class)->find($statusId);
 
         if (!$book || !$status) {
-            return $this->json(['success' => false, 'message' => 'Livre ou statut introuvable.']);
+            return $this->json(['success' => false, 'message' => 'Livre ou statut introuvable.'], 404);
         }
 
-        // Vérifie si le livre est déjà dans la bibliothèque
+        // --- Validation du label de statut ---
+        $validLabels = [
+            'en_train_de_lire','coup_de_coeur','adore','apprecie',
+            'mitige','pas_aime','lu_aussi','pal','envies'
+        ];
+
+        if (!in_array($status->getLabel(), $validLabels)) {
+            return $this->json(['success' => false, 'message' => 'Statut invalide.'], 400);
+        }
+
+        // --- Vérifie si le livre est déjà dans la bibliothèque ---
         $bookshelf = $em->getRepository(Bookshelf::class)->findOneBy([
             'utilisateur' => $user,
             'book' => $book
@@ -69,6 +91,12 @@ class BookshelfController extends AbstractController
             return $this->json(['success' => false, 'message' => 'Non connecté'], 403);
         }
 
+        // Vérifie le token CSRF
+        $csrfToken = $request->headers->get('X-CSRF-TOKEN');
+        if (!$this->isCsrfTokenValid('bookshelf_add_or_update', $csrfToken)) {
+            return $this->json(['success' => false, 'message' => 'Token CSRF invalide'], 400);
+        }
+
         $data = json_decode($request->getContent(), true);
         $bookId = $data['bookId'] ?? null;
 
@@ -76,7 +104,6 @@ class BookshelfController extends AbstractController
             return $this->json(['success' => false, 'message' => 'ID du livre manquant']);
         }
 
-        // Récupérer l'objet Book
         $book = $em->getRepository(Book::class)->find($bookId);
         if (!$book) {
             return $this->json(['success' => false, 'message' => 'Livre introuvable']);
@@ -88,7 +115,8 @@ class BookshelfController extends AbstractController
         ]);
 
         if (!$entry) {
-            return $this->json(['success' => false, 'message' => 'Livre non trouvé dans votre bibliothèque']);
+            // Livre déjà supprimé => considérer comme succès
+            return $this->json(['success' => true]);
         }
 
         $em->remove($entry);
@@ -100,28 +128,43 @@ class BookshelfController extends AbstractController
     #[Route('/livres/{id}/deplacer', name: 'livres_deplacer', methods: ['POST'])]
     public function moveBook(int $id, Request $request, EntityManagerInterface $em, LoggerInterface $logger): JsonResponse
     {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['success' => false, 'message' => 'Non connecté'], 403);
+        }
+
         $data = json_decode($request->getContent(), true);
+        $token = $data['_token'] ?? null;
+
+        if (!$this->isCsrfTokenValid('bookshelf_add_or_update', $token)) {
+            throw $this->createAccessDeniedException('Token CSRF invalide.');
+        }
+
         $statusId = $data['readingStatusId'] ?? null;
 
-        $logger->info('DEBUG moveBook', ['bookshelfId' => $id, 'data' => $data]);
+        // Vérification Bookshelf + appartenance utilisateur
+        $bookshelf = $em->getRepository(Bookshelf::class)->findOneBy([
+            'id' => $id,
+            'utilisateur' => $user
+        ]);
 
-        // Récupération du Bookshelf
-        $bookshelf = $em->getRepository(Bookshelf::class)->find($id);
         if (!$bookshelf) {
             return $this->json(['success' => false, 'message' => 'Livre introuvable dans votre bibliothèque.']);
         }
 
-        // Récupération du statut
         $status = $em->getRepository(ReadingStatus::class)->find($statusId);
         if (!$status) {
             return $this->json(['success' => false, 'message' => 'Statut introuvable.']);
         }
 
-        // Mise à jour du statut
+        $validLabels = ['en_train_de_lire','coup_de_coeur','adore','apprecie','mitige','pas_aime','lu_aussi','pal','envies'];
+        if (!in_array($status->getLabel(), $validLabels)) {
+            return $this->json(['success' => false, 'message' => 'Statut invalide.']);
+        }
+
         $bookshelf->setReadingStatus($status);
         $em->flush();
 
-        // Retour JSON avec label et ID
         return $this->json([
             'success' => true,
             'message' => 'Livre déplacé avec succès !',

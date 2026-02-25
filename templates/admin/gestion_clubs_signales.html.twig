@@ -58,7 +58,7 @@
                                     Suspendre
                                 </button>
                                 <!-- Bouton pour ignorer le report -->
-                                <button class="btn unsuspend-btn"
+                                <button class="btn ignore-report-btn"
                                         data-url="{{ path('report_ignore', {'id': report.id}) }}"
                                         data-csrf="{{ csrf_token('ignore_report_' ~ report.id) }}">
                                     Ignorer

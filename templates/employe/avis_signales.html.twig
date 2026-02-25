@@ -39,10 +39,20 @@
                             <td>{% if report %}{{ report.author.pseudo }}{% else %}-{% endif %}</td>
                             <td>{% if report %}{{ report.message }}{% else %}-{% endif %}</td>
                             <td class="admin-actions">
-                                <a href="{{ path('employe_avis_valider', {'id': review.id}) }}" class="btn-valider" title="Supprime l'avis et envoie un mail d'avertissement">Supprimer l'avis</a>
+                                <form method="POST" action="{{ path('employe_avis_valider', {'id': review.id}) }}" style="display:inline;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('valider_avis_' ~ review.id) }}">
+                                    <button type="submit" class="btn-valider" title="Supprime l'avis et envoie un mail d'avertissement">
+                                        Supprimer l'avis
+                                    </button>
+                                </form>
 
                                 {% if report %}
-                                    <a href="{{ path('employe_report_supprimer', {'id': report.id}) }}" class="btn-supprimer" title="Supprime seulement le signalement">Supprimer le signalement</a>
+                                    <form method="POST" action="{{ path('employe_report_supprimer', {'id': report.id}) }}" style="display:inline;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('supprimer_report_' ~ report.id) }}">
+                                        <button type="submit" class="btn-supprimer" title="Supprime seulement le signalement, l'avis est valide">
+                                            Supprimer le signalement
+                                        </button>
+                                    </form>
                                 {% else %}
                                     <span class="btn-supprimer disabled" title="Aucun signalement">Supprimer le signalement</span>
                                 {% endif %}

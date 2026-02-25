@@ -43,7 +43,9 @@
                             <span class="mobile-text">Modifier</span>
                         </a>
 
-                        <button class="btn-validate" data-report-id="{{ report.id }}">
+                        <button class="btn-validate"
+                                data-report-id="{{ report.id }}"
+                                data-csrf="{{ csrf_token('valider_livre_' ~ report.id) }}">
                             <span class="desktop-text">Valider / supprimer signalement</span>
                             <span class="mobile-text">Valider</span>
                         </button>
@@ -95,12 +97,19 @@
         document.querySelectorAll('.btn-validate').forEach(btn => {
             btn.addEventListener('click', async () => {
                 const reportId = btn.dataset.reportId;
+                const csrfToken = btn.dataset.csrf;
+
                 if (!confirm('Valider la modification et clôturer le report ?')) return;
 
                 const resp = await fetch(`/employe/livres-signales/valider/${reportId}`, {
                     method: 'POST',
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ _token: csrfToken })
                 });
+
                 const result = await resp.json();
                 if (result.success) {
                     alert('Report validé.');

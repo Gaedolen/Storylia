@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // --- Récupérer le token CSRF depuis Twig ---
+    const csrfToken = window.csrfToken || '';
+
     // --- Modal suppression ---
     const removeModal = document.getElementById("confirm-remove-modal");
     const removeCloseBtn = removeModal.querySelector(".close");
@@ -36,7 +39,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken
                 },
                 body: JSON.stringify({ bookId })
             });
@@ -46,6 +50,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (result.success) {
                 currentBookCard.remove();
                 closeRemoveModal();
+            } else {
+                alert(result.message || "Erreur lors de la suppression.");
             }
         } catch (err) {
             console.error(err);
@@ -56,12 +62,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- Modal déplacement ---
     const moveModal = document.getElementById("bookshelf-move-modal");
     const moveCloseBtn = moveModal.querySelector(".close");
-    const moveConfirmBtn = document.getElementById("bookshelf-move-confirm");
+    const moveConfirmBtn = moveModal.querySelector("#bookshelf-move-confirm");
 
     let currentMoveBookCard = null;
-    let currentMoveBookId = null; // RENOMMÉ pour plus de clarté
+    let currentMoveBookId = null;
 
-    // Ouvrir le modal
     document.body.addEventListener("click", e => {
         const btn = e.target.closest(".bookshelf-move-btn");
         if (!btn) return;
@@ -75,11 +80,8 @@ document.addEventListener("DOMContentLoaded", () => {
         moveModal.querySelectorAll(".status-btn").forEach(b => {
             b.classList.toggle("active", b.dataset.statusKey === currentStatusKey);
         });
-
-        console.log("DEBUG MOVE:", currentMoveBookId, currentStatusKey);
     });
 
-    // Sélection d'un nouveau statut
     moveModal.querySelectorAll(".status-btn").forEach(b => {
         b.addEventListener("click", () => {
             moveModal.querySelectorAll(".status-btn").forEach(btn => btn.classList.remove("active"));
@@ -87,7 +89,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Fermer le modal
     const closeMoveModal = () => {
         moveModal.style.display = "none";
         currentMoveBookId = null;
@@ -99,7 +100,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.target === moveModal) closeMoveModal();
     });
 
-    // Confirmer le déplacement
     moveConfirmBtn.addEventListener("click", async () => {
         if (!currentMoveBookId || !currentMoveBookCard) return;
 
@@ -113,7 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const statusKey = selected.dataset.statusKey;
 
         const url = currentMoveBookCard.querySelector(".bookshelf-move-btn").dataset.moveUrl;
-        console.log("DEBUG MOVE URL:", url);
 
         try {
             const response = await fetch(url, {
@@ -121,25 +120,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken
                 },
-                body: JSON.stringify({
-                    readingStatusId: statusId
-                })
+                body: JSON.stringify({ readingStatusId: statusId, _token: csrfToken })
             });
 
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
             const result = await response.json();
-            console.log("DEBUG RESULT:", result);
 
             if (result.success) {
                 const category = document.querySelector(`.category[data-status-key="${statusKey}"] .category-books`);
                 if (category && currentMoveBookCard instanceof Node) {
-                    category.appendChild(currentMoveBookCard); // déplacer le livre
+                    category.appendChild(currentMoveBookCard);
                     currentMoveBookCard.querySelector(".bookshelf-move-btn").dataset.currentStatusKey = statusKey;
                 }
-                closeMoveModal(); // fermer le modal après
+                closeMoveModal();
             } else {
                 alert(result.message || "Erreur lors du déplacement.");
             }
@@ -149,8 +146,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // --- Carousel horizontal (optionnel) ---
     document.querySelectorAll('.category').forEach(category => {
-
         const track = category.querySelector('.category-books');
         const btnLeft = category.querySelector('.carousel-arrow.left');
         const btnRight = category.querySelector('.carousel-arrow.right');
@@ -164,6 +161,5 @@ document.addEventListener("DOMContentLoaded", () => {
         btnRight.onclick = () => {
             track.scrollBy({ left: 150, behavior: "smooth" });
         };
-
     });
 });

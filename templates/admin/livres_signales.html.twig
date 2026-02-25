@@ -36,8 +36,17 @@
                 <td>{{ report.date|date('d/m/Y') }}</td>
                 <td>
                     <a href="{{ path('admin_livre_edit', {'id': report.reportedBook.id}) }}" class="btn-edit">Modifier</a>
-                    <button class="btn-validate" data-report-id="{{ report.id }}">Valider report</button>
-                    <button class="btn-delete" data-book-id="{{ report.reportedBook.id }}">Désactiver livre</button>
+                    <button class="btn-validate"
+                            data-report-id="{{ report.id }}"
+                            data-csrf="{{ csrf_token('valider_livre_' ~ report.id) }}">
+                        Valider report
+                    </button>
+
+                    <button class="btn-delete"
+                            data-book-id="{{ report.reportedBook.id }}"
+                            data-csrf="{{ csrf_token('desactiver_livre_' ~ report.reportedBook.id) }}">
+                        Désactiver livre
+                    </button>
                 </td>
             </tr>
             {% endif %}
@@ -60,59 +69,67 @@
 {% block javascripts %}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const detailModal = document.getElementById('book-detail-modal');
-    const detailContent = document.getElementById('book-detail-content');
-    const openModal = modal => modal.style.display = 'flex';
-    const closeModal = modal => modal.style.display = 'none';
-    const setupCloseOutside = modal => {
-        window.addEventListener('click', e => { if(e.target === modal) closeModal(modal); });
-    };
-    setupCloseOutside(detailModal);
-    detailModal.querySelector('.close')?.addEventListener('click', () => closeModal(detailModal));
 
-    // Valider report
+    // --- Valider report ---
     document.querySelectorAll('.btn-validate').forEach(btn => {
         btn.addEventListener('click', async () => {
             const reportId = btn.dataset.reportId;
             if (!confirm('Valider le report et le supprimer ?')) return;
-            const resp = await fetch(`/admin/livres-signales/valider/${reportId}`, {
-                method: 'POST',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
-            const result = await resp.json();
-            if (result.success) {
-                alert('Report validé.');
-                btn.closest('tr').remove();
-            } else {
-                alert(result.message || 'Erreur serveur.');
+
+            const formData = new FormData();
+            formData.append('_token', btn.dataset.csrf);
+
+            try {
+                const resp = await fetch(`/admin/livres-signales/valider/${reportId}`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                // Vérifie si la réponse est OK (200-299)
+                if (!resp.ok) {
+                    const text = await resp.text();
+                    console.error('Erreur serveur:', text);
+                    alert('Erreur serveur : voir console');
+                    return;
+                }
+
+                // Parse le JSON une seule fois
+                const result = await resp.json();
+
+                if (result.success) {
+                    alert('Report validé.');
+                    btn.closest('tr').remove();
+                } else {
+                    alert(result.message || 'Erreur serveur.');
+                }
+
+            } catch (e) {
+                alert('Erreur réseau ou serveur : ' + e.message);
             }
         });
     });
 
+    // --- Désactiver livre ---
     document.querySelectorAll('.btn-delete').forEach(btn => {
         btn.addEventListener('click', async () => {
             const bookId = btn.dataset.bookId;
             if (!confirm('Êtes-vous sûr de vouloir désactiver ce livre ?')) return;
 
-            try {
-                const resp = await fetch(`/admin/admin/livres-signales/desactiver/${bookId}`, {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                });
+            const formData = new FormData();
+            formData.append('_token', btn.dataset.csrf);
 
-                // Vérifie que la réponse est du JSON
-                const contentType = resp.headers.get('content-type');
-                if (!contentType || !contentType.includes('application/json')) {
-                    throw new Error('Réponse invalide du serveur');
-                }
+            try {
+                const resp = await fetch(`/admin/livres-signales/desactiver/${bookId}`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
 
                 const result = await resp.json();
                 if (result.success) {
                     alert(result.message);
-                    btn.closest('tr').remove(); // supprime la ligne du tableau
+                    btn.closest('tr').remove();
                 } else {
                     alert(result.message || 'Erreur serveur.');
                 }

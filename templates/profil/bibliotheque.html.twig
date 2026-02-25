@@ -79,10 +79,10 @@
                                         <div>
                                             <h3>
                                                 <a href="{{ path('app_livre_detail', {'id': bookshelf.book.id}) }}">
-                                                    {{ bookshelf.book.title }}
+                                                    {{ bookshelf.book.title|e }}
                                                 </a>
                                             </h3>
-                                            <p><a href="#">{{ bookshelf.book.author.name }}</a></p>
+                                            <p><a href="#">{{ bookshelf.book.author.name|e }}</a></p>
                                         </div>
                                         <div class="buttons">
                                             {% if isSelf %}
@@ -158,6 +158,9 @@
 
     {% block javascripts %}
         {{ parent() }}
+        <script>
+            window.csrfToken = '{{ csrf_token("bookshelf_add_or_update") }}';
+        </script>
         <script src="{{ asset('js/BookshelfActions.js') }}"></script>
     {% endblock %}
 {% endblock %}

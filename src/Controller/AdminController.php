@@ -136,29 +136,38 @@ class AdminController extends AbstractController
         ]);
     }
 
-    #[Route('/import-books', name: 'import_books', methods: ['GET'])]
-    public function importBooks(Request $request, BookApiService $apiService, BookCreationService $creationService, EntityManagerInterface $em): Response
-    {
+    #[Route('/import-books', name: 'import_books', methods: ['POST'])]
+    public function importBooks(
+        Request $request,
+        BookApiService $apiService,
+        BookCreationService $creationService,
+        EntityManagerInterface $em
+    ): Response {
+        // --- Vérification CSRF ---
+        $csrfToken = $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('import_books_action', $csrfToken)) {
+            return $this->json(['success' => false, 'error' => 'Token CSRF invalide'], 400);
+        }
+
         set_time_limit(0);
         ini_set('memory_limit', '2048M');
 
         $batchSize = 50;
         $totalImported = 0;
 
-        // --- Récupère tous les livres existants avec title + author name ---
+        // --- Livres existants ---
         $existingBooks = $em->getRepository(Book::class)
                             ->createQueryBuilder('b')
                             ->select('b.title, IDENTITY(b.author) AS author_id')
                             ->getQuery()
                             ->getArrayResult();
 
-        // --- Crée un tableau pour vérifier rapidement l’existence ---
         $existingMap = [];
         foreach ($existingBooks as $b) {
             $author = $em->getRepository(Author::class)->find($b['author_id']);
             $authorName = $author ? strtolower(trim($author->getName())) : '';
             $titleKey = strtolower(trim($b['title']));
-            $key = $titleKey . '||' . $authorName; // uniquement titre + auteur
+            $key = $titleKey . '||' . $authorName;
             $existingMap[$key] = true;
         }
 
@@ -176,17 +185,15 @@ class AdminController extends AbstractController
                     $authorName = strtolower(trim($bookData['author'] ?? 'Auteur inconnu'));
                     $key = strtolower($title) . '||' . $authorName;
 
-                    // Si le livre existe déjà, on saute
                     if (isset($existingMap[$key])) continue;
 
                     $book = $creationService->createOrUpdateBookFromApi($bookData);
                     if ($book) {
                         $em->persist($book);
-                        $existingMap[$key] = true; // marque comme existant
+                        $existingMap[$key] = true;
                         $totalImported++;
                     }
 
-                    // Flush par batch
                     if ($totalImported % $batchSize === 0) {
                         $em->flush();
                         $em->clear();
@@ -201,20 +208,25 @@ class AdminController extends AbstractController
         $em->flush();
         $em->clear();
 
-        if ($request->isXmlHttpRequest()) {
-            return $this->json([
-                'success' => true,
-                'message' => "$totalImported livre(s) importé(s)."
-            ]);
-        }
-
-        $this->addFlash('success', "$totalImported livre(s) importé(s).");
-        return $this->redirectToRoute('admin_dashboard');
+        return $this->json([
+            'success' => true,
+            'message' => "$totalImported livre(s) importé(s)."
+        ]);
     }
 
-    #[Route('/update-books', name: 'update_books', methods: ['GET'])]
-    public function updateBooks(Request $request, BookApiService $apiService, BookCreationService $creationService, EntityManagerInterface $em): Response
-    {
+    #[Route('/update-books', name: 'update_books', methods: ['POST'])]
+    public function updateBooks(
+        Request $request,
+        BookApiService $apiService,
+        BookCreationService $creationService,
+        EntityManagerInterface $em
+    ): Response {
+        // --- Vérification CSRF ---
+        $csrfToken = $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('update_books_action', $csrfToken)) {
+            return $this->json(['success' => false, 'error' => 'Token CSRF invalide'], 400);
+        }
+
         set_time_limit(0);
         ini_set('memory_limit', '2048M');
 
@@ -248,15 +260,10 @@ class AdminController extends AbstractController
         $em->flush();
         $em->clear();
 
-        if ($request->isXmlHttpRequest()) {
-            return $this->json([
-                'success' => true,
-                'message' => "$count livre(s) mis à jour."
-            ]);
-        }
-
-        $this->addFlash('success', "$count livre(s) mis à jour.");
-        return $this->redirectToRoute('admin_dashboard');
+        return $this->json([
+            'success' => true,
+            'message' => "$count livre(s) mis à jour."
+        ]);
     }
 
     #[Route('/employes', name: 'admin_employes')]
@@ -779,16 +786,28 @@ class AdminController extends AbstractController
     }
 
     #[Route('/club/unsuspendre/{id}', name: 'club_unsuspendre', methods: ['POST'])]
-    public function unsuspendreClub(
-        int $id,
-        EntityManagerInterface $em,
-        CsrfTokenManagerInterface $csrfTokenManager,
-        MailerInterface $mailer
-    ): JsonResponse
+    public function unsuspendreClub(int $id, EntityManagerInterface $em, CsrfTokenManagerInterface $csrfTokenManager, MailerInterface $mailer, Request $request): JsonResponse
     {
+        $csrfToken = $request->request->get('_token');
+
+        if (!$csrfToken || !$this->isCsrfTokenValid('unsuspend_club_' . $id, $csrfToken)) {
+            return $this->json([
+                'success' => false,
+                'error' => 'Token CSRF invalide'
+            ], 403);
+        }
+
         $club = $em->getRepository(Club::class)->find($id);
         if (!$club) {
             return $this->json(['success' => false, 'error' => 'Club non trouvé'], 404);
+        }
+
+        $creator = $club->getCreator();
+        if (!$creator || $creator->getStatus() !== Utilisateur::STATUS_ACTIF) {
+            return $this->json([
+                'success' => false,
+                'error' => 'Impossible de réactiver ce club : le compte du créateur est suspendu.'
+            ], 400);
         }
 
         $club->setStatus(Club::STATUS_ACTIF);
@@ -829,7 +848,17 @@ class AdminController extends AbstractController
     }
 
     #[Route('/report/ignore/{id}', name: 'report_ignore', methods: ['POST'])]
-    public function ignoreReport(int $id, EntityManagerInterface $em): JsonResponse {
+    public function ignoreReport(int $id, EntityManagerInterface $em, Request $request): JsonResponse 
+    {
+        $csrfToken = $request->request->get('_token');
+
+        if (!$csrfToken || !$this->isCsrfTokenValid('ignore_report_' . $id, $csrfToken)) {
+            return $this->json([
+                'success' => false,
+                'error' => 'Token CSRF invalide'
+            ], 403);
+        }
+
         $report = $em->getRepository(Report::class)->find($id);
         if (!$report) return $this->json(['success' => false, 'error' => 'Report non trouvé'], 404);
 
@@ -909,10 +938,14 @@ class AdminController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/livres-signales/valider/{id}', name: 'admin_livre_valider', methods: ['POST'])]
+    #[Route('/livres-signales/valider/{id}', name: 'admin_livre_valider', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
-    public function validerLivre(int $id, ReportRepository $reportRepository, EntityManagerInterface $em): Response
+    public function validerLivre(int $id, ReportRepository $reportRepository, EntityManagerInterface $em, Request $request): Response
     {
+        $csrfToken = $request->request->get('_token');
+        if (!$csrfToken || !$this->isCsrfTokenValid('valider_livre_' . $id, $csrfToken)) {
+            return $this->json(['success' => false, 'message' => 'Token CSRF invalide'], 403);
+        }
         $report = $reportRepository->find($id);
 
         if (!$report) {
@@ -925,10 +958,14 @@ class AdminController extends AbstractController
         return $this->json(['success' => true]);
     }
 
-    #[Route('/admin/livres-signales/desactiver/{id}', name: 'admin_livre_desactiver', methods: ['POST'])]
+    #[Route('/livres-signales/desactiver/{id}', name: 'admin_livre_desactiver', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
-    public function desactiverLivre(Book $book, EntityManagerInterface $em): JsonResponse
+    public function desactiverLivre(Book $book, EntityManagerInterface $em, Request $request): JsonResponse
     {
+        $csrfToken = $request->request->get('_token');
+        if (!$csrfToken || !$this->isCsrfTokenValid('desactiver_livre_' . $book->getId(), $csrfToken)) {
+            return $this->json(['success' => false, 'message' => 'Token CSRF invalide'], 403);
+        }
         try {
             // Désactiver le livre
             $book->setIsActive(false);

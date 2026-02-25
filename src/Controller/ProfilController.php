@@ -114,20 +114,31 @@ class ProfilController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
+        // Vérification propriétaire : l'utilisateur ne peut modifier que ses propres bookshelves
+        if ($bookshelf->getUtilisateur() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
+
+        // Vérification CSRF
         if (!$this->isCsrfTokenValid(
             'update_pages_read'.$bookshelf->getId(),
             $request->request->get('_token')
         )) {
-            throw $this->createAccessDeniedException('Invalid CSRF');
+            throw $this->createAccessDeniedException('Token CSRF invalide');
         }
 
         $pagesRead = (int) $request->request->get('pagesRead', 0);
         $totalPages = (int) $request->request->get('totalPages', 0);
 
-        // Met à jour les pages lues
+        // 🔹 Validation simple
+        if ($pagesRead < 0) $pagesRead = 0;
+        if ($totalPages < 0) $totalPages = 0;
+        if ($totalPages > 0 && $pagesRead > $totalPages) {
+            $pagesRead = $totalPages;
+        }
+
         $bookshelf->setPagesRead($pagesRead);
 
-        // Si un total est fourni et que le livre n'en a pas encore
         if ($totalPages > 0 && !$bookshelf->getBook()->getPages()) {
             $bookshelf->getBook()->setPages($totalPages);
             $em->persist($bookshelf->getBook());

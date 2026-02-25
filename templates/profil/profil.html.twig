@@ -54,30 +54,10 @@
                 <div class="personal-info-header">
                     <h3>Profil de {{ utilisateur.pseudo }}</h3>
 
-                    {% if isSelf %}
-                        <a href="{{ path('app_profil_edit') }}" class="btn-edit-profil">Modifier le profil</a>
-                    {% endif %}
-
                     {% if currentUser and not isSelf %}
-                        {% set report = utilisateur.latestReport ?? null %}
-                        
-                        {% if report %}
-                            {% if report.status == 'en_attente' %}
-                                <span class="report-badge in-progress">
-                                    Signalé
-                                </span>
-                            {% else %}
-                                {# signalement validé ou refusé -> bouton réactivé #}
-                                <button
-                                    type="button"
-                                    class="btn btn-warning btn-report-user"
-                                    data-user-id="{{ utilisateur.id }}"
-                                >
-                                    Signaler
-                                </button>
-                            {% endif %}
+                        {% if hasReported %}
+                            <span class="report-badge in-progress">Signalé</span>
                         {% else %}
-                            {# aucun signalement -> bouton disponible #}
                             <button
                                 type="button"
                                 class="btn btn-warning btn-report-user"

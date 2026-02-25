@@ -41,8 +41,9 @@ table.avis-table td + td {
 }
 
 /* Boutons plus compacts */
-.admin-actions a {
+.admin-actions button, a {
     display: inline-block;
+    border: none;
     margin: 0 5px;
     padding: 6px 12px;
     border-radius: 6px;
