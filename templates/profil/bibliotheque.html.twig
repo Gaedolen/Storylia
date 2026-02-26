@@ -13,8 +13,8 @@
         {# --- Menu profil --- #}
         <nav class="profil-menu-horizontal">
             <div class="profil-user">
-                <img src="{{ asset('uploads/profiles/' ~ utilisateur.profilePicture) }}" alt="Photo de profil">
-                <span class="pseudo">{{ utilisateur.pseudo }}</span>
+                <img src="{{ asset('uploads/profiles/' ~ utilisateur.profilePicture)|e('html_attr') }}" alt="Photo de profil">
+                <span class="pseudo">{{ utilisateur.pseudo|e }}</span>
             </div>
 
             <ul class="profil-links">
@@ -37,7 +37,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ isSelf ? path('app_profil_historique') : path('app_utilisateur_historique', {'id': utilisateur.id}) }}#}" 
+                    <a href="{{ isSelf ? path('app_profil_historique') : path('app_utilisateur_historique', {'id': utilisateur.id}) }}" 
                     class="{{ app.request.get('_route') in ['app_profil_historique','app_utilisateur_historique'] ? 'active' : '' }}">
                         Historique
                     </a>
@@ -72,7 +72,7 @@
                                 <div class="book-card" data-book-id="{{ bookshelf.book.id }}">
                                     <div class="cover">
                                         <a href="{{ path('app_livre_detail', {'id': bookshelf.book.id}) }}">
-                                            <img src="{{ bookshelf.book.cover|replace({'http://':'https://'}) }}" alt="{{ bookshelf.book.title }}">
+                                            <img src="{{ bookshelf.book.cover|replace({'http://':'https://'})|e('html_attr') }}" alt="{{ bookshelf.book.title }}">
                                         </a>
                                     </div>
                                     <div class="info">

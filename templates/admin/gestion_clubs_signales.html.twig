@@ -35,14 +35,14 @@
                     {% set author = report.author %}
 
                     <tr>
-                        <td>{{ club.name }}</td>
-                        <td>{{ club.creator.pseudo }}</td>
-                        <td>{{ author.pseudo }}</td>
-                        <td>{{ report.reason }}</td>
-                        <td>{{ report.employeMessage }}</td>
+                        <td>{{ club.name|e }}</td>
+                        <td>{{ club.creator.pseudo|e }}</td>
+                        <td>{{ author.pseudo|e }}</td>
+                        <td>{{ report.reason|e }}</td>
+                        <td>{{ report.employeMessage|e }}</td>
                         <td>
                             {% if report.transmittedBy %}
-                                {{ report.transmittedBy.pseudo }}
+                                {{ report.transmittedBy.pseudo|e }}
                             {% else %}
                                 -
                             {% endif %}

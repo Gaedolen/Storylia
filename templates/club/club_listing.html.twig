@@ -89,14 +89,14 @@
                     <div class="club-card">
                         <div class="club-card-left">
                             {% if club.photo %}
-                                <img src="{{ asset('uploads/clubs/' ~ club.photo) }}" alt="{{ club.name }}">
+                                <img src="{{ asset('uploads/clubs/' ~ club.photo|e('url') ) }}" alt="{{ club.name|e }}">
                             {% else %}
                                 <div class="club-photo-placeholder">Aucune photo</div>
                             {% endif %}
                         </div>
 
                         <div class="club-card-right">
-                            <h3>{{ club.name }}</h3>
+                            <h3>{{ club.name|e }}</h3>
 
                             <div class="club-card-meta">
                                 <span class="club-participants">{{ club.membres|length }} participants</span>
@@ -110,7 +110,7 @@
                                 {% endif %}
                             </div>
 
-                            <div class="club-description">{{ club.description }}</div>
+                            <div class="club-description">{{ club.description|e }}</div>
 
                             <div class="club-preferences">
                                 {% set preferencesLabels = {
@@ -144,7 +144,7 @@
                                 } %}
 
                                 {% for code in club.preferences %}
-                                    <span class="pref-badge">{{ preferencesLabels[code] }}</span>
+                                    <span class="pref-badge">{{ preferencesLabels[code]|default('Inconnu') }}</span>
                                 {% endfor %}
                             </div>
                         </div>
@@ -161,12 +161,12 @@
                     {% for user in users %}
                         <a href="{{ path('app_utilisateur_profil', {'id': user.id}) }}" class="user-card">
                             {% if user.profilePicture %}
-                                <img src="{{ asset('uploads/profiles/' ~ user.profilePicture) }}" alt="{{ user.pseudo }}">
+                                <img src="{{ asset('uploads/profiles/' ~ user.profilePicture|e('url')) }}" alt="{{ user.pseudo|e }}">
                             {% else %}
                                 <img src="{{ asset('uploads/profiles/default.png') }}" alt="Utilisateur sans photo">
                             {% endif %}
                             <div class="user-info">
-                                <p class="pseudo">{{ user.pseudo }}</p>
+                                <p class="pseudo">{{ user.pseudo|e }}</p>
                             </div>
                         </a>
                     {% else %}

@@ -37,7 +37,7 @@
                         </div>
                         <a href="{{ path('club_index') }}" class="all-clubs-link">
                             Voir tous les clubs lectures
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon-arrow" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="https://www.w3.org/2000/svg" class="icon-arrow" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                 <line x1="17" y1="7" x2="7" y2="17" />
                                 <polyline points="8 7 17 7 17 16" />
@@ -65,7 +65,7 @@
                                 <div class="carousel-card">
                                     <a href="{{ path('app_livre_detail', {'id': item.book.id}) }}" class="card-link">
                                         {% if item.book.cover %}
-                                            <img src="{{ item.book.cover }}" alt="{{ item.book.title }}" class="card-img">
+                                            <img src="{{ item.book.cover|replace({'http://':'https://'})|e('html_attr') }}" alt="{{ item.book.title }}" class="card-img">
                                         {% else %}
                                             <img src="{{ asset('images/default_cover.jpg') }}" alt="{{ item.book.title }}" class="card-img">
                                         {% endif %}
@@ -106,9 +106,10 @@
                         </div>
                         {% if app.user %}
                             {% if not club.membres.contains(app.user) %}
-                                <form method="POST" action="{{ path('club_participer', {'id': club.id}) }}">
-                                    <button type="submit" class="btn-participate">Participer</button>
-                                </form>
+                                <form method="post" action="{{ path('club_participer', { id: club.id }) }}" style="display:inline;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('participer_club_' ~ club.id) }}">
+                                        <button type="submit" class="btn-participate">Participer</button>
+                                    </form>
                             {% else %}
                                 <button class="btn-participate" disabled>Déjà membre</button>
                             {% endif %}
@@ -130,7 +131,7 @@
                     <div class="review-card">
                         <a href="{{ path('app_livre_detail', {'id': review.book.id}) }}" class="review-link">
                             <div class="review-left">
-                                <img src="{{ review.book.cover }}" alt="{{ review.book.title }}" class="review-cover">
+                                <img src="{{ review.book.cover|replace({'http://':'https://'})|e('html_attr') }}" alt="{{ review.book.title }}" class="review-cover">
                             </div>
                             <div class="review-right">
                                 <div class="review-book-title">{{ review.book.title }}</div>

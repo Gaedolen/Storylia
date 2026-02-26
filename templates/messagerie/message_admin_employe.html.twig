@@ -16,11 +16,11 @@
 
                 <div class="message {{ classe }}">
                     <div class="message-pseudo">
-                        {{ msg.sender.pseudo }}
+                        {{ msg.sender.pseudo|e }}
                     </div>
 
                     <div class="message-bubble">
-                        {{ msg.content }}
+                        {{ msg.content|e }}
                     </div>
 
                     <small class="message-date">
@@ -33,7 +33,6 @@
         </div>
 
         <form method="post" action="{{ path('messagerie_send') }}" class="messenger-form">
-            <input type="hidden" name="receiver_id" value="1">
             <textarea name="content" placeholder="Écrire un message…"></textarea>
             <button type="submit">Envoyer</button>
         </form>

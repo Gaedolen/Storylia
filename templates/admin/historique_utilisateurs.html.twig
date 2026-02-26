@@ -71,7 +71,7 @@
                         <tr>
                             <td>
                                 <a href="{{ path('app_utilisateur_profil', {'id': userReported.id}) }}">
-                                    {{ userReported.pseudo }}
+                                    {{ userReported.pseudo|e }}
                                     {% if userReported.status == 'actif' %}
                                         <span class="badge badge-green">Actif</span>
                                     {% else %}
@@ -79,15 +79,15 @@
                                     {% endif %}
                                 </a>
                             </td>
-                            <td>{{ userReported.email }}</td>
+                            <td>{{ userReported.email|e }}</td>
                             <td>
                                 <a href="{{ path('app_utilisateur_profil', {'id': report.author.id}) }}">
-                                    {{ report.author.pseudo }}
+                                    {{ report.author.pseudo|e }}
                                 </a>
                             </td>
-                            <td>{{ report.transmittedBy ? report.transmittedBy.pseudo : '-' }}</td>
-                            <td>{{ reasonLabels[report.reason] ?? report.reason }}</td>
-                            <td class="message-employe">{{ report.employeMessage ?: '-' }}</td>
+                            <td>{{ report.transmittedBy ? report.transmittedBy.pseudo|e : '-' }}</td>
+                            <td>{{ reasonLabels[report.reason] ?? report.reason|e }}</td>
+                            <td class="message-employe">{{ report.employeMessage|e ?: '-' }}</td>
                             <td>{{ report.date|date('d/m/Y') }}</td>
                             <td>
                                 {% if report.status == 'traite' %}

@@ -39,25 +39,26 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?RedirectResponse
     {
-        // Si une redirection était prévue avant le login, on la reprend
-        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
-            return new RedirectResponse($targetPath);
-        }
-
         $user = $token->getUser();
 
         // Redirection selon le rôle
         if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+            // Si un admin avait un targetPath, on peut le reprendre
+            if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
+                return new RedirectResponse($targetPath);
+            }
             return new RedirectResponse($this->urlGenerator->generate('admin_dashboard'));
         }
 
-        // Redirection Employé
         if (in_array('ROLE_EMPLOYE', $user->getRoles(), true)) {
+            if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
+                return new RedirectResponse($targetPath);
+            }
             return new RedirectResponse($this->urlGenerator->generate('employe_dashboard'));
         }
 
-        // Par défaut : page d’accueil du site
-        return new RedirectResponse(url: $this->urlGenerator->generate('homepage'));
+        // Pour les utilisateurs normaux, on ignore le targetPath pour éviter AccessDenied
+        return new RedirectResponse($this->urlGenerator->generate('homepage'));
     }
 
     protected function getLoginUrl(Request $request): string

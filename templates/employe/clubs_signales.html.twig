@@ -34,75 +34,73 @@
                 <tr>
                     <td>{{ report.id }}</td>
 
-                    <td>
-                        {{ report.reportedClub.name }}
-                    </td>
+                    <td>{{ report.reportedClub.name|e }}</td>
 
                     <td>
-                        {{ report.reportedClub.creator.pseudo }}
+                        {{ report.reportedClub.creator.pseudo|e }}
 
                         <button
                             type="button"
                             class="btn-contact"
-                            data-pseudo="{{ report.reportedClub.creator.pseudo }}"
-                            data-action="{{ path('employe_club_signalement_mail_createur', { id: report.id }) }}"
-                            data-token="{{ csrf_token('mail_creator' ~ report.id) }}"
+                            data-pseudo="{{ report.reportedClub.creator.pseudo|e }}"
+                            data-action="{{ path('employe_club_signalement_mail_createur', { id: report.id })|e }}"
+                            data-token="{{ csrf_token('mail_creator' ~ report.id)|e }}"
                         >
                             Contacter
                         </button>
                     </td>
 
                     <td>
-                        {{ report.author.pseudo }}
+                        {{ report.author.pseudo|e }}
                         <button
                             type="button"
                             class="btn-contact"
-                            data-pseudo="{{ report.author.pseudo }}"
-                            data-action="{{ path('employe_club_signalement_mail_auteur', { id: report.id }) }}"
-                            data-token="{{ csrf_token('mail_author' ~ report.id) }}"
+                            data-pseudo="{{ report.author.pseudo|e }}"
+                            data-action="{{ path('employe_club_signalement_mail_auteur', { id: report.id })|e }}"
+                            data-token="{{ csrf_token('mail_author' ~ report.id)|e }}"
                         >
                             Contacter
                         </button>
                     </td>
 
-                    <td>{{ report.reason }}</td>
-                    <td>{{ report.message }}</td>
+                    <td>{{ report.reason|e }}</td>
+                    <td>{{ report.message|e }}</td>
                     <td>{{ report.date|date('d/m/Y') }}</td>
 
                     <td>
                         {% if report.isEnCours() %}
                             <form method="post"
-                                action="{{ path('employe_club_traiter_signalement', {id: report.id}) }}"
+                                action="{{ path('employe_club_traiter_signalement', {id: report.id})|e }}"
                                 style="display:inline-block;">
                                 <input type="hidden" name="_token"
-                                    value="{{ csrf_token('traiter_report' ~ report.id) }}">
+                                    value="{{ csrf_token('traiter_report' ~ report.id)|e }}">
                                 <button class="btn btn-success">Traiter</button>
                             </form>
 
                             <form method="post"
-                                action="{{ path('employe_club_ignorer_signalement', {id: report.id}) }}"
+                                action="{{ path('employe_club_ignorer_signalement', {id: report.id})|e }}"
                                 style="display:inline-block;">
                                 <input type="hidden" name="_token"
-                                    value="{{ csrf_token('ignorer_report' ~ report.id) }}">
+                                    value="{{ csrf_token('ignorer_report' ~ report.id)|e }}">
                                 <button class="btn btn-secondary">Ignorer</button>
                             </form>
 
                             <button
                                 type="button"
                                 class="btn btn-warning btn-transmettre"
-                                data-action="{{ path('employe_club_signalement_transmettre', {id: report.id}) }}"
-                                data-token="{{ csrf_token('transmettre' ~ report.id) }}"
+                                data-action="{{ path('employe_club_signalement_transmettre', {id: report.id})|e }}"
+                                data-token="{{ csrf_token('transmettre' ~ report.id)|e }}"
                             >
                                 Transmettre à l’admin
                             </button>
                         {% else %}
-                            <span>{{ report.status|capitalize }}</span>
+                            <span>{{ report.status|capitalize|e }}</span>
                         {% endif %}
                     </td>
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="7" style="text-align:center; color: #777;">
+                    <td colspan="8" style="text-align:center; color: #777;">
                         Aucun signalement pour le moment.
                     </td>
                 </tr>
@@ -110,7 +108,6 @@
             </tbody>
         </table>
 
-        {# Pagination (structure conservée) #}
         {% if totalPages > 1 %}
             <div class="pagination">
                 {% for p in 1..totalPages %}

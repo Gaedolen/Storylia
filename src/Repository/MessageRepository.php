@@ -14,7 +14,10 @@ class MessageRepository extends ServiceEntityRepository
         parent::__construct($registry, Message::class);
     }
 
-    public function findByUserAndAdmin(Utilisateur $user)
+    /**
+     * Récupère tous les messages entre un utilisateur et un admin
+        */
+    public function findByUserAndStaff(Utilisateur $user)
     {
         return $this->createQueryBuilder('m')
             ->where('m.sender = :user OR m.receiver = :user')

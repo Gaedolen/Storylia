@@ -15,7 +15,9 @@
             <h3>Créateur du club</h3>
             <a href="{{ path('app_utilisateur_profil', {'id': club.creator.id}) }}" class="creator-card-link">
                 <div class="creator-card">
-                    <img src="{{ asset('uploads/profiles/' ~ club.creator.profilePicture) }}" alt="{{ club.creator.pseudo }}" class="creator-photo">
+                    <img src="{{ asset('uploads/profiles/' ~ club.creator.profilePicture)|e('html_attr') }}"
+                        alt="{{ club.creator.pseudo|e }}"
+                        class="creator-photo">
                     <span class="creator-pseudo">{{ club.creator.pseudo }}</span>
                 </div>
             </a>
@@ -30,8 +32,8 @@
                     <a href="{{ isSuspended ? '#' : path('app_utilisateur_profil', {'id': membre.id}) }}"
                     class="member-card-link {{ isSuspended ? 'suspended' : '' }}">
                         <div class="member-card">
-                            <img src="{{ asset('uploads/profiles/' ~ membre.profilePicture) }}"
-                                alt="{{ membre.pseudo }}"
+                            <img src="{{ asset('uploads/profiles/' ~ membre.profilePicture)|e('html_attr') }}"
+                                alt="{{ membre.pseudo|e }}"
                                 class="member-photo">
                             <span class="member-pseudo">{{ membre.pseudo }}</span>
                         </div>
@@ -44,7 +46,9 @@
         <div class="club-details-section">
             <h3>Informations sur le club</h3>
             <div class="club-info-card">
-                <img src="{{ asset('uploads/clubs/' ~ club.photo) }}" alt="{{ club.name }}" class="club-photo">
+                <img src="{{ asset('uploads/clubs/' ~ club.photo)|e('html_attr') }}"
+                    alt="{{ club.name|e }}"
+                    class="club-photo">
                 <div class="club-info-text">
                     <h2>{{ club.name }}</h2>
                     <p>{{ club.description }}</p>

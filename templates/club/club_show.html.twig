@@ -149,7 +149,7 @@
                 <div class="book-card-nm">
                     <!-- Image avec lien -->
                     <a href="{{ path('app_livre_detail', {id: bookOfNextMonth.id}) }}">
-                        <img src="{{ bookOfNextMonth.cover }}" alt="{{ bookOfNextMonth.title }}">
+                        <img src="{{ bookOfNextMonth.cover|replace({'http://':'https://'})|e('html_attr') }}" alt="{{ bookOfNextMonth.title }}">
                     </a>
 
                     <!-- Infos à côté -->
@@ -197,7 +197,7 @@
 
             {% if bookOfMonth %}
                 <div class="book-details">
-                    <a href="{{ path('app_livre_detail', {id: bookOfMonth.id}) }}"><img src={{ bookOfMonth.cover }} alt="{{ bookOfMonth.title }}" class="book-cover"></a>
+                    <a href="{{ path('app_livre_detail', {id: bookOfMonth.id}) }}"><img src="{{ bookOfMonth.cover|replace({'http://':'https://'})|e('html_attr') }}" alt="{{ bookOfMonth.title }}" class="book-cover"></a>
 
                     <div class="book-info">
                         <a href="{{ path('app_livre_detail', {id: bookOfMonth.id}) }}"><p class="book-title">{{ bookOfMonth.title }}</p></a>
@@ -265,7 +265,7 @@
                     {% for proposal in recentBookProposals|slice(0, 20) %}
                         <a href="{{ path('app_livre_detail', {id: proposal.book.id}) }}" class="book-card">
                             <div class="card">
-                                <img src="{{ proposal.book.cover }}" class="card-img-top" alt="{{ proposal.book.title }}">
+                                <img src="{{ proposal.book.cover|replace({'http://':'https://'})|e('html_attr') }}" class="card-img-top" alt="{{ proposal.book.title }}">
                                 <div class="card-body text-center">
                                     <h6 class="card-title">
                                         {{ proposal.book.title|length > 25 ? proposal.book.title[:25] ~ '…' : proposal.book.title }}
@@ -296,7 +296,7 @@
                             <div class="book-card">
                                 <div class="book-cover-wrapper">
                                     <label for="proposal-{{ proposal.id }}">
-                                        <img src="{{ book.cover }}" alt="{{ book.title }}" class="book-cover">
+                                        <img src="{{ book.cover|replace({'http://':'https://'})|e('html_attr') }}" alt="{{ book.title }}" class="book-cover">
                                     </label>
 
                                         <input 

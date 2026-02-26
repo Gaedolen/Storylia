@@ -51,9 +51,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 closeModal.style.display = 'inline-block';
 
                 if (data.success) {
-                    resultText.innerHTML = `Opération terminée : <br>${data.message}`;
+                    resultText.textContent = `Opération terminée : ${data.message}`;
                 } else {
-                    resultText.innerHTML = `Erreur serveur : <br>${data.error || 'Erreur inconnue'}`;
+                    resultText.textContent = `Erreur serveur : ${data.error || 'Erreur inconnue'}`;
                 }
 
             } catch (err) {
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadingText.style.display = 'none';
                 resultText.style.display = 'block';
                 closeModal.style.display = 'inline-block';
-                resultText.innerHTML = `Erreur JS : <br>${err.message}`;
+                resultText.textContent = `Erreur JS : ${err.message}`;
                 console.error(err);
             }
         });

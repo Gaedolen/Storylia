@@ -13,7 +13,9 @@
     {# Bloc Livre #}
     <div class="book-info-container">
         <div class="book-left">
-            <img src={{  book.cover }} alt="{{ book.title }}" class="book-cover">
+            <img src="{{ book.cover|replace({'http://':'https://'})|e('html_attr') }}" 
+                alt="{{ book.title }}" 
+                class="book-cover">
             <div class="book-meta">
                 <h2>{{ book.title }}</h2>
                 <p><strong>Auteur :</strong> {{ book.author.name }}</p>
@@ -21,20 +23,16 @@
                     <p><strong>Genres :</strong> {{ book.genres|join(', ') }}</p>
                 {% endif %}
                 <p><strong>Date de publication :</strong> {{ book.publicationDate ? book.publicationDate|date('d/m/Y') : 'N/A' }}</p>
-                <p><strong>Pages :</strong> {{ book.pages }}</p>
+                <p><strong>Pages :</strong> {{ book.pages ?: 'N/A' }}</p>
                 <p><strong>Éditeurs :</strong> 
-                    {% if book.publishers is not empty %}
-                        {{ book.publishers|join(', ') }}
-                    {% else %}
-                        N/A
-                    {% endif %}
+                    {{ book.publishers is not empty ? book.publishers|join(', ') : 'N/A' }}
                 </p>
                 <p><strong>Livre du mois de {{ currentMonthName }}</strong></p>
             </div>
         </div>
         <div class="book-right">
             <h3>Résumé</h3>
-            <p>{{ book.summary }}</p>
+            <p>{{ book.summary ?: 'Résumé non disponible.' }}</p>
         </div>
     </div>
 

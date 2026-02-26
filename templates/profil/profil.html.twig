@@ -13,8 +13,13 @@
     {# Menu de navigation profil #}
     <nav class="profil-menu-horizontal">
         <div class="profil-user">
-            <img src="{{ asset('uploads/profiles/' ~ utilisateur.profilePicture) }}" alt="Photo de profil">
-            <span class="pseudo">{{ utilisateur.pseudo }}</span>
+            {% set profileImage = utilisateur.profilePicture ?: 'default.png' %}
+
+            <img 
+                src="{{ asset('uploads/profiles/' ~ profileImage|e('html_attr')) }}" 
+                alt="Photo de profil"
+            >
+            <span class="pseudo">{{ utilisateur.pseudo|e }}</span>
         </div>
 
         <ul class="profil-links">
@@ -37,7 +42,7 @@
                 </a>
             </li>
             <li>
-                <a href="{{ isSelf ? path('app_profil_historique') : path('app_utilisateur_historique', {'id': utilisateur.id}) }}#}" 
+                <a href="{{ isSelf ? path('app_profil_historique') : path('app_utilisateur_historique', {'id': utilisateur.id}) }} }}" 
                 class="{{ app.request.get('_route') in ['app_profil_historique','app_utilisateur_historique'] ? 'active' : '' }}">
                     Historique
                 </a>
@@ -52,7 +57,7 @@
             <!-- Carte données personnelles -->
             <div class="card personal-info">
                 <div class="personal-info-header">
-                    <h3>Profil de {{ utilisateur.pseudo }}</h3>
+                    <h3>Profil de {{ utilisateur.pseudo|e }}</h3>
 
                     {% if currentUser and not isSelf %}
                         {% if hasReported %}
@@ -102,7 +107,7 @@
                     <div class="info-item">
                         <i class="fa-solid fa-user"></i>
                         <span class="label">Pseudo</span>
-                        <span class="value">{{ utilisateur.pseudo }}</span>
+                        <span class="value">{{ utilisateur.pseudo|e }}</span>
                     </div>
 
                     <div class="info-item">
@@ -127,7 +132,7 @@
 
                         <div class="bio-content">
                             {% if utilisateur.bio %}
-                                <p class="bio-text">{{ utilisateur.bio }}</p>
+                                <p class="bio-text">{{ utilisateur.bio|e }}</p>
                             {% else %}
                                 <p class="bio-text empty">Aucune description pour le moment.</p>
                             {% endif %}
@@ -138,7 +143,7 @@
                 {% if utilisateur.presentation %}
                     <div class="presentation">
                         <h4>À propos de moi</h4>
-                        <p>{{ utilisateur.presentation }}</p>
+                        <p>{{ utilisateur.presentation|e }}</p>
                     </div>
                 {% endif %}
             </div>
@@ -166,7 +171,7 @@
                                                 {% for livre in chunk %}
                                                     <a href="{{ path('app_livre_detail', {id: livre.book.id}) }}" class="carousel-card-link">
                                                         <div class="card carousel-card">
-                                                            <img src="{{ livre.book.cover }}" class="card-img-top" alt="{{ livre.book.title }}">
+                                                            <img src="{{ livre.book.cover|replace({'http://':'https://'})|e('html_attr') }}" class="card-img-top" alt="{{ livre.book.title }}">
                                                             <div class="card-body text-center">
                                                                 <h6 class="card-title">{{ livre.book.title }}</h6>
                                                                 <p class="card-text">{{ livre.book.author.name }}</p>
@@ -204,7 +209,7 @@
                     <div class="lecture-container">
                         <div class="lecture-cover">
                             <a href="{{ path('app_livre_detail', {id: lectureEnCours.book.id}) }}">
-                                <img src="{{ lectureEnCours.book.cover|default(asset('images/default_cover.jpg')) }}" 
+                                <img src="{{ lectureEnCours.book.cover|replace({'http://':'https://'})|default(asset('images/default_cover.jpg'))|e('html_attr') }}" 
                                     alt="{{ lectureEnCours.book.title }}">
                             </a>
                         </div>
@@ -318,9 +323,9 @@
                                             {% for shelf in book %}
                                                 <a href="{{ path('app_livre_detail', {id: shelf.book.id}) }}" class="carousel-card-link text-center">
                                                     <div class="card carousel-card">
-                                                        <img src="{{ shelf.book.cover }}" class="card-img-top" alt="{{ shelf.book.title }}">
+                                                        <img src="{{ shelf.book.cover|replace({'http://':'https://'})|e('html_attr') }}" class="card-img-top" alt="{{ shelf.book.title }}">
                                                         <div class="card-body">
-                                                            <h6 class="card-title">{{ shelf.book.title }}</h6>
+                                                            <h6 class="card-title">{{ shelf.book.title|e }}</h6>
                                                             <p class="card-text">{{ shelf.readingDate|date('d/m/Y') }}</p>
                                                         </div>
                                                     </div>

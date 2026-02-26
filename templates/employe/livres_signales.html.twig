@@ -30,11 +30,11 @@
                 {% if report.reportedBook %}
                 <tr data-report-id="{{ report.id }}">
                     <td>{{ report.id }}</td>
-                    <td>{{ report.reportedBook.title }}</td>
-                    <td>{{ report.reportedBook.author.name }}</td>
-                    <td>{{ report.reason }}</td>
-                    <td>{{ report.message|default('—') }}</td>
-                    <td>{{ report.author.pseudo }}</td>
+                    <td>{{ report.reportedBook.title|e }}</td>
+                    <td>{{ report.reportedBook.author.name|e }}</td>
+                    <td>{{ report.reason|e }}</td>
+                    <td>{{ report.message|default('—')|e }}</td>
+                    <td>{{ report.author.pseudo|e }}</td>
                     <td>{{ report.date|date('d/m/Y') }}</td>
                     <td>
                         <a href="{{ path('employe_livre_edit', {'id': report.reportedBook.id}) }}" 
@@ -66,9 +66,9 @@
             <div id="book-detail-content"></div>
         </div>
     </div>
-    {% endblock %}
+{% endblock %}
 
-    {% block javascripts %}
+{% block javascripts %}
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const openModal = (modal) => { modal.style.display = 'flex'; };

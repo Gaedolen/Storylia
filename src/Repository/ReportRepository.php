@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Report;
+use App\Entity\Utilisateur;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -137,6 +138,18 @@ class ReportRepository extends ServiceEntityRepository
             ->orderBy('r.date', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+    public function hasUserReported(Utilisateur $author, Utilisateur $reported): bool
+    {
+        return (bool) $this->createQueryBuilder('r')
+            ->select('COUNT(r.id)')
+            ->where('r.author = :author')
+            ->andWhere('r.reported = :reported')
+            ->setParameter('author', $author)
+            ->setParameter('reported', $reported)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     //    /**

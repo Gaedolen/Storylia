@@ -16,11 +16,8 @@
         {# ===== MENU PROFIL ===== #}
         <nav class="profil-menu-horizontal">
             <div class="profil-user">
-                <img
-                    src="{{ asset('uploads/profiles/' ~ utilisateur.profilePicture) }}"
-                    alt="Photo de profil"
-                >
-                <span class="pseudo">{{ utilisateur.pseudo }}</span>
+                <img src="{{ asset('uploads/profiles/' ~ utilisateur.profilePicture)|e('html_attr') }}" alt="Photo de profil">
+                <span class="pseudo">{{ utilisateur.pseudo|e }}</span>
             </div>
 
             <ul class="profil-links">
@@ -101,8 +98,7 @@
 
                                                     <div class="cover">
                                                         <a href="{{ path('app_livre_detail', {'id': reading.book.id}) }}">
-                                                            <img src="{{ reading.book.cover|replace({'http://':'https://'}) }}"
-                                                                alt="{{ reading.book.title }}">
+                                                            <img src="{{ reading.book.cover|e('html_attr') }}" alt="{{ reading.book.title|e }}">
                                                         </a>
                                                     </div>
 
@@ -110,13 +106,13 @@
                                                         <div class="info-content">
                                                             <h3>
                                                                 <a href="{{ path('app_livre_detail', {'id': reading.book.id}) }}">
-                                                                    {{ reading.book.title }}
+                                                                    {{ reading.book.title|e }}
                                                                 </a>
                                                             </h3>
 
                                                             <p>
                                                                 <a href="#">
-                                                                    {{ reading.book.author.name }}
+                                                                    {{ reading.book.author.name|e }}
                                                                 </a>
                                                             </p>
 

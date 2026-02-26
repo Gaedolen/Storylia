@@ -12,21 +12,39 @@
     <h1>Connexion</h1>
 
     {% if error %}
-        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        <div class="alert alert-danger">
+            {{ error.messageKey|trans(error.messageData, 'security')|e }}
+        </div>
     {% endif %}
 
     <form action="{{ path('app_login') }}" method="post">
-        <label for="username">Email :</label>
-        <input type="email" id="email" name="email" value="{{ last_username }}" required autofocus>
+        <label for="email">Email :</label>
+        <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            value="{{ last_username|e('html_attr') }}" 
+            required 
+            autofocus
+        >
 
         <label for="password">Mot de passe :</label>
         <input type="password" id="password" name="password" required>
 
-        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+        <input 
+            type="hidden" 
+            name="_csrf_token" 
+            value="{{ csrf_token('authenticate') }}"
+        >
 
-         <div class="remember-me">
+        <div class="remember-me">
             <label class="remember-me__label">
-                <input type="checkbox" id="remember_me" name="_remember_me" class="remember-me__checkbox">
+                <input 
+                    type="checkbox" 
+                    id="remember_me" 
+                    name="_remember_me" 
+                    class="remember-me__checkbox"
+                >
                 <span class="custom-checkbox"></span>
                 <span class="remember-me__text">Se souvenir de moi</span>
             </label>
@@ -36,12 +54,15 @@
     </form>
 
     <p>
-        Pas encore de compte ? <a href="{{ path('register') }}">Inscrivez-vous ici 
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon-arrow" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-            <line x1="17" y1="7" x2="7" y2="17" />
-            <polyline points="8 7 17 7 17 16" />
-        </svg></a>
+        Pas encore de compte ? 
+        <a href="{{ path('register') }}">
+            Inscrivez-vous ici
+            <svg xmlns="https://www.w3.org/2000/svg" class="icon-arrow" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <line x1="17" y1="7" x2="7" y2="17" />
+                <polyline points="8 7 17 7 17 16" />
+            </svg>
+        </a>
     </p>
 </div>
 {% endblock %}

@@ -16,11 +16,8 @@
         {# ===== MENU PROFIL ===== #}
         <nav class="profil-menu-horizontal">
             <div class="profil-user">
-                <img
-                    src="{{ asset('uploads/profiles/' ~ utilisateur.profilePicture) }}"
-                    alt="Photo de profil"
-                >
-                <span class="pseudo">{{ utilisateur.pseudo }}</span>
+                <img src="{{ asset('uploads/profiles/' ~ utilisateur.profilePicture)|e('html_attr') }}" alt="Photo de profil">
+                <span class="pseudo">{{ utilisateur.pseudo|e }}</span>
             </div>
 
             <ul class="profil-links">
@@ -46,7 +43,7 @@
                 </li>
 
                 <li>
-                    <a href="{{ isSelf ? path('app_profil_historique') : path('app_utilisateur_historique', {'id': utilisateur.id}) }}#}"
+                    <a href="{{ isSelf ? path('app_profil_historique') : path('app_utilisateur_historique', {'id': utilisateur.id}) }}"
                     class="{{ app.request.get('_route') in ['app_profil_historique','app_utilisateur_historique'] ? 'active' : '' }}">
                         Historique
                     </a>
@@ -99,7 +96,7 @@
 
                     <div class="club-card-left">
                         {% if club.photo %}
-                            <img src="{{ asset('uploads/clubs/' ~ club.photo) }}" alt="{{ club.name }}">
+                            <img src="{{ asset('uploads/clubs/' ~ club.photo)|e('html_attr') }}" alt="{{ club.name|e }}">
                         {% else %}
                             <div class="club-photo-placeholder">Aucune photo</div>
                         {% endif %}
@@ -115,16 +112,16 @@
                     </div>
 
                     <div class="club-card-right">
-                        <h3>{{ club.name }}</h3>
+                        <h3>{{ club.name|e }}</h3>
 
                         <div class="club-description">
-                            {{ club.description }}
+                            {{ club.description|e }}
                         </div>
 
                         <div class="club-preferences">
                             {% for code in club.preferences %}
                                 <span class="pref-badge">
-                                    {{ preferencesLabels[code] }}
+                                    {{ preferencesLabels[code]|e }}
                                 </span>
                             {% endfor %}
                         </div>
@@ -158,7 +155,7 @@
 
                 <div class="club-card-left">
                     {% if club.photo %}
-                        <img src="{{ asset('uploads/clubs/' ~ club.photo) }}" alt="{{ club.name }}">
+                        <img src="{{ asset('uploads/clubs/' ~ club.photo)|e('html_attr') }}" alt="{{ club.name|e }}">
                     {% else %}
                         <div class="club-photo-placeholder">Aucune photo</div>
                     {% endif %}
@@ -174,16 +171,16 @@
                 </div>
 
                 <div class="club-card-right">
-                    <h3>{{ club.name }}</h3>
+                    <h3>{{ club.name|e }}</h3>
 
                     <div class="club-description">
-                        {{ club.description }}
+                        {{ club.description|e }}
                     </div>
 
                     <div class="club-preferences">
                         {% for code in club.preferences %}
                             <span class="pref-badge">
-                                {{ preferencesLabels[code] }}
+                                {{ preferencesLabels[code]|e }}
                             </span>
                         {% endfor %}
                     </div>

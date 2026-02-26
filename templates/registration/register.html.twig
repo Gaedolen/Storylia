@@ -10,123 +10,121 @@
 {% block body %}
     <div class='conteneur-principal'>
         <h1>Créer un compte</h1>
-    
+
         {% for message in app.flashes('success') %}
-            <div class="alert alert-success">{{ message }}</div>
+            <div class="alert alert-success">{{ message|e }}</div>
         {% endfor %}
 
         <div class='form-container'>
-
             {{ form_start(registrationForm) }}
 
-                <div class="form-container">
+            <div class="form-container">
 
-                    <div class="left-container">
-                        <div class="form-group">
-                            {{ form_label(registrationForm.familyName) }}
-                            {{ form_widget(registrationForm.familyName, {'attr': {'class': 'form-control'}}) }}
-                            {{ form_errors(registrationForm.familyName) }}
-                        </div>
-
-                        <div class="form-group">
-                            {{ form_label(registrationForm.firstName) }}
-                            {{ form_widget(registrationForm.firstName, {'attr': {'class': 'form-control'}}) }}
-                            {{ form_errors(registrationForm.firstName) }}
-                        </div>
-
-                        <div class="form-group">
-                            {{ form_label(registrationForm.pseudo) }}
-                            {{ form_widget(registrationForm.pseudo, {'attr': {'class': 'form-control'}}) }}
-                            {{ form_errors(registrationForm.pseudo) }}
-                        </div>
-
-                        <div class="form-group">
-                            {{ form_label(registrationForm.birthDate) }}
-                            {{ form_widget(registrationForm.birthDate, {'attr': {'class': 'form-control'}}) }}
-                            {{ form_errors(registrationForm.birthDate) }}
-                        </div>
+                <div class="left-container">
+                    <div class="form-group">
+                        {{ form_label(registrationForm.familyName) }}
+                        {{ form_widget(registrationForm.familyName, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.familyName) }}
                     </div>
 
-                    <span class="line-separator"></span>
+                    <div class="form-group">
+                        {{ form_label(registrationForm.firstName) }}
+                        {{ form_widget(registrationForm.firstName, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.firstName) }}
+                    </div>
 
-                    <div class="right-container">
-                        <div class="form-group">
-                            {{ form_label(registrationForm.email) }}
-                            {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
-                            {{ form_errors(registrationForm.email) }}
-                        </div>
+                    <div class="form-group">
+                        {{ form_label(registrationForm.pseudo) }}
+                        {{ form_widget(registrationForm.pseudo, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.pseudo) }}
+                    </div>
 
-                        <div class="form-group">
-                            {{ form_label(registrationForm.plainPassword.first) }}
-                            {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
-                            {{ form_errors(registrationForm.plainPassword.first) }}
-                        </div>
+                    <div class="form-group">
+                        {{ form_label(registrationForm.birthDate) }}
+                        {{ form_widget(registrationForm.birthDate, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.birthDate) }}
+                    </div>
+                </div>
 
-                        <div class="form-group">
-                            {{ form_label(registrationForm.plainPassword.second) }}
-                            {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
-                            {{ form_errors(registrationForm.plainPassword.second) }}
-                        </div>
+                <span class="line-separator"></span>
 
-                        <div class="form-group file-input-wrapper">
-                            {{ form_label(registrationForm.profilePicture) }}
+                <div class="right-container">
+                    <div class="form-group">
+                        {{ form_label(registrationForm.email) }}
+                        {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.email) }}
+                    </div>
 
-                            {{ form_widget(registrationForm.profilePicture, {
-                                'attr': {
-                                    'class': 'file-input',
-                                    'id': 'profilePicture',
-                                }
-                            }) }}
+                    <div class="form-group">
+                        {{ form_label(registrationForm.plainPassword.first) }}
+                        {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.plainPassword.first) }}
+                    </div>
 
-                            <label for="profilePicture" class="custom-file-label">
-                                Choisir une photo…
+                    <div class="form-group">
+                        {{ form_label(registrationForm.plainPassword.second) }}
+                        {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.plainPassword.second) }}
+                    </div>
+
+                    <div class="form-group file-input-wrapper">
+                        {{ form_label(registrationForm.profilePicture) }}
+                        {{ form_widget(registrationForm.profilePicture, {
+                            'attr': {
+                                'class': 'file-input',
+                                'id': 'profilePicture',
+                            }
+                        }) }}
+
+                        <label for="profilePicture" class="custom-file-label">
+                            Choisir une photo…
+                        </label>
+
+                        <span class="file-name">Aucun fichier sélectionné</span>
+
+                        {{ form_errors(registrationForm.profilePicture) }}
+                    </div>
+
+                    <div class="right-bottom">
+                        <div class="agree-terms">
+                            <label class="agree-terms__label">
+                                {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'agree-terms__checkbox'}, 'label': false}) }}
+                                <span class="custom-checkbox"></span>
+                                <span class="agree-terms__text">
+                                    J’accepte les conditions générales.
+                                </span>
                             </label>
 
-                            <span class="file-name">Aucun fichier sélectionné</span>
-
-                            {{ form_errors(registrationForm.profilePicture) }}
+                            {{ form_errors(registrationForm.agreeTerms) }}
                         </div>
 
-                        <div class="right-bottom">
-                            <div class="agree-terms">
-                                <label class="agree-terms__label">
-                                    {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'agree-terms__checkbox'}, 'label': false}) }}
-                                    <span class="custom-checkbox"></span>
-                                    <span class="agree-terms__text">
-                                        J’accepte les conditions générales.
-                                    </span>
-                                </label>
+                        <div class="form-group">
+                            {{ form_widget(registrationForm.submit, {'attr': {'class': 'btn-create-account'}}) }}
+                        </div>
 
-                                {{ form_errors(registrationForm.agreeTerms) }}
-                            </div>
-
-                            <div class="form-group">
-                                {{ form_widget(registrationForm.submit, {'attr': {'class': 'btn-create-account'}}) }}
-                            </div>
-
-                            <div class="conteneur-login">
-                                <p>
-                                    Déjà inscrit ? <a href="{{ path('app_login') }}">
+                        <div class="conteneur-login">
+                            <p>
+                                Déjà inscrit ? 
+                                <a href="{{ path('app_login')|e('html_attr') }}">
                                     Connectez-vous ici
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon-arrow" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <svg xmlns="https://www.w3.org/2000/svg" class="icon-arrow" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                         <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                         <line x1="17" y1="7" x2="7" y2="17" />
                                         <polyline points="8 7 17 7 17 16" />
-                                    </svg></a>
-                                </p>
-                            </div>
+                                    </svg>
+                                </a>
+                            </p>
                         </div>
                     </div>
-
                 </div>
 
-            {{ form_end(registrationForm) }}
+            </div>
 
+            {{ form_end(registrationForm) }}
         </div>
     </div>
 
     {% block javascripts %}
         <script src="{{ asset('js/fileInputPreview.js') }}"></script>
     {% endblock %}
-
 {% endblock %}

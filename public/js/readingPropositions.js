@@ -43,9 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const performSearch = debounce(() => {
-            const query = searchInput.value.trim();
+            const query = searchInput.value.trim().toLowerCase();
             if (query.length < 2) {
                 booksGrid.innerHTML = '<p>Tapez au moins 2 caractères...</p>';
+                validerBtn.disabled = true;
                 return;
             }
 
@@ -60,23 +61,43 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     data.forEach(book => {
+                        // Création card
                         const card = document.createElement('div');
                         card.className = 'book-card';
                         card.dataset.title = book.title.toLowerCase();
-                        card.innerHTML = `
-                            <div class="checkbox-container">
-                                <input type="radio" name="selectedBook" value="${book.id}">
-                            </div>
-                            <img src="${book.cover}" alt="${book.title}">
-                            <p class="book-title">${book.title}</p>
-                            <p class="book-author">${book.author}</p>
-                        `;
-                        booksGrid.appendChild(card);
-                    });
 
-                    // Activer bouton valider quand un radio est sélectionné
-                    booksGrid.querySelectorAll('input[name="selectedBook"]').forEach(cb => {
-                        cb.addEventListener('change', () => validerBtn.disabled = false);
+                        // Checkbox
+                        const checkboxDiv = document.createElement('div');
+                        checkboxDiv.className = 'checkbox-container';
+                        const radio = document.createElement('input');
+                        radio.type = 'radio';
+                        radio.name = 'selectedBook';
+                        radio.value = book.id;
+                        checkboxDiv.appendChild(radio);
+                        card.appendChild(checkboxDiv);
+
+                        // Image
+                        const img = document.createElement('img');
+                        img.src = book.cover;
+                        img.alt = book.title;
+                        card.appendChild(img);
+
+                        // Titre
+                        const titleP = document.createElement('p');
+                        titleP.className = 'book-title';
+                        titleP.textContent = book.title; // safe
+                        card.appendChild(titleP);
+
+                        // Auteur
+                        const authorP = document.createElement('p');
+                        authorP.className = 'book-author';
+                        authorP.textContent = book.author; // safe
+                        card.appendChild(authorP);
+
+                        booksGrid.appendChild(card);
+
+                        // Écoute radio pour activer validerBtn
+                        radio.addEventListener('change', () => validerBtn.disabled = false);
                     });
                 })
                 .catch(err => console.error('Erreur recherche :', err));

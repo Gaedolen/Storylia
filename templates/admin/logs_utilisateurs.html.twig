@@ -23,9 +23,9 @@
                 <tbody>
                     {% for log in logs %}
                         <tr>
-                            <td>{{ log.userId }}</td>
-                            <td>{{ log.action }}</td>
-                            <td>{{ log.details }}</td>
+                            <td>{{ log.userId|e }}</td>
+                            <td>{{ log.action|e }}</td>
+                            <td>{{ log.details|e }}</td>
                             <td>{{ log.createdAt|date('d/m/Y H:i') }}</td>
                         </tr>
                     {% endfor %}

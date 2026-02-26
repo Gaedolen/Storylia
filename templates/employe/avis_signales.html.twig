@@ -32,12 +32,12 @@
                     {% for review in avis %}
                         {% set report = review.reports|first %}
                         <tr>
-                            <td>{{ review.book.title }}</td>
-                            <td>{{ review.utilisateur.pseudo }}</td>
+                            <td>{{ review.book.title|e }}</td>
+                            <td>{{ review.utilisateur.pseudo|e }}</td>
                             <td>{{ review.rating }}/5</td>
-                            <td>{{ review.comment }}</td>
-                            <td>{% if report %}{{ report.author.pseudo }}{% else %}-{% endif %}</td>
-                            <td>{% if report %}{{ report.message }}{% else %}-{% endif %}</td>
+                            <td>{{ review.comment|e }}</td>
+                            <td>{% if report %}{{ report.author.pseudo|e }}{% else %}-{% endif %}</td>
+                            <td>{% if report %}{{ report.message|e }}{% else %}-{% endif %}</td>
                             <td class="admin-actions">
                                 <form method="POST" action="{{ path('employe_avis_valider', {'id': review.id}) }}" style="display:inline;">
                                     <input type="hidden" name="_token" value="{{ csrf_token('valider_avis_' ~ review.id) }}">
@@ -64,7 +64,6 @@
                 </tbody>
             </table>
         {% endif %}
-
 
     </div>
 {% endblock %}

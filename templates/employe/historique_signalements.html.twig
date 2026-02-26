@@ -23,7 +23,7 @@
 
         <div>
             <label>Utilisateur :</label>
-            <input type="text" name="user" value="{{ searchUser }}" placeholder="Pseudo…">
+            <input type="text" name="user" value="{{ searchUser|e }}" placeholder="Pseudo…">
         </div>
 
         <button type="submit" class="btn btn-primary">Filtrer</button>
@@ -46,10 +46,10 @@
             {% for report in reports %}
                 <tr>
                     <td>{{ report.id }}</td>
-                    <td>{{ report.reported.pseudo }}</td>
-                    <td>{{ report.author.pseudo }}</td>
-                    <td>{{ report.reason }}</td>
-                    <td>{{ report.message }}</td>
+                    <td>{{ report.reported.pseudo|e }}</td>
+                    <td>{{ report.author.pseudo|e }}</td>
+                    <td>{{ report.reason|e }}</td>
+                    <td>{{ report.message|e }}</td>
                     <td>
                         {% if report.status == 'traite' %}
                             <span class="badge badge-green">Traité</span>

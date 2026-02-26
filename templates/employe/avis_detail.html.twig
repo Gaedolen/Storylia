@@ -15,20 +15,23 @@
     <!-- Bloc Avis -->
     <div class="card review-card">
         <h2>Avis</h2>
-        <p><strong>Auteur :</strong> {{ review.utilisateur.pseudo }}</p>
+        <p><strong>Auteur :</strong> {{ review.utilisateur.pseudo|e }}</p>
         <p><strong>Note :</strong> {{ review.rating }}/5</p>
-        <p><strong>Commentaire :</strong><br>{{ review.comment }}</p>
+        <p><strong>Commentaire :</strong><br>{{ review.comment|e }}</p>
 
         {% set report = review.reports|first %}
         {% if report %}
+            {% set allowedStatuses = ['en_cours', 'traite', 'refuse'] %}
+            {% set statusClass = report.status in allowedStatuses ? report.status : 'inconnu' %}
+
             <div class="report-section">
                 <h3>Signalement</h3>
-                <p><strong>Signalé par :</strong> {{ report.author.pseudo }}</p>
+                <p><strong>Signalé par :</strong> {{ report.author.pseudo|e }}</p>
                 <p><strong>Date :</strong> {{ report.date|date('d/m/Y H:i') }}</p>
-                <p><strong>Raison :</strong> {{ report.reason }}</p>
-                <p><strong>Commentaire :</strong> {{ report.message }}</p>
+                <p><strong>Raison :</strong> {{ report.reason|e }}</p>
+                <p><strong>Commentaire :</strong> {{ report.message|e }}</p>
                 <p><strong>Statut :</strong> 
-                    <span class="badge-status {{ report.status }}">{{ report.status|capitalize }}</span>
+                    <span class="badge-status {{ statusClass }}">{{ report.status|capitalize }}</span>
                 </p>
             </div>
         {% endif %}
@@ -38,10 +41,11 @@
     <div class="card book-card">
         <h2>Livre concerné</h2>
         <div class="book-content">
-            <img src="{{ review.book.cover }}" alt="{{ review.book.title }}">
+            <img src="{{ asset('uploads/books/' ~ review.book.cover)|e('html_attr') }}"
+                alt="{{ review.book.title|e }}">
             <div class="book-info">
-                <p><strong>Titre :</strong> {{ review.book.title }}</p>
-                <p><strong>Auteur :</strong> {{ review.book.author.name }}</p>
+                <p><strong>Titre :</strong> {{ review.book.title|e }}</p>
+                <p><strong>Auteur :</strong> {{ review.book.author.name|e }}</p>
                 <p><strong>Genre(s) :</strong> 
                     {% for genre in review.book.genres %}
                         {{ genre }}{% if not loop.last %}, {% endif %}
@@ -49,7 +53,7 @@
                 </p>
                 <div class="summary">
                     <h3>Résumé</h3>
-                    <p>{{ review.book.summary }}</p>
+                    <p>{{ review.book.summary|e }}</p>
                 </div>
             </div>
         </div>

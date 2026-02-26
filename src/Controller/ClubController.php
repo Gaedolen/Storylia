@@ -456,18 +456,19 @@ class ClubController extends AbstractController
 
     #[Route('/club/{clubId}/proposer-livre/{month}', name: 'club_proposer_livre')]
     #[IsGranted('ROLE_USER')]
-    public function proposerLivre(Request $request, int $clubId, string $month, EntityManagerInterface $em, BookRepository $bookRepo, ClubRepository $clubRepo): Response {
-
+    public function proposerLivre(Request $request, int $clubId, string $month, EntityManagerInterface $em, BookRepository $bookRepo, ClubRepository $clubRepo): Response 
+    {
         /** @var Utilisateur $user */
         $user = $this->getUser();
 
-
+        // --- Vérification club et membership ---
         $club = $clubRepo->find($clubId);
         if (!$club) throw $this->createNotFoundException('Club non trouvé');
         if (!$club->getMembres()->contains($user) && $club->getCreator() !== $user) {
             throw $this->createAccessDeniedException('Vous devez être membre du club.');
         }
 
+        // --- Récupérer ou créer le mois de lecture ---
         $readingMonth = $club->getReadingMonths()->filter(fn($rm) => $rm->getMonth() === $month)->first();
         if (!$readingMonth) {
             $readingMonth = new ClubReadingMonth();
@@ -476,15 +477,18 @@ class ClubController extends AbstractController
             $em->persist($readingMonth);
         }
 
-        // Vérifier si l'utilisateur a déjà proposé ce mois
-        $existingProposal = $readingMonth->getBookProposals()
-            ->filter(fn($p) => $p->getProposer()->getId() === $user->getId())
-            ->first();
-
-        $canPropose = !$readingMonth->getBookProposals()
+        // --- Vérification si l'utilisateur a déjà proposé ---
+        $hasProposed = $readingMonth->getBookProposals()
             ->exists(fn($key, $p) => $p->getProposer()->getId() === $user->getId());
 
+        // --- Vérification si l'utilisateur a déjà voté ---
+        $hasVoted = $em->getRepository(Vote::class)
+            ->findOneBy(['utilisateur' => $user, 'clubReadingMonth' => $readingMonth]) !== null;
 
+        // --- Peut proposer ? ---
+        $canPropose = !$hasProposed && !$hasVoted;
+
+        // --- POST : proposer un livre ---
         if ($request->isMethod('POST')) {
             $monthNormalized = $month;
 
@@ -496,7 +500,7 @@ class ClubController extends AbstractController
             }
 
             if (!$canPropose) {
-                $this->addFlash('error', 'Vous avez déjà proposé un livre ce mois.');
+                $this->addFlash('error', 'Vous ne pouvez plus proposer de livre pour ce mois.');
                 return $this->redirectToRoute('club_propositions', ['id' => $clubId]);
             }
 
@@ -519,7 +523,7 @@ class ClubController extends AbstractController
             return $this->redirectToRoute('club_propositions', ['id' => $clubId]);
         }
 
-        // AJAX modal
+        // --- AJAX modal ---
         if ($request->isXmlHttpRequest()) {
             $books = $bookRepo->findBy([], ['title' => 'ASC'], 10);
             return $this->render('club/proposition_modal.html.twig', [

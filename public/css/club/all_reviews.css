@@ -27,9 +27,9 @@ body {
 
 .book-left {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    width: 40%;
+    width: 50%;
 }
 
 .book-cover {
@@ -37,13 +37,14 @@ body {
     max-width: 250px;
     border-radius: 5px;
     margin-bottom: 20px;
+    margin-right: 10px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .book-meta h2 {
     color: #714B2F;
     margin-bottom: 10px;
-    text-align: center;
+    text-align: flex-start;
 }
 
 .book-meta p {

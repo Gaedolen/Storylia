@@ -61,18 +61,18 @@
                     {% set club = report.reportedClub %}
                     <tr>
                         <td>
-                            {{ report.reportedClub.name }}
+                            {{ report.reportedClub.name|e }}
                             {% if club.status == 'actif' %}
                                 <span class="badge badge-green">Actif</span>
                             {% else %}
                                 <span class="badge badge-red">Inactif</span>
                             {% endif %}
                         </td>
-                        <td>{{ report.reportedClub.creator.pseudo }}</td>
-                        <td>{{ report.author.pseudo }}</td>
-                        <td>{{ report.transmittedBy ? report.transmittedBy.pseudo : '-' }}</td>
-                        <td>{{ report.reason }}</td>
-                        <td>{{ report.employeMessage }}</td>
+                        <td>{{ report.reportedClub.creator.pseudo|e }}</td>
+                        <td>{{ report.author.pseudo|e }}</td>
+                        <td>{{ report.transmittedBy ? report.transmittedBy.pseudo|e : '-' }}</td>
+                        <td>{{ report.reason|e }}</td>
+                        <td>{{ report.employeMessage|e }}</td>
                         <td>{{ report.date|date('d/m/Y H:i') }}</td>
                         <td>
                             {% if report.status == 'traite' %}

@@ -46,7 +46,7 @@
                         <td class="td-user">
                             {% if userReported %}
                                 <a href="{{ path('app_utilisateur_profil', {'id': userReported.id}) }}">
-                                    {{ userReported.pseudo }}
+                                    {{ userReported.pseudo|e }}
                                 </a>
                                 <button type="button"
                                         class="btn btn-contact"
@@ -62,14 +62,14 @@
 
                         <td>
                             {% if userReported %}
-                                {{ userReported.email }}
+                                {{ userReported.email|e }}
                             {% else %}
                                 -
                             {% endif %}
                         </td>
                         <td class="td-user">
                             <a href="{{ path('app_utilisateur_profil', {'id': report.author.id}) }}">
-                                {{ report.author.pseudo }}
+                                {{ report.author.pseudo|e }}
                             </a>
                             <button type="button"
                                     class="btn btn-contact"
@@ -81,15 +81,15 @@
                         </td>
                         <td>
                             {% if report.transmittedBy %}
-                                {{ report.transmittedBy.pseudo }}
+                                {{ report.transmittedBy.pseudo|e }}
                             {% else %}
                                 -
                             {% endif %}
                         </td>
-                        <td>{{ reasons[report.reason]|default(report.reason) }}</td>
+                        <td>{{ reasons[report.reason]|default(report.reason)|e }}</td>
                         <td class="message-employe">
                             {% if report.employeMessage %}
-                                {{ report.employeMessage }}
+                                {{ report.employeMessage|e }}
                             {% else %}
                                 -
                             {% endif %}

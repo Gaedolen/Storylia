@@ -57,7 +57,7 @@
                             {% if rm.book %}
                                 <a href="{{ path('app_livre_detail', {'id': rm.book.id}) }}">
                                     <div class="book-card selected">
-                                        <img src="{{ rm.book.cover|default('images/default_cover.jpg') }}" alt="{{ rm.book.title }}">
+                                        <img src="{{ (rm.book.cover|default('images/default_cover.jpg'))|replace({'http://':'https://'})|e('html_attr') }}" alt="{{ rm.book.title }}">
                                         <p class="book-title">{{ rm.book.title }}</p>
                                         <p class="book-author">{{ rm.book.author.name }}</p>
                                     </div>
@@ -69,7 +69,7 @@
                                 {% set book = proposal.book %}
                                 <a href="{{ path('app_livre_detail', {'id': book.id}) }}">
                                     <div class="book-card {{ rm.book and book.id == rm.book.id ? 'selected' : '' }}">
-                                        <img src="{{ book.cover|default('images/default_cover.jpg') }}" alt="{{ book.title }}">
+                                        <img src="{{ (book.cover|default('images/default_cover.jpg'))|replace({'http://':'https://'})|e('html_attr') }}" alt="{{ book.title }}">
                                         <p class="book-title">{{ book.title }}</p>
                                         <p class="book-author">{{ book.author.name }}</p>
                                     </div>

@@ -35,7 +35,7 @@
                 <tr>
                     <td>{{ report.id }}</td>
                     <td>
-                        {{ report.reported.pseudo }}
+                        {{ report.reported.pseudo|e }}
                         <button
                             type="button"
                             class="btn-contact"
@@ -47,7 +47,7 @@
                         </button>
                     </td>
                     <td>
-                        {{ report.author.pseudo }}
+                        {{ report.author.pseudo|e }}
                         <button
                             type="button"
                             class="btn-contact"
@@ -59,8 +59,8 @@
                         </button>
                     </td>
                     </td>
-                    <td>{{ report.reason }}</td>
-                    <td>{{ report.message }}</td>
+                    <td>{{ report.reason|e }}</td>
+                    <td>{{ report.message|e }}</td>
                     <td>{{ report.date|date('d/m/Y') }}</td>
                     <td>
                         {% if report.isEnCours() %}
@@ -160,10 +160,11 @@
     </div>
 
     {% block javascripts %}
-        <script src="{{ asset('js/utilisateurs_signales.js') }}"></script>
         {{ parent() }}
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        <script src="{{ asset('js/utilisateurs_signales.js') }}"></script>
+
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const $el = $('.user-select');

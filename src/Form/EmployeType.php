@@ -84,7 +84,7 @@ class EmployeType extends AbstractType
             if ($data && $data->getBirthDate()) {
                 $age = (new \DateTime())->diff($data->getBirthDate())->y;
                 if ($age < 18) {
-                    $form->get('dateNaissance')->addError(new FormError("L'employé doit avoir au moins 18 ans."));
+                    $form->get('birthDate')->addError(new FormError("L'employé doit avoir au moins 18 ans."));
                 }
             }
         });

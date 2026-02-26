@@ -520,6 +520,7 @@ h2, h3 {
     margin: 0;
     font-weight: 600;
     color: #4b3426;
+    text-decoration: none;
 }
 
 .livres-count {
@@ -530,8 +531,12 @@ h2, h3 {
 
 /* ======= UTILISATEURS ======= */
 .utilisateur-card {
-    justify-content: flex-start; /* au lieu de space-between */
+    justify-content: flex-start;
     gap: 12px;
+    flex-direction: row;
+    background-color: #E8CBAE;
+    border-radius: 25px;
+    padding :10px;
 }
 
 .utilisateur-avatar {

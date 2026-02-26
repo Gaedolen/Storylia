@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block body %}
-<h1>Modifier le livre : {{ book.title }}</h1>
+<h1>Modifier le livre : {{ book.title|e }}</h1>
 
 <div class="livre-edit-container">
 
@@ -18,46 +18,46 @@
         <!-- Bloc détails du livre -->
         <div class="livre-details">
             <h2>Détails du livre</h2>
-            <img src="{{ asset(book.cover) }}" alt="Cover" style="width: 100%; max-width: 200px; margin-bottom: 1rem;">
-            <p><strong>Titre :</strong> {{ book.title }}</p>
+            <img src="{{ asset(book.cover)|e('html_attr') }}" alt="{{ book.title|e }}" style="width: 100%; max-width: 200px; margin-bottom: 1rem;">
+            <p><strong>Titre :</strong> {{ book.title|e }}</p>
             {% if book.voTitle %}
-                <p><strong>Titre VO :</strong> {{ book.voTitle }}</p>
+                <p><strong>Titre VO :</strong> {{ book.voTitle|e }}</p>
             {% endif %}
-            <p><strong>Auteur :</strong> {{ book.author.name }}</p>
+            <p><strong>Auteur :</strong> {{ book.author.name|e }}</p>
             {% if book.publicationDate %}
                 <p><strong>Date de publication :</strong> {{ book.publicationDate|date('d/m/Y') }}</p>
             {% endif %}
             {% if book.genres %}
-                <p><strong>Genres :</strong> {{ book.genres|join(', ') }}</p>
+                <p><strong>Genres :</strong> {{ book.genres|map(g => g|e)|join(', ') }}</p>
             {% endif %}
             {% if book.subjects %}
-                <p><strong>Sujets :</strong> {{ book.subjects|join(', ') }}</p>
+                <p><strong>Sujets :</strong> {{ book.subjects|map(s => s|e)|join(', ') }}</p>
             {% endif %}
             {% if book.summary %}
-                <p><strong>Résumé :</strong> {{ book.summary }}</p>
+                <p><strong>Résumé :</strong> {{ book.summary|e }}</p>
             {% endif %}
             {% if book.isbn %}
-                <p><strong>ISBN :</strong> {{ book.isbn }}</p>
+                <p><strong>ISBN :</strong> {{ book.isbn|e }}</p>
             {% endif %}
             {% if book.pages %}
                 <p><strong>Pages :</strong> {{ book.pages }}</p>
             {% endif %}
             {% if book.publishers %}
-                <p><strong>Éditeurs :</strong> {{ book.publishers|join(', ') }}</p>
+                <p><strong>Éditeurs :</strong> {{ book.publishers|map(p => p|e)|join(', ') }}</p>
             {% endif %}
             {% if book.format %}
-                <p><strong>Format :</strong> {{ book.format }}</p>
+                <p><strong>Format :</strong> {{ book.format|e }}</p>
             {% endif %}
         </div>
 
         <!-- Bloc signalement -->
         <div class="signalement-block">
             <h2>Signalement</h2>
-            <p><strong>Émis par :</strong> {{ report.author.pseudo }}</p>
+            <p><strong>Émis par :</strong> {{ report.author.pseudo|e }}</p>
             <p><strong>Date :</strong> {{ report.date|date('d/m/Y H:i') }}</p>
-            <p><strong>Raison :</strong> {{ report.reason }}</p>
+            <p><strong>Raison :</strong> {{ report.reason|e }}</p>
             {% if report.message %}
-                <p><strong>Message :</strong> {{ report.message }}</p>
+                <p><strong>Message :</strong> {{ report.message|e }}</p>
             {% endif %}
         </div>
 

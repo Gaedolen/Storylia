@@ -26,7 +26,7 @@
             <input
                 type="text"
                 name="club"
-                value="{{ searchClub }}"
+                value="{{ searchClub|e }}"
                 placeholder="Nom du club…"
             >
         </div>
@@ -52,20 +52,20 @@
             <tr>
                 <td>{{ report.id }}</td>
 
-                <td>{{ report.reportedClub.name }}</td>
+                <td>{{ report.reportedClub.name|e }}</td>
 
                 <td>
                     {% if report.reportedClub.creator is not null %}
-                        {{ report.reportedClub.creator.pseudo }}
+                        {{ report.reportedClub.creator.pseudo|e }}
                     {% else %}
                         <span style="color:#999;">—</span>
                     {% endif %}
                 </td>
 
-                <td>{{ report.author.pseudo }}</td>
+                <td>{{ report.author.pseudo|e }}</td>
 
-                <td>{{ report.reason }}</td>
-                <td>{{ report.message }}</td>
+                <td>{{ report.reason|e }}</td>
+                <td>{{ report.message|e }}</td>
 
                 <td>
                     {% if report.status == 'traite' %}

@@ -112,7 +112,7 @@
         <div class="livre-container">
 
             <div class="livre-infos">
-                <img src={{ book.cover }} alt="{{ book.title }}">
+                <img src="{{ book.cover|replace({'http://':'https://'})|e('html_attr') }}" alt="{{ book.title }}">
 
                 <div class="livre-details">
                     <h2>{{ book.title }}</h2>
@@ -318,7 +318,7 @@
                         <div class="review-user">
                             <a href="{{ path('app_utilisateur_profil', {'id': review.utilisateur.id}) }}" class="user-card">
                                 <img
-                                    src="{{ asset('uploads/profiles/' ~ review.utilisateur.profilePicture) }}"
+                                    src="{{ asset('uploads/profiles/' ~ review.utilisateur.profilePicture)|e('html_attr') }}"
                                     alt="Photo {{ review.utilisateur.pseudo }}"
                                 >
                                 <span class="review-username">

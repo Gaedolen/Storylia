@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const messagesContainer = document.querySelector('.messages');
     const form = document.querySelector('.messenger-form');
     const textarea = form.querySelector('textarea[name="content"]');
-    const receiverId = form.querySelector('input[name="receiver_id"]').value;
 
     // ===== Fonction pour charger les messages =====
     async function loadMessages() {
@@ -22,19 +21,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 const isMine = (msg.sender_id == appUser);
                 div.className = 'message ' + (isMine ? 'sender' : 'receiver');
 
-                div.innerHTML = `
-                    <div class="message-pseudo">
-                        ${msg.sender}
-                    </div>
+                // Création sécurisée des éléments
+                const pseudoDiv = document.createElement('div');
+                pseudoDiv.className = 'message-pseudo';
+                pseudoDiv.textContent = msg.sender;
 
-                    <div class="message-bubble">
-                        ${msg.content}
-                    </div>
+                const bubbleDiv = document.createElement('div');
+                bubbleDiv.className = 'message-bubble';
+                bubbleDiv.textContent = msg.content;
 
-                    <small class="message-date">
-                        ${msg.createdAt}
-                    </small>
-                `;
+                const dateSmall = document.createElement('small');
+                dateSmall.className = 'message-date';
+                dateSmall.textContent = msg.createdAt;
+
+                div.appendChild(pseudoDiv);
+                div.appendChild(bubbleDiv);
+                div.appendChild(dateSmall);
 
                 messagesContainer.appendChild(div);
             });
@@ -49,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ===== Rafraîchissement automatique =====
     loadMessages(); // premier chargement
-    setInterval(loadMessages, 2000); // toutes les 2 secondes
+    const refreshInterval = setInterval(loadMessages, 2000); // toutes les 2 secondes
 
     // ===== Envoi du message en AJAX =====
     form.addEventListener('submit', async function (e) {
@@ -60,7 +62,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const formData = new FormData();
         formData.append('content', content);
-        formData.append('receiver_id', receiverId);
 
         try {
             const res = await fetch('/messagerie/envoyer', {

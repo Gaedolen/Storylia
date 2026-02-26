@@ -9,7 +9,7 @@
                     <div class="checkbox-container">
                         <input type="radio" name="selectedBook" value="{{ book.id }}">
                     </div>
-                    <img src="{{ book.cover|replace({'http://':'https://'}) }}" alt="{{ book.title }}">
+                    <img src="{{ book.cover|replace({'http://':'https://'})|e('html_attr') }}" alt="{{ book.title }}">
                     <p class="book-title">{{ book.title }}</p>
                     <p class="book-author">{{ book.author.name }}</p>
                 </div>

@@ -31,7 +31,7 @@ class ProfilController extends AbstractController
         $utilisateur = $this->getUser();
         $currentUser = $utilisateur;
         $isSelf = true;
-
+        $hasReported = $em->getRepository(Report::class)->hasUserReported($currentUser, $utilisateur);
 
         // Mapping des préférences
         $preferenceLabels = [
@@ -106,6 +106,7 @@ class ProfilController extends AbstractController
             'utilisateur' => $utilisateur,
             'currentUser' => $this->getUser(),
             'isSelf' => $isSelf,
+            'hasReported' => $hasReported,
         ]);
     }
 
