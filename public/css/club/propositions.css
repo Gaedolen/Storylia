@@ -280,24 +280,24 @@ button:disabled {
     /* Bloc titre + bouton proposer */
     .header-title-proposer {
         display: flex;
-        align-items: center;          /* bouton collé verticalement */
-        justify-content: flex-start;  /* reste à gauche */
-        gap: 10px;                    /* petit espace entre titre et bouton */
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
         width: 100%;
     }
 
     .propositions-header h1 {
         font-size: 1.6rem;
         margin: 0;
-        white-space: nowrap;           /* empêcher retour à la ligne du titre */
+        white-space: nowrap;
     }
 
     .propositions-header button.btn-primary {
-        white-space: nowrap;           /* texte bouton sur une seule ligne */
-        flex-shrink: 0;                /* ne pas rétrécir */
-        max-width: none;               /* autoriser largeur selon contenu */
-        padding: 6px 12px;             /* réduit un peu pour rester sur une ligne */
-        font-size: 0.95rem;            /* légèrement plus petit */
+        white-space: nowrap;
+        flex-shrink: 0;
+        max-width: none;
+        padding: 6px 12px;
+        font-size: 0.95rem;
     }
 
     /* Mois / blocs */
@@ -461,7 +461,6 @@ button:disabled {
 }
 
 @media (max-width: 480px) {
-
     /* Header : bouton retour au-dessus */
     .propositions-header {
         display: flex;
@@ -485,7 +484,7 @@ button:disabled {
         justify-content: flex-start;
         gap: 6px;
         width: 100%;
-        flex-wrap: wrap; /* si manque de place, bouton passe à la ligne */
+        flex-wrap: wrap;
     }
 
     .propositions-header h1 {
@@ -514,7 +513,6 @@ button:disabled {
         font-size: 0.85rem;
     }
 
-    /* Grille livres : 1 colonne */
     .books-grid {
         grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
         gap: 6px;
@@ -532,7 +530,6 @@ button:disabled {
         font-size: 0.65rem;
     }
 
-    /* Modal responsive compacte */
     .modal {
         padding: 6px;
         overflow-y: auto;

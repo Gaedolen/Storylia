@@ -322,7 +322,6 @@ textarea {
         font-size: 11px;
     }
 
-    /* Préférences → 1 colonne mobile */
     .preferences-grid {
         grid-template-columns: 1fr 1fr;
         gap: 8px;
@@ -332,7 +331,6 @@ textarea {
         gap: 8px;
     }
 
-    /* Checkbox un peu plus grandes pour mobile */
     .pref-item input[type="checkbox"] {
         width: 20px;
         height: 20px;
@@ -342,7 +340,6 @@ textarea {
         font-size: 14px;
     }
 
-    /* Bouton */
     .btn-create-club {
         font-size: 16px;
         padding: 12px;

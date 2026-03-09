@@ -115,7 +115,7 @@ class ClubController extends AbstractController
         $form = $this->createForm(ClubType::class, $club);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) { 
             // Gestion de l'upload de la photo
             $photoFile = $form->get('photo')->getData();
             if ($photoFile) {
@@ -127,8 +127,6 @@ class ClubController extends AbstractController
 
             $em->persist($club);
             $em->flush();
-
-            $this->addFlash('success', 'Le club a été créé avec succès !');
 
             return $this->redirectToRoute('club_index');
         }
@@ -636,7 +634,7 @@ class ClubController extends AbstractController
         $maxVotes = -1;
 
         foreach ($proposals as $proposal) {
-            $votesCount = count($proposal->getVotes()); // Assure-toi que getVotes() existe
+            $votesCount = count($proposal->getVotes());
             if ($votesCount > $maxVotes) {
                 $maxVotes = $votesCount;
                 $leadingProposalId = $proposal->getId();

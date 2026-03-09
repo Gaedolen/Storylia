@@ -5,7 +5,7 @@
 [![Symfony](https://img.shields.io/badge/Symfony-5.10.4-blue)](https://symfony.com/)
 [![PHP](https://img.shields.io/badge/PHP-8.2.12-brightgreen)](https://www.php.net/)
 [![License](https://img.shields.io/badge/License-MIT-lightgrey)](LICENSE)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)](https://www.postgresql.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17.6-blue)](https://www.postgresql.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-latest-brightgreen)](https://www.mongodb.com/)
 [![Heroku](https://img.shields.io/badge/Heroku-deploy-purple)](https://www.heroku.com/)
 
@@ -26,6 +26,16 @@ L'objectif est de permettre la création de communautés livresques facilement, 
 - [Licence](#licence)
 
 ---
+
+## Environnement de développement
+- OS : Windows 10 (22H2)
+- IDE : Visual Studio Code
+- PHP : 8.2.12
+- Symfony : 5.10.4
+- PostgreSQL : 17.6
+- MongoDB : dernière version stable
+- Git : 2.47.1
+- Node.js : 20.17.0
 
 ## Fonctionnalités
 

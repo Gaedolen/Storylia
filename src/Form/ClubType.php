@@ -22,6 +22,9 @@ class ClubType extends AbstractType
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
+                'attr' => [
+                    'maxlength' => 1000
+                ],
             ])
             ->add('preferences', ChoiceType::class, [
                 'label' => 'Vos préférences de lecture',
