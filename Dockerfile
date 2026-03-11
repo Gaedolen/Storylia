@@ -40,3 +40,7 @@ EXPOSE 80
 
 # === Commande pour démarrer Apache ===
 CMD ["apache2-foreground"]
+
+RUN a2dismod mpm_event mpm_worker || true
+RUN a2enmod mpm_prefork
+RUN a2enmod rewrite
