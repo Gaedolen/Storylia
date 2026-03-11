@@ -1,9 +1,7 @@
+# === Image de base PHP avec Apache ===
 FROM php:8.2-apache
 
-# Activer le module rewrite
-RUN a2enmod rewrite
-
-# Installer dépendances système et extensions PHP
+# === Installation des dépendances système ===
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -11,32 +9,34 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     libzip-dev \
     zip \
-    && docker-php-ext-install intl pdo pdo_pgsql zip
-
-# Installer MongoDB
-RUN pecl install mongodb \
+    && docker-php-ext-install intl pdo pdo_pgsql zip \
+    && pecl install mongodb \
     && docker-php-ext-enable mongodb
 
-# Copier Composer depuis l'image officielle
+# === Composer ===
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Définir le répertoire de travail
+# === Définir le répertoire de travail ===
 WORKDIR /var/www/html
 
-# Copier le projet
+# === Copier le code source ===
 COPY . .
 
-# Installer les dépendances PHP
+# === Installer les dépendances PHP sans scripts post-install (évite cache:clear qui peut planter) ===
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-# Corriger le MPM Apache (important pour éviter le crash)
-RUN a2dismod mpm_prefork mpm_worker && a2enmod mpm_event
-
-# Permissions
+# === Permissions ===
 RUN chown -R www-data:www-data /var/www/html
 
-# Exposer le port 80
+# === Modules Apache ===
+RUN a2enmod rewrite
+
+# === Désactiver les MPMs conflictuels et activer mpm_event ===
+RUN a2dismod mpm_prefork mpm_worker || true
+RUN a2enmod mpm_event
+
+# === Exposer le port 80 ===
 EXPOSE 80
 
-# Lancer Apache
+# === Commande pour démarrer Apache ===
 CMD ["apache2-foreground"]
