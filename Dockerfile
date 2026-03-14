@@ -26,8 +26,14 @@ RUN echo '<VirtualHost *:80>\n\
 
 RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
           /etc/apache2/mods-enabled/mpm_*.conf \
-    && a2enmod mpm_prefork rewrite
+          /etc/apache2/mods-available/mpm_event.load \
+          /etc/apache2/mods-available/mpm_event.conf \
+          /etc/apache2/mods-available/mpm_worker.load \
+          /etc/apache2/mods-available/mpm_worker.conf \
+    && ln -s /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.load \
+    && ln -s /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/mpm_prefork.conf \
+    && a2enmod rewrite
 
 EXPOSE 80
 
-CMD ["bash", "-lc", "a2dismod mpm_event mpm_worker || true && a2enmod mpm_prefork && apache2-foreground"]
+CMD ["apache2-foreground"]
