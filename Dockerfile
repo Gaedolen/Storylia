@@ -36,4 +36,4 @@ RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
 
 EXPOSE 80
 
-CMD ["apache2-foreground"]
+CMD ["sh", "-c", "ls /etc/apache2/mods-enabled/mpm_* && apache2-foreground"]
