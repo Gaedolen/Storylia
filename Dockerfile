@@ -30,4 +30,4 @@ RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
 
 EXPOSE 80
 
-CMD ["apache2-foreground"]
+CMD ["bash", "-lc", "a2dismod mpm_event mpm_worker || true && a2enmod mpm_prefork && apache2-foreground"]
