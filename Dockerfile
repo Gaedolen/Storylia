@@ -22,7 +22,7 @@ WORKDIR /var/www/html
 # === Copier le code source ===
 COPY . .
 
-# === Installer les dépendances PHP sans scripts post-install (évite cache:clear qui peut planter) ===
+# === Installer les dépendances PHP sans scripts post-install ===
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 # === Permissions ===
@@ -31,16 +31,12 @@ RUN chown -R www-data:www-data /var/www/html
 # === Modules Apache ===
 RUN a2enmod rewrite
 
-# === Désactiver les MPMs conflictuels et activer mpm_event ===
-RUN a2dismod mpm_prefork mpm_worker || true
-RUN a2enmod mpm_event
+# === Désactiver les MPM conflictuels et activer mpm_prefork ===
+RUN a2dismod mpm_event mpm_worker || true
+RUN a2enmod mpm_prefork
 
 # === Exposer le port 80 ===
 EXPOSE 80
 
 # === Commande pour démarrer Apache ===
 CMD ["apache2-foreground"]
-
-RUN a2dismod mpm_event mpm_worker || true
-RUN a2enmod mpm_prefork
-RUN a2enmod rewrite
